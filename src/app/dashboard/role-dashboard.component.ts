@@ -2,7 +2,6 @@ import { Component, inject, OnInit, ViewContainerRef, Type } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { SuperadminDashboardComponent } from './superadmin-dashboard/superadmin-dashboard.component';
 import { ManagerDashboardComponent } from './manager-dashboard/manager-dashboard.component';
-import { TaDashboardComponent } from './ta-dashboard/ta-dashboard.component';
 import { VendorDashboardComponent } from './vendor-dashboard/dashboard.component';
 import { AuthStore } from '../services/auth.store';
 
@@ -29,10 +28,8 @@ export class RoleDashboardComponent implements OnInit {
         component = SuperadminDashboardComponent;
         break;
       case 'MANAGER':
-        component = ManagerDashboardComponent;
-        break;
       case 'TALENT_ACQUISITION':
-        component = TaDashboardComponent;
+        component = ManagerDashboardComponent;
         break;
       case 'VENDOR':
         component = VendorDashboardComponent;

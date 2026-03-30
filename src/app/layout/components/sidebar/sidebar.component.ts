@@ -280,6 +280,13 @@ export class SidebarComponent implements OnInit {
           notificationCategory: 'APPLICATION',
         },
         {
+          label: 'Interviews',
+          route: '/interviews',
+          icon: 'bi bi-calendar-event',
+          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'VENDOR'],
+          orgTypes: ['SOLVENTEK', 'VENDOR'],
+        },
+        {
           label: 'Track Applications',
           route: '/track-applications',
           icon: 'bi bi-list-check',

@@ -25,6 +25,8 @@ export interface Interview {
   type: InterviewType;
   status: InterviewStatus;
   meetingLink: string;
+  schedulingNotes?: string;
+  ccUsers?: any[]; // Collection of User objects
   feedback?: string;
   rating?: number;
   createdAt?: string;
@@ -38,4 +40,6 @@ export interface ScheduleInterviewRequest {
   durationMinutes: number;
   type: InterviewType;
   meetingLink?: string;
+  ccUserIds?: number[];
+  schedulingNotes?: string;
 }

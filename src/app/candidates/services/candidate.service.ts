@@ -4,6 +4,7 @@ import { Candidate } from '../models/candidate.model';
 import { Observable } from 'rxjs';
 import { JobApplication } from '../../models/application.model';
 import { Interview } from '../../models/interview.model';
+import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 
 @Injectable({
   providedIn: 'root',
@@ -79,5 +80,9 @@ export class CandidateService {
 
   getCandidateInterviews(id: string): Observable<Interview[]> {
     return this.api.get<Interview[]>(`${this.BASE_URL}/${id}/interviews`);
+  }
+
+  getDashboardStats(id: string): Observable<DashboardStatsResponse> {
+    return this.api.get<DashboardStatsResponse>(`${this.BASE_URL}/${id}/dashboard-stats`);
   }
 }

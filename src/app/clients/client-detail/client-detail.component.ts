@@ -6,11 +6,13 @@ import { Client } from '../../models/client.model';
 import { ProjectService } from '../../services/project.service';
 import { Project } from '../../models/project.model';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
+import { HubDashboardBannerComponent } from '../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
+import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 
 @Component({
   selector: 'app-client-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, OrganizationLogoComponent],
+  imports: [CommonModule, RouterLink, OrganizationLogoComponent, HubDashboardBannerComponent],
   template: `
     <div class="space-y-6 animate-fade-in" *ngIf="client() as c">
       <!-- Breadcrumb & Back -->
@@ -22,6 +24,9 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
           <i class="bi bi-arrow-left mr-1"></i> Back to Clients
         </a>
       </div>
+
+      <!-- Dashboard Banner -->
+      <app-hub-dashboard-banner [stats]="dashboardStats()?.stats || []"></app-hub-dashboard-banner>
 
       <!-- Header Banner -->
       <div class="card-modern p-6 md:p-8 relative overflow-hidden">
@@ -242,6 +247,7 @@ export class ClientDetailComponent implements OnInit {
   private projectService = inject(ProjectService);
 
   client = signal<Client | undefined>(undefined);
+  dashboardStats = signal<DashboardStatsResponse | null>(null);
   clientProjects = signal<Project[]>([]);
 
   activeProjectsCount = computed(() => {
@@ -261,6 +267,11 @@ export class ClientDetailComponent implements OnInit {
   loadClient(id: string | number) {
     this.clientService.getClientById(id).subscribe((client: Client) => {
       this.client.set(client);
+    });
+
+    this.clientService.getDashboardStats(id).subscribe({
+        next: stats => this.dashboardStats.set(stats),
+        error: err => console.error('Failed to load dashboard stats', err)
     });
   }
 

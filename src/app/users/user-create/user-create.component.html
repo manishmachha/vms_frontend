@@ -124,33 +124,22 @@
             </div>
           </div>
 
-          <!-- Vendor Selection (Only for VENDOR type) -->
-          <div class="space-y-2" *ngIf="userForm.get('type')?.value === 'VENDOR'">
-            <label class="block text-sm font-semibold text-gray-700 ml-1">Associated Vendor</label>
+          <!-- Organization Selection -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">
+              {{ userForm.get('type')?.value === 'VENDOR' ? 'Associated Vendor' : 'Organization (Optional)' }}
+            </label>
             <div class="relative group">
-              <i class="bi bi-shop absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors z-10"></i>
-              <select 
-                formControlName="vendorId" 
-                class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
-              >
-                <option [value]="null">Select Vendor...</option>
-                <option *ngFor="let vendor of vendors" [value]="vendor.id">{{ vendor.name }}</option>
-              </select>
-              <i class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-            </div>
-          </div>
-
-          <!-- Internal Organization Selection (Optional for SOLVENTEK type) -->
-          <div class="space-y-2" *ngIf="userForm.get('type')?.value === 'SOLVENTEK'">
-            <label class="block text-sm font-semibold text-gray-700 ml-1 pl-1 pr-1">Organization (Optional)</label>
-            <div class="relative group">
-              <i class="bi bi-building-gear absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors z-10"></i>
+              <i [class]="userForm.get('type')?.value === 'VENDOR' ? 'bi bi-shop' : 'bi bi-building-gear'" 
+                 class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors z-10"></i>
               <select 
                 formControlName="organizationId" 
                 class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
               >
-                <option [value]="null">Select Organization (Default to Solventek)...</option>
-                <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
+                <option [value]="null">Select {{ userForm.get('type')?.value === 'VENDOR' ? 'Vendor' : 'Organization (Default to Solventek)' }}...</option>
+                <option *ngFor="let org of (userForm.get('type')?.value === 'VENDOR' ? vendors : organizations)" [value]="org.id">
+                  {{ org.name }}
+                </option>
               </select>
               <i class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
             </div>

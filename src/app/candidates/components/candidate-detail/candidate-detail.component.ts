@@ -14,6 +14,8 @@ import { JobApplication } from '../../../models/application.model';
 import { Interview } from '../../../models/interview.model';
 import { Subscription, interval } from 'rxjs';
 import { startWith, switchMap } from 'rxjs/operators';
+import { HubDashboardBannerComponent } from '../../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
+import { DashboardStatsResponse } from '../../../models/dashboard-stats.model';
 
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
 import { LoadingModalComponent } from '../../../layout/components/loading-modal/loading-modal.component';
@@ -32,9 +34,13 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
     LoadingModalComponent,
     ConfirmModalComponent,
     ClientSubmissionsComponent,
+    HubDashboardBannerComponent,
   ],
   template: `
     <div class="container mx-auto px-4 py-8" *ngIf="candidate()">
+      <!-- Dashboard Banner -->
+      <app-hub-dashboard-banner [stats]="dashboardStats()?.stats || []"></app-hub-dashboard-banner>
+
       <!-- Header Card -->
       <div
         class="bg-linear-to-r from-indigo-50 to-rose-50 rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-6 relative overflow-hidden group"
@@ -858,6 +864,7 @@ export class CandidateDetailComponent implements OnInit {
   public authStore = inject(AuthStore);
 
   candidate = signal<Candidate | null>(null);
+  dashboardStats = signal<DashboardStatsResponse | null>(null);
   brandedResume = signal<BrandedResume | null>(null);
   applications = signal<JobApplication[]>([]);
   interviews = signal<Interview[]>([]);
@@ -902,6 +909,14 @@ export class CandidateDetailComponent implements OnInit {
           if (this.applications().length === 0) this.loadApplications(c.id);
           if (this.interviews().length === 0) this.loadInterviews(c.id);
           
+          // Load dashboard stats
+          if (!this.dashboardStats()) {
+            this.candidateService.getDashboardStats(c.id).subscribe({
+              next: stats => this.dashboardStats.set(stats),
+              error: err => console.error('Failed to load dashboard stats', err)
+            });
+          }
+
           if (!this.brandedResume()) {
             this.loadBrandedResume(c.id);
           } else if (this.brandedResume()?.status === 'GENERATING') {

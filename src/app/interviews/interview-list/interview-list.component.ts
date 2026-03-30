@@ -1,0 +1,289 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { InterviewService } from '../../services/interview.service';
+import { Interview } from '../../models/interview.model';
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  selector: 'app-interview-list',
+  standalone: true,
+  imports: [CommonModule, RouterLink, FormsModule, MatIconModule],
+  template: `
+    <div class="space-y-6 animate-fade-in pb-10">
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Interview Pipeline</h2>
+          <p class="text-gray-500 text-sm mt-1">Manage and track candidate evaluation schedules</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="relative group">
+            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors"></i>
+            <input 
+              type="text" 
+              [(ngModel)]="searchQuery"
+              (input)="onSearch()"
+              placeholder="Search interviews..."
+              class="pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-2xl w-full md:w-80 shadow-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-hidden transition-all text-sm"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats / Bento Grid Mini -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-indigo-600 p-5 rounded-3xl text-white shadow-lg overflow-hidden relative group">
+          <div class="relative z-10">
+            <p class="text-indigo-100 text-[10px] font-bold uppercase tracking-wider mb-1">Total Scheduled</p>
+            <p class="text-3xl font-black">{{ totalInterviews() }}</p>
+          </div>
+          <i class="bi bi-calendar-check absolute -right-4 -bottom-4 text-7xl text-white/10 group-hover:scale-110 transition-transform duration-500"></i>
+        </div>
+        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-emerald-100 transition-colors">
+          <div>
+            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Upcoming Today</p>
+            <p class="text-2xl font-bold text-gray-900">{{ todayCount() }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="bi bi-clock-history text-xl"></i>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-amber-100 transition-colors">
+          <div>
+            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Awaiting Feedback</p>
+            <p class="text-2xl font-bold text-gray-900">{{ awaitingFeedbackCount() }}</p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="bi bi-chat-left-text text-xl"></i>
+          </div>
+        </div>
+        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-purple-100 transition-colors">
+          <div>
+            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Pass Rate</p>
+            <p class="text-2xl font-bold text-gray-900">{{ passRate() }}%</p>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="bi bi-graph-up-arrow text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+        <button 
+          *ngFor="let tab of tabs"
+          (click)="setActiveTab(tab.id)"
+          [class]="'shrink-0 px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all duration-300 ' + 
+                  (activeTab() === tab.id ? 'bg-gray-900 text-white shadow-md' : 'bg-white text-gray-500 hover:bg-gray-50 border border-gray-100')"
+        >
+          {{ tab.label }}
+          <span class="ml-2 px-1.5 py-0.5 rounded-lg text-[10px] bg-white/20" *ngIf="activeTab() === tab.id">
+            {{ filteredInterviews().length }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Interview Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" *ngIf="!loading(); else loader">
+        <div 
+          *ngFor="let interview of filteredInterviews()"
+          class="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 overflow-hidden group flex flex-col sm:flex-row"
+        >
+          <!-- Date / Time Strip -->
+          <div [class]="'sm:w-32 flex flex-col items-center justify-center p-4 text-center border-b sm:border-b-0 sm:border-r border-gray-50 transition-colors ' + getDateBg(interview)">
+            <p class="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-1">{{ interview.scheduledAt | date:'MMM' }}</p>
+            <p class="text-3xl font-black leading-none mb-1">{{ interview.scheduledAt | date:'dd' }}</p>
+            <p class="text-[10px] font-bold opacity-60 uppercase">{{ interview.scheduledAt | date:'EEEE' }}</p>
+            <div class="mt-4 px-2 py-1 rounded-lg bg-black/5 flex items-center justify-center gap-1">
+              <i class="bi bi-clock text-[10px]"></i>
+              <span class="text-[10px] font-bold">{{ interview.scheduledAt | date:'shortTime' }}</span>
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="flex-1 p-5 lg:p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <h4 class="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    {{ interview.application?.candidate?.firstName }} {{ interview.application?.candidate?.lastName }}
+                  </h4>
+                  <p class="text-sm font-medium text-gray-500">{{ interview.application?.job?.title }}</p>
+                </div>
+                <span [class]="'px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-xs ' + getStatusClass(interview)">
+                  {{ interview.status }}
+                </span>
+              </div>
+
+              <div class="flex flex-wrap gap-4 text-sm text-gray-600">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center">
+                    <i class="bi bi-patch-check text-indigo-500 text-sm"></i>
+                  </div>
+                  <span class="text-xs font-semibold">{{ interview.type.replace('_', ' ') }}</span>
+                </div>
+                <div class="flex items-center gap-1.5" *ngIf="interview.interviewer">
+                  <div class="w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center">
+                    <i class="bi bi-person-video2 text-indigo-500 text-sm"></i>
+                  </div>
+                  <span class="text-xs font-semibold">{{ interview.interviewer.firstName || 'Assigned' }} {{ interview.interviewer.lastName || 'Interviewer' }}</span>
+                </div>
+                <!-- CC & Notes Quick Indicators -->
+                <div class="flex items-center gap-2 ml-auto">
+                  <span *ngIf="interview.ccUsers && interview.ccUsers.length > 0" class="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[10px] font-bold border border-blue-100" title="CC Users">
+                    <i class="bi bi-people-fill"></i>
+                    {{ interview.ccUsers.length }}
+                  </span>
+                  <span *ngIf="interview.schedulingNotes" class="flex items-center justify-center w-6 h-6 rounded-md bg-amber-50 text-amber-600 border border-amber-100" title="Has Scheduling Notes">
+                    <i class="bi bi-journal-text text-xs"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 flex items-center gap-3">
+              <a 
+                [routerLink]="['/interviews', interview.id]"
+                class="flex-1 py-2 rounded-xl bg-gray-900 text-white text-xs font-bold text-center hover:bg-gray-800 transition-colors shadow-sm"
+              >
+                View Details
+              </a>
+              <a 
+                *ngIf="interview.meetingLink"
+                [href]="interview.meetingLink" 
+                target="_blank"
+                class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+              >
+                <i class="bi bi-camera-video"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #loader>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div *ngFor="let i of [1,2,3,4]" class="h-48 bg-gray-100 rounded-3xl animate-pulse"></div>
+        </div>
+      </ng-template>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading() && filteredInterviews().length === 0" class="flex flex-col items-center justify-center py-20 text-center opacity-40">
+        <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mb-4">
+          <i class="bi bi-calendar-x text-4xl"></i>
+        </div>
+        <p class="text-lg font-bold">No interviews found</p>
+        <p class="text-sm">Try adjusting your filters or search query</p>
+      </div>
+    </div>
+  `
+})
+export class InterviewListComponent implements OnInit {
+  private interviewService = inject(InterviewService);
+
+  loading = signal(true);
+  searchQuery = '';
+  activeTab = signal('upcoming');
+  interviews = signal<Interview[]>([]);
+  filteredInterviews = signal<Interview[]>([]);
+  
+  // Stats
+  totalInterviews = signal(0);
+  todayCount = signal(0);
+  awaitingFeedbackCount = signal(0);
+  passRate = signal(0);
+
+  tabs = [
+    { id: 'upcoming', label: 'Upcoming' },
+    { id: 'completed', label: 'Completed' },
+    { id: 'all', label: 'All Interviews' }
+  ];
+
+  ngOnInit() {
+    this.loadInterviews();
+  }
+
+  loadInterviews() {
+    this.loading.set(true);
+    this.interviewService.getAllInterviews().subscribe({
+      next: (res) => {
+        this.interviews.set(res || []);
+        this.updateStats(res || []);
+        this.applyFilters();
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false)
+    });
+  }
+
+  updateStats(data: Interview[]) {
+    this.totalInterviews.set(data.length);
+    
+    const today = new Date().toISOString().split('T')[0];
+    this.todayCount.set(data.filter(i => i.scheduledAt.startsWith(today)).length);
+    
+    this.awaitingFeedbackCount.set(
+      data.filter(i => i.status === 'COMPLETED' && !i.feedback).length
+    );
+
+    const completed = data.filter(i => i.feedback);
+    if (completed.length > 0) {
+      // Logic for pass rate could be added here if defined in data
+      this.passRate.set(75); // Mock
+    }
+  }
+
+  setActiveTab(id: string) {
+    this.activeTab.set(id);
+    this.applyFilters();
+  }
+
+  onSearch() {
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    let filtered = this.interviews();
+    const now = new Date();
+
+    // Tab Filter
+    if (this.activeTab() === 'upcoming') {
+      filtered = filtered.filter(i => new Date(i.scheduledAt) >= now && i.status !== 'CANCELLED');
+    } else if (this.activeTab() === 'completed') {
+      filtered = filtered.filter(i => i.status === 'COMPLETED');
+    }
+
+    // Search Query
+    if (this.searchQuery) {
+      const query = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(i => 
+        i.application?.candidate?.firstName.toLowerCase().includes(query) ||
+        i.application?.candidate?.lastName.toLowerCase().includes(query) ||
+        i.application?.job?.title.toLowerCase().includes(query)
+      );
+    }
+
+    this.filteredInterviews.set(filtered);
+  }
+
+  getDateBg(interview: Interview): string {
+    const isToday = new Date(interview.scheduledAt).toDateString() === new Date().toDateString();
+    if (isToday) return 'bg-indigo-600 text-white';
+    if (interview.status === 'COMPLETED') return 'bg-emerald-50 text-emerald-900';
+    if (interview.status === 'CANCELLED') return 'bg-red-50 text-red-900';
+    return 'bg-gray-50 text-gray-900';
+  }
+
+  getStatusClass(interview: Interview): string {
+    switch (interview.status) {
+      case 'SCHEDULED': return 'bg-blue-100 text-blue-700 border border-blue-200';
+      case 'COMPLETED': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+      case 'CANCELLED': return 'bg-red-100 text-red-700 border border-red-200';
+      case 'NO_SHOW': return 'bg-amber-100 text-amber-700 border border-amber-200';
+      default: return 'bg-gray-100 text-gray-700 border border-gray-200';
+    }
+  }
+}

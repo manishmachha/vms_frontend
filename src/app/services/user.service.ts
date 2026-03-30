@@ -38,8 +38,8 @@ export class UserService {
     return this.api.get<User>(`/v1/users/${userId}`);
   }
 
-  getUsersByVendor(vendorId: string | number) {
-    return this.api.get<User[]>(`/v1/users/vendor/${vendorId}`);
+  getUsersByOrganization(orgId: string | number) {
+    return this.api.get<User[]>(`/v1/users/organization/${orgId}`);
   }
 
   createUser(data: CreateEmployeeRequest) {

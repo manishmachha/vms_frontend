@@ -8,7 +8,6 @@ export interface AuthResponse {
   email: string;
   role: string;
   orgId?: number;
-  vendorId?: number;
   userType?: string;
 }
 
@@ -29,24 +28,13 @@ export interface User {
   status?: boolean;
   type?: string; // 'SOLVENTEK' | 'VENDOR'
   role?: string; // 'SUPER_ADMIN' | 'MANAGER' | 'TALENT_ACQUISITION' | 'VENDOR'
-  vendorId?: number;
   organizationId?: number;
-  orgId?: number; // legacy/alias used in some components
+  orgId?: number;
   createdAt?: string;
   updatedAt?: string;
 }
 
-// ===== Organization (matches backend OrganizationDto) =====
-export interface Organization {
-  id: number;
-  name: string;
-  type?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Organization moved to separate file
 
 // ===== Request types used by UserService =====
 export interface CreateEmployeeRequest {
@@ -57,7 +45,6 @@ export interface CreateEmployeeRequest {
   phone?: string;
   type?: string;
   role?: string;
-  vendorId?: number;
   organizationId?: number;
 }
 

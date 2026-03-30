@@ -51,8 +51,7 @@ export class AuthStore {
 
   // Derive orgType from user.type
   readonly orgType = computed(() => this.state().user?.type || null);
-  readonly organizationId = computed(() => this.state().user?.organizationId || this.state().user?.orgId);
-  readonly vendorId = computed(() => this.state().user?.vendorId || null);
+  readonly organizationId = computed(() => this.state().user?.organizationId || this.state().user?.orgId || null);
 
   readonly permissions = computed(() => {
     return [];
@@ -100,8 +99,8 @@ export class AuthStore {
       lastName: response.lastName,
       email: response.email,
       role: response.role,
+      organizationId: response.orgId,
       orgId: response.orgId,
-      vendorId: response.vendorId,
       type: response.userType,
     };
 

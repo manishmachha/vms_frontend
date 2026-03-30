@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { VendorService } from '../../services/vendor.service';
+import { OrganizationService } from '../../services/organization.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -29,7 +29,7 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class VendorCreateComponent {
   private fb = inject(FormBuilder);
-  private vendorService = inject(VendorService);
+  private organizationService = inject(OrganizationService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
 
@@ -47,7 +47,9 @@ export class VendorCreateComponent {
     if (this.vendorForm.invalid) return;
 
     this.loading = true;
-    this.vendorService.createVendor(this.vendorForm.value).subscribe({
+    const vendorData = { ...this.vendorForm.value, orgType: 'VENDOR' };
+
+    this.organizationService.createOrganization(vendorData).subscribe({
       next: (vendor) => {
         this.loading = false;
         this.snackBar.open('Vendor created successfully', 'Close', { duration: 3000 });

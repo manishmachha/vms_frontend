@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { Candidate } from '../candidates/models/candidate.model';
 import { Observable } from 'rxjs';
+import { DashboardStatsResponse } from '../models/dashboard-stats.model';
 
 @Injectable({
   providedIn: 'root',
@@ -40,5 +41,9 @@ export class CandidateService {
 
   downloadResume(id: string | number): Observable<Blob> {
     return this.api.download(`${this.BASE_URL}/${id}/resume`);
+  }
+
+  getDashboardStats(id: string | number): Observable<DashboardStatsResponse> {
+    return this.api.get<DashboardStatsResponse>(`${this.BASE_URL}/${id}/dashboard-stats`);
   }
 }

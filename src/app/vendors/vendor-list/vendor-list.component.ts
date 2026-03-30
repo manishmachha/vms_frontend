@@ -2,8 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { VendorService } from '../../services/vendor.service';
-import { Vendor } from '../../models/vendor.model';
+import { OrganizationService } from '../../services/organization.service';
+import { Vendor } from '../../models/organization.model';
 import { HeaderService } from '../../services/header.service';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { NotificationService } from '../../services/notification.service';
@@ -95,7 +95,7 @@ import { NotificationService } from '../../services/notification.service';
               <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
                 <i class="bi bi-building text-gray-500"></i>
               </div>
-              <span class="text-gray-600">{{ vendor.type }}</span>
+              <span class="text-gray-600">{{ vendor.orgType }}</span>
             </div>
             <div class="flex items-center gap-3 text-sm">
               <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -150,7 +150,7 @@ import { NotificationService } from '../../services/notification.service';
   `,
 })
 export class VendorListComponent implements OnInit {
-  vendorService = inject(VendorService);
+  organizationService = inject(OrganizationService);
   headerService = inject(HeaderService);
   notificationService = inject(NotificationService);
 
@@ -180,12 +180,12 @@ export class VendorListComponent implements OnInit {
     });
   }
 
-  hasNotification(vendorId: number | string): boolean {
-    return this.unreadVendorIds.has(vendorId as number);
+  hasNotification(orgId: number | string): boolean {
+    return this.unreadVendorIds.has(orgId as number);
   }
 
   loadVendors() {
-    this.vendorService.getVendors().subscribe((data: Vendor[]) => {
+    this.organizationService.getVendors().subscribe((data: Vendor[]) => {
       // Sort: notified first
       const sorted = [...data].sort((a, b) => {
         const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
@@ -230,20 +230,20 @@ export class VendorListComponent implements OnInit {
 
   approve(id: number | string) {
     if (confirm('Approve this vendor?')) {
-      this.vendorService.approveVendor(id).subscribe(() => this.loadVendors());
+      this.organizationService.approveVendor(id).subscribe(() => this.loadVendors());
     }
   }
 
   reject(id: number | string) {
     if (confirm('Reject this vendor?')) {
-      this.vendorService.rejectVendor(id).subscribe(() => this.loadVendors());
+      this.organizationService.rejectVendor(id).subscribe(() => this.loadVendors());
     }
   }
 
   toggleStatus(vendor: Vendor, newStatus: string) {
     const action = newStatus === 'ACTIVE' ? 'activate' : 'deactivate';
     if (confirm(`Are you sure you want to ${action} this vendor?`)) {
-      this.vendorService.updateVendorStatus(vendor.id, newStatus).subscribe(() => {
+      this.organizationService.updateStatus(vendor.id, newStatus).subscribe(() => {
         this.loadVendors();
       });
     }

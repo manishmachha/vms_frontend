@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ApiService } from './api.service';
-import { Organization } from '../models/auth.model';
+import { ApiResponse, Organization, Vendor } from '../models/organization.model';
+import { DashboardStatsResponse } from '../models/dashboard-stats.model';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment.dev';
 import { map } from 'rxjs/operators';
-import { ApiResponse } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +16,10 @@ export class OrganizationService {
 
   getAllOrganizations(): Observable<Organization[]> {
     return this.api.get<Organization[]>('/v1/organizations');
+  }
+
+  getVendors(): Observable<Vendor[]> {
+    return this.api.get<Vendor[]>('/v1/organizations/type/VENDOR');
   }
 
   getOrganizationById(id: string | number): Observable<Organization> {
@@ -32,6 +36,19 @@ export class OrganizationService {
 
   deleteOrganization(id: string | number): Observable<void> {
     return this.api.delete<void>(`/v1/organizations/${id}`);
+  }
+
+  approveVendor(id: string | number): Observable<Organization> {
+    return this.api.post<Organization>(`/v1/organizations/${id}/approve`, {});
+  }
+
+  rejectVendor(id: string | number): Observable<Organization> {
+    return this.api.post<Organization>(`/v1/organizations/${id}/reject`, {});
+  }
+
+  updateStatus(id: string | number, status: string): Observable<Organization> {
+    const params = new HttpParams().set('status', status);
+    return this.api.put<Organization>(`/v1/organizations/${id}/status`, {}, undefined, params);
   }
 
   uploadLogo(id: string | number, file: File): Observable<Organization> {
@@ -57,5 +74,9 @@ export class OrganizationService {
     const formData = new FormData();
     formData.append('file', file);
     return this.api.post('/v1/organizations/handbook', formData);
+  }
+
+  getDashboardStats(id: string | number): Observable<DashboardStatsResponse> {
+    return this.api.get<DashboardStatsResponse>(`/v1/organizations/${id}/dashboard-stats`);
   }
 }

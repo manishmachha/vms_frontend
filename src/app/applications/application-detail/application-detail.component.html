@@ -1,6 +1,10 @@
 @if (application(); as app) {
   <div class="min-h-screen p-6">
     <div class="mx-auto space-y-6">
+      
+      <!-- Dashboard Banner -->
+      <app-hub-dashboard-banner [stats]="dashboardStats()?.stats || []"></app-hub-dashboard-banner>
+
       <!-- Header Profile Card -->
       <div class="card-modern p-6 md:p-8 relative overflow-hidden">
         <!-- Background Decoration -->
@@ -703,6 +707,22 @@
                         </div>
                       </div>
 
+                      <!-- CC Users -->
+                      <div class="flex flex-wrap gap-2 mb-4 px-1" *ngIf="interview.ccUsers?.length">
+                        <span class="text-xs text-gray-400 font-medium w-full mb-1">CC:</span>
+                        <span *ngFor="let cc of interview.ccUsers" class="px-2 py-0.5 rounded-md bg-gray-50 text-gray-600 text-[10px] font-bold border border-gray-100">
+                          {{ cc.firstName }} {{ cc.lastName }}
+                        </span>
+                      </div>
+
+                      <!-- Scheduling Notes -->
+                      <div class="bg-indigo-50/30 p-3 rounded-xl border border-indigo-100/50 mb-4" *ngIf="interview.schedulingNotes">
+                         <div class="flex items-start gap-2">
+                           <mat-icon class="text-indigo-400! icon-sm mt-0.5">notes</mat-icon>
+                           <p class="text-xs text-indigo-700 leading-relaxed italic">{{ interview.schedulingNotes }}</p>
+                         </div>
+                      </div>
+
                       <!-- Feedback Preview -->
                       <div class="bg-gray-50 p-4 rounded-xl border border-gray-100" *ngIf="interview.feedback">
                         <div class="flex justify-between items-center mb-2">
@@ -971,6 +991,21 @@
                 <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">videocam</mat-icon>
                 <input type="text" formControlName="meetingLink" placeholder="Zoom, Google Meet, Teams link..." class="input-modern pl-12 bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10">
               </div>
+            </div>
+
+            <div class="col-span-2">
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">CC Users (Solventek / Vendor)</label>
+              <select multiple formControlName="ccUserIds" class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 min-h-[100px]">
+                @for (user of potentialCcUsers(); track user.id) {
+                  <option [value]="user.id">{{ user.firstName }} {{ user.lastName }} ({{ user.type }})</option>
+                }
+              </select>
+              <p class="text-[10px] text-gray-500 mt-1 px-1">Hold Ctrl/Cmd to select multiple users</p>
+            </div>
+
+            <div class="col-span-2">
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Scheduling Notes</label>
+              <textarea formControlName="schedulingNotes" rows="3" placeholder="Add any specific instructions or notes for this interview..." class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 resize-none"></textarea>
             </div>
           </div>
 

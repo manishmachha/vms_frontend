@@ -19,8 +19,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BaseChartDirective } from 'ng2-charts';
-import { Subscription, interval } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
+import { forkJoin, of, Subscription, interval } from 'rxjs';
+import { startWith, switchMap, map, catchError } from 'rxjs/operators';
 
 import { ApplicationService } from '../../services/application.service';
 import { DialogService } from '../../services/dialog.service';
@@ -32,7 +32,11 @@ import { AuthStore } from '../../services/auth.store';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { ClientSubmissionsComponent } from '../../candidates/components/client-submissions/client-submissions.component';
 import { InterviewService } from '../../services/interview.service';
+import { UserService } from '../../services/user.service';
 import { Interview, InterviewType } from '../../models/interview.model';
+import { ChangeDetectorRef } from '@angular/core';
+import { HubDashboardBannerComponent } from '../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
+import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 
 @Component({
   selector: 'app-application-detail',
@@ -51,6 +55,7 @@ import { Interview, InterviewType } from '../../models/interview.model';
     BaseChartDirective,
     OrganizationLogoComponent,
     ClientSubmissionsComponent,
+    HubDashboardBannerComponent,
   ],
   templateUrl: './application-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -63,7 +68,9 @@ export class ApplicationDetailComponent implements OnInit {
   private brandedResumeService = inject(BrandedResumeService);
   private authStore = inject(AuthStore);
   private interviewService = inject(InterviewService);
+  private userService = inject(UserService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
 
   // Permission Signal
   // Permission Signals
@@ -92,6 +99,7 @@ export class ApplicationDetailComponent implements OnInit {
 
   // State Signals
   application = signal<JobApplication | null>(null);
+  dashboardStats = signal<DashboardStatsResponse | null>(null);
   brandedResume = signal<BrandedResume | null>(null);
   analysis = signal<any>(null);
   timeline = signal<any[]>([]);
@@ -105,11 +113,14 @@ export class ApplicationDetailComponent implements OnInit {
   // Interview State
   interviews = signal<Interview[]>([]);
   showScheduleModal = signal(false);
+  potentialCcUsers = signal<any[]>([]);
   scheduleForm = this.fb.group({
     scheduledAt: ['', Validators.required],
     durationMinutes: [30, [Validators.required, Validators.min(15)]],
     type: ['TECHNICAL' as InterviewType, Validators.required],
     meetingLink: [''],
+    ccUserIds: [[] as number[]],
+    schedulingNotes: [''],
   });
 
   // Documents
@@ -339,7 +350,7 @@ export class ApplicationDetailComponent implements OnInit {
         switchMap(() => this.appService.getLatestAnalysis(id))
       )
       .subscribe({
-        next: (res) => {
+        next: (res: any) => {
           if (res) {
             this.analysis.set(res);
             this.analysisPollingSub?.unsubscribe();
@@ -363,8 +374,45 @@ export class ApplicationDetailComponent implements OnInit {
         if (app.candidate?.id) {
           this.loadBrandedResume(app.candidate.id);
         }
+
+        // Load dashboard stats
+        this.appService.getDashboardStats(id).subscribe({
+          next: stats => this.dashboardStats.set(stats),
+          error: err => console.error('Failed to load dashboard stats', err)
+        });
+
+        if (app.candidate?.organization?.id) {
+          this.loadPotentialCcUsers(Number(app.candidate.organization.id));
+        } else {
+          this.loadPotentialCcUsers();
+        }
       },
       error: () => this.loading.set(false),
+    });
+  }
+
+  loadPotentialCcUsers(vendorOrgId?: number) {
+    const internalUsers$ = this.userService.getUsers().pipe(
+      map(res => (res as any).data || res),
+      catchError(() => of([]))
+    );
+    
+    const vendorUsers$ = vendorOrgId 
+      ? this.userService.getUsersByOrganization(vendorOrgId).pipe(
+          map(res => (res as any).data || res),
+          catchError(() => of([]))
+        )
+      : of([]);
+
+    forkJoin([internalUsers$, vendorUsers$]).pipe(
+      map(([internal, vendor]: [any[], any[]]) => {
+        const combined = [...internal, ...vendor];
+        const unique = Array.from(new Map(combined.map(u => [u.id, u])).values());
+        return unique;
+      })
+    ).subscribe((unique) => {
+      this.potentialCcUsers.set(unique);
+      this.cdr.markForCheck();
     });
   }
 
@@ -412,7 +460,7 @@ export class ApplicationDetailComponent implements OnInit {
     const request = {
       ...this.scheduleForm.value,
       applicationId: Number(appId),
-      interviewerId: 1, // Placeholder for now, should be selectable
+      interviewerId: this.authStore.user()?.id || 1, // Default to current user for now if no selector
     };
 
     this.interviewService.scheduleInterview(request).subscribe({
@@ -423,6 +471,8 @@ export class ApplicationDetailComponent implements OnInit {
         this.scheduleForm.reset({
           durationMinutes: 30,
           type: 'TECHNICAL',
+          ccUserIds: [],
+          schedulingNotes: ''
         });
       },
       error: (err) => {

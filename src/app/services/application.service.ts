@@ -6,6 +6,8 @@ import {
 } from '../models/application.model';
 import { Page } from '../models/page.model';
 import { HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { DashboardStatsResponse } from '../models/dashboard-stats.model';
 
 @Injectable({
   providedIn: 'root',
@@ -96,5 +98,7 @@ export class ApplicationService {
     return this.api.get<JobApplication>(`/applications/${id}`);
   }
 
-
+  getDashboardStats(id: string | number): Observable<DashboardStatsResponse> {
+    return this.api.get<DashboardStatsResponse>(`/applications/${id}/dashboard-stats`);
+  }
 }

@@ -1,4 +1,4 @@
-import { Organization } from './auth.model';
+import { Organization } from './organization.model';
 
 // ===== Job Status (matches backend JobStatus enum) =====
 export type JobStatus =

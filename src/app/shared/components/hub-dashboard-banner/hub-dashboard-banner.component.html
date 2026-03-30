@@ -1,0 +1,13 @@
+<div class="hub-banner">
+    @for (item of stats; track item.label) {
+        <div class="stat-card" [ngClass]="getAccentClass(item.label)" (click)="navigateTo(item.route)">
+            <div class="icon-wrapper">
+                <i [class]="'bi ' + item.icon"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-count">{{ item.count }}</span>
+                <span class="stat-label">{{ item.label }}</span>
+            </div>
+        </div>
+    }
+</div>

@@ -1,5 +1,5 @@
 import { Job } from './job.model';
-import { Vendor } from './vendor.model';
+import { Vendor } from './organization.model';
 
 // ===== JobApplication (matches backend JobApplication entity) =====
 export interface JobApplication {

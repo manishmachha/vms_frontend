@@ -2,7 +2,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
-import { VendorService } from '../../services/vendor.service';
 import { OrganizationService } from '../../services/organization.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,8 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { Vendor } from '../../models/vendor.model';
-import { Organization } from '../../models/auth.model';
+import { Organization, Vendor } from '../../models/organization.model';
 
 @Component({
   selector: 'app-user-create',
@@ -36,7 +34,6 @@ import { Organization } from '../../models/auth.model';
 export class UserCreateComponent implements OnInit {
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
-  private vendorService = inject(VendorService);
   private orgService = inject(OrganizationService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
@@ -52,8 +49,7 @@ export class UserCreateComponent implements OnInit {
     phone: [''],
     type: ['SOLVENTEK', [Validators.required]],
     role: ['', [Validators.required]],
-    vendorId: [null],
-    organizationId: [null]
+    organizationId: [null, [Validators.required]]
   });
 
   vendors: Vendor[] = [];
@@ -94,7 +90,6 @@ export class UserCreateComponent implements OnInit {
           phone: user.phone,
           type: user.type,
           role: user.role,
-          vendorId: user.vendorId,
           organizationId: user.organizationId || user.orgId
         });
         this.loading = false;
@@ -108,25 +103,23 @@ export class UserCreateComponent implements OnInit {
   }
 
   loadInitialData() {
-    this.vendorService.getVendors().subscribe(vendors => this.vendors = vendors);
-    this.orgService.getAllOrganizations().subscribe(orgs => this.organizations = orgs);
+    this.orgService.getAllOrganizations().subscribe(orgs => {
+      this.organizations = orgs;
+      this.vendors = orgs.filter(o => o.orgType === 'VENDOR');
+    });
   }
 
   setupTypeListener() {
     this.userForm.get('type')?.valueChanges.subscribe(type => {
       const roleControl = this.userForm.get('role');
-      const vendorIdControl = this.userForm.get('vendorId');
       
       if (type === 'VENDOR') {
         roleControl?.setValue('VENDOR');
         roleControl?.disable();
-        vendorIdControl?.setValidators([Validators.required]);
       } else {
         roleControl?.enable();
         roleControl?.setValue('');
-        vendorIdControl?.clearValidators();
       }
-      vendorIdControl?.updateValueAndValidity();
     });
   }
 

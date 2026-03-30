@@ -1,0 +1,143 @@
+.hub-banner {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.stat-card {
+    flex: 1;
+    min-width: 180px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border-color: #e2e8f0;
+}
+
+/* Base Accent Bar */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #cbd5e1;
+    transition: width 0.3s ease;
+}
+
+.stat-card:hover::before {
+    width: 6px;
+}
+
+.icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover .icon-wrapper {
+    transform: scale(1.1);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-count {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.075em;
+    font-weight: 600;
+    margin-top: 0.125rem;
+}
+
+/* Accent Colors */
+
+/* Indigo: Candidates */
+.accent-indigo::before { background: #6366f1; }
+.accent-indigo .icon-wrapper { background: #eef2ff; color: #4f46e5; }
+.accent-indigo:hover { border-color: #c7d2fe; }
+
+/* Emerald: Applications */
+.accent-emerald::before { background: #10b981; }
+.accent-emerald .icon-wrapper { background: #ecfdf5; color: #059669; }
+.accent-emerald:hover { border-color: #a7f3d0; }
+
+/* Blue: Jobs */
+.accent-blue::before { background: #3b82f6; }
+.accent-blue .icon-wrapper { background: #eff6ff; color: #2563eb; }
+.accent-blue:hover { border-color: #bfdbfe; }
+
+/* Rose: Interviews */
+.accent-rose::before { background: #f43f5e; }
+.accent-rose .icon-wrapper { background: #fff1f2; color: #e11d48; }
+.accent-rose:hover { border-color: #fecdd3; }
+
+/* Violet: Projects */
+.accent-violet::before { background: #8b5cf6; }
+.accent-violet .icon-wrapper { background: #f5f3ff; color: #7c3aed; }
+.accent-violet:hover { border-color: #ddd6fe; }
+
+/* Cyan: Clients */
+.accent-cyan::before { background: #06b6d4; }
+.accent-cyan .icon-wrapper { background: #ecfeff; color: #0891b2; }
+.accent-cyan:hover { border-color: #a5f3fc; }
+
+/* Slate: Vendors */
+.accent-slate::before { background: #64748b; }
+.accent-slate .icon-wrapper { background: #f1f5f9; color: #475569; }
+.accent-slate:hover { border-color: #cbd5e1; }
+
+/* Custom scrollbar for horizontal overflow */
+.hub-banner::-webkit-scrollbar {
+    height: 5px;
+}
+
+.hub-banner::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.hub-banner::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.hub-banner::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

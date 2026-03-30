@@ -6,7 +6,6 @@ import { ProjectService, UpdateStatusRequest } from '../../services/project.serv
 import { Project } from '../../models/project.model';
 import { Client } from '../../models/client.model';
 import { ClientService } from '../../services/client.service';
-import { Organization } from '../../models/auth.model';
 import { OrganizationService } from '../../services/organization.service';
 import { FormsModule } from '@angular/forms';
 import { HeaderService } from '../../services/header.service';

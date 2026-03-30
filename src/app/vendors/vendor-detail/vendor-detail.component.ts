@@ -5,9 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
-import { VendorService } from '../../services/vendor.service';
-import { Vendor } from '../../models/vendor.model';
-import { Organization } from '../../models/auth.model';
+import { Organization, Vendor } from '../../models/organization.model';
 import { HeaderService } from '../../services/header.service';
 import { AuthStore } from '../../services/auth.store';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
@@ -17,6 +15,8 @@ import { RouterLink } from '@angular/router';
 import { Job } from '../../models/job.model';
 import { DialogService } from '../../services/dialog.service';
 import { AuthService } from '../../services/auth.service';
+import { HubDashboardBannerComponent } from '../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
+import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 
 @Component({
   selector: 'app-vendor-detail',
@@ -29,6 +29,7 @@ import { AuthService } from '../../services/auth.service';
     OrganizationLogoComponent,
     FormsModule,
     RouterLink,
+    HubDashboardBannerComponent,
   ],
   template: `
     <div class=" mx-auto space-y-8 p-6">
@@ -37,6 +38,9 @@ import { AuthService } from '../../services/auth.service';
       </div>
 
       <ng-container *ngIf="vendor() as organization">
+        <!-- Dashboard Banner -->
+        <app-hub-dashboard-banner [stats]="dashboardStats()?.stats || []"></app-hub-dashboard-banner>
+
         <!-- Header Card -->
         <div
           class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center gap-6 relative overflow-hidden"
@@ -58,7 +62,7 @@ import { AuthService } from '../../services/auth.service';
           <div class="flex-1 min-w-0 z-10">
             <div class="flex items-center gap-3 mb-2 flex-wrap">
               <h1 class="text-3xl font-bold text-gray-900 truncate">{{ organization.name }}</h1>
-              <span class="badge badge-primary">{{ organization.type }}</span>
+              <span class="badge badge-primary">{{ organization.orgType }}</span>
               <span class="badge" [ngClass]="organization.status === 'ACTIVE' ? 'badge-success' : 'badge-danger'">
                 {{ organization.status }}
               </span>
@@ -288,7 +292,6 @@ import { AuthService } from '../../services/auth.service';
 })
 export class VendorDetailComponent implements OnInit {
   route = inject(ActivatedRoute);
-  vendorService = inject(VendorService);
   organizationService = inject(OrganizationService);
   headerService = inject(HeaderService);
   authStore = inject(AuthStore); // For permission check
@@ -297,6 +300,7 @@ export class VendorDetailComponent implements OnInit {
   authService = inject(AuthService);
 
   vendor = signal<any>(null);
+  dashboardStats = signal<DashboardStatsResponse | null>(null);
   loading = signal(true);
 
   // Public View State
@@ -342,14 +346,17 @@ export class VendorDetailComponent implements OnInit {
   loadVendor(id: string) {
     this.loading.set(true);
 
-    // User state managed by AuthStore
-
-    this.vendorService.getVendorById(id).subscribe({
+    this.organizationService.getOrganizationById(id).subscribe({
       next: (data) => {
         this.vendor.set(data);
 
+        // Fetch Stats
+        this.organizationService.getDashboardStats(id).subscribe({
+          next: stats => this.dashboardStats.set(stats),
+          error: err => console.error('Failed to load dashboard stats', err)
+        });
+
         // Fetch Public Jobs
-        // (getPublicJobs removed - not in organization service)
         this.jobs.set([]);
 
         this.loading.set(false);
@@ -369,7 +376,7 @@ export class VendorDetailComponent implements OnInit {
     if (v && v.status !== newStatus) {
       const confirmMsg = `Change organization status from ${v.status} to ${newStatus}?`;
       if (confirm(confirmMsg)) {
-        this.vendorService.updateVendorStatus(v.id, newStatus).subscribe({
+        this.organizationService.updateStatus(v.id, newStatus).subscribe({
           next: () => {
             this.loadVendor(String(v.id));
           },
