@@ -1,0 +1,187 @@
+<div class="min-h-screen bg-gray-50/50 p-4 md:p-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+      <a routerLink="/organization/users" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm">
+        <i class="bi bi-arrow-left text-xl"></i>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">{{ isEditMode() ? 'Edit User' : 'Create New User' }}</h1>
+        <p class="text-gray-500">{{ isEditMode() ? 'Update the details for this system user' : 'Add a new internal or vendor user to the platform' }}</p>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+      <div class="h-2 bg-linear-to-r from-indigo-600 to-purple-600"></div>
+      
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="p-6 md:p-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          
+          <!-- Basic Info Section -->
+          <div class="col-span-1 md:col-span-2 flex items-center gap-3 pb-2 border-b border-gray-50">
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+              <i class="bi bi-person text-lg"></i>
+            </div>
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Basic Information</h2>
+          </div>
+
+          <!-- First Name -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">First Name</label>
+            <div class="relative group">
+              <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+              <input 
+                type="text" 
+                formControlName="firstName" 
+                placeholder="John" 
+                class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all"
+              >
+            </div>
+          </div>
+
+          <!-- Last Name -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">Last Name</label>
+            <div class="relative group">
+              <i class="bi bi-person absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+              <input 
+                type="text" 
+                formControlName="lastName" 
+                placeholder="Doe" 
+                class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all"
+              >
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">Email address</label>
+            <div class="relative group">
+              <i class="bi bi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+              <input 
+                type="email" 
+                formControlName="email" 
+                placeholder="john.doe@company.com" 
+                class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all"
+              >
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">Phone Number</label>
+            <div class="relative group">
+              <i class="bi bi-telephone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+              <input 
+                type="tel" 
+                formControlName="phone" 
+                placeholder="+1 (555) 000-0000" 
+                class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all"
+              >
+            </div>
+          </div>
+
+          <!-- Role & Type Section -->
+          <div class="col-span-1 md:col-span-2 mt-4 flex items-center gap-3 pb-2 border-b border-gray-50">
+            <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+              <i class="bi bi-shield-check text-lg"></i>
+            </div>
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Role & Permissions</h2>
+          </div>
+
+          <!-- User Type -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">User Type</label>
+            <div class="relative group">
+              <i class="bi bi-building absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors z-10"></i>
+              <select 
+                formControlName="type" 
+                class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+              >
+                <option value="SOLVENTEK">Internal (Solventek)</option>
+                <option value="VENDOR">External (Vendor)</option>
+              </select>
+              <i class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Role -->
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">System Role</label>
+            <div class="relative group">
+              <i class="bi bi-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors z-10"></i>
+              <select 
+                formControlName="role" 
+                class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="" disabled>Select a role...</option>
+                <option *ngFor="let role of (userForm.get('type')?.value === 'SOLVENTEK' ? solventekRoles : [{value: 'VENDOR', label: 'Vendor Partner'}])" [value]="role.value">
+                  {{ role.label }}
+                </option>
+              </select>
+              <i class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Vendor Selection (Only for VENDOR type) -->
+          <div class="space-y-2" *ngIf="userForm.get('type')?.value === 'VENDOR'">
+            <label class="block text-sm font-semibold text-gray-700 ml-1">Associated Vendor</label>
+            <div class="relative group">
+              <i class="bi bi-shop absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors z-10"></i>
+              <select 
+                formControlName="vendorId" 
+                class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+              >
+                <option [value]="null">Select Vendor...</option>
+                <option *ngFor="let vendor of vendors" [value]="vendor.id">{{ vendor.name }}</option>
+              </select>
+              <i class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- Internal Organization Selection (Optional for SOLVENTEK type) -->
+          <div class="space-y-2" *ngIf="userForm.get('type')?.value === 'SOLVENTEK'">
+            <label class="block text-sm font-semibold text-gray-700 ml-1 pl-1 pr-1">Organization (Optional)</label>
+            <div class="relative group">
+              <i class="bi bi-building-gear absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors z-10"></i>
+              <select 
+                formControlName="organizationId" 
+                class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+              >
+                <option [value]="null">Select Organization (Default to Solventek)...</option>
+                <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
+              </select>
+              <i class="bi bi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Form Actions -->
+        <div class="mt-12 pt-8 border-t border-gray-100 flex items-center justify-end gap-4">
+          <a
+            routerLink="/organization/users"
+            class="px-8 py-3.5 text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            Cancel
+          </a>
+          <button
+            type="submit"
+            [disabled]="userForm.invalid || loading"
+            class="relative px-10 py-3.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-indigo-500/25 active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all overflow-hidden group"
+          >
+            <span *ngIf="!loading" class="flex items-center gap-2">
+              {{ isEditMode() ? 'Save Changes' : 'Create User' }}
+              <i class="bi bi-arrow-right-short text-xl group-hover:translate-x-1 transition-transform"></i>
+            </span>
+            <div *ngIf="loading" class="flex items-center gap-3">
+              <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span>Processing...</span>
+            </div>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

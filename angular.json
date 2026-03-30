@@ -2,11 +2,12 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
-    "vms-ui": {
+    "vms_ui": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -25,6 +26,7 @@
               }
             ],
             "styles": [
+              "src/material-theme.scss",
               "src/styles.css"
             ]
           },
@@ -56,10 +58,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "vms-ui:build:production"
+              "buildTarget": "vms_ui:build:production"
             },
             "development": {
-              "buildTarget": "vms-ui:build:development"
+              "buildTarget": "vms_ui:build:development"
             }
           },
           "defaultConfiguration": "development"

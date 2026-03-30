@@ -1,0 +1,131 @@
+<div class="min-h-screen bg-gray-50/50 p-4 md:p-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+      <a routerLink="/vendors" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm">
+        <i class="bi bi-arrow-left text-xl"></i>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Create New Vendor</h1>
+        <p class="text-gray-500">Register a new vendor partner in the system</p>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="grid grid-cols-1 gap-8">
+      
+      <div class="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden animate-fade-in-up">
+        <div class="h-2 bg-linear-to-r from-emerald-500 to-teal-600"></div>
+        
+        <form [formGroup]="vendorForm" (ngSubmit)="onSubmit()" class="p-6 md:p-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            
+            <div class="col-span-1 md:col-span-2 flex items-center gap-3 pb-2 border-b border-gray-50">
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="bi bi-shop text-lg"></i>
+              </div>
+              <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Business Details</h2>
+            </div>
+
+            <!-- Vendor Name -->
+            <div class="space-y-2 col-span-1 md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 ml-1">Vendor Name</label>
+              <div class="relative group">
+                <i class="bi bi-building absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></i>
+                <input 
+                  type="text" 
+                  formControlName="name" 
+                  placeholder="Global Talent Solutions" 
+                  class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                >
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700 ml-1">Business Email</label>
+              <div class="relative group">
+                <i class="bi bi-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></i>
+                <input 
+                  type="email" 
+                  formControlName="email" 
+                  placeholder="contact@vendor.com" 
+                  class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                >
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700 ml-1">Phone Number</label>
+              <div class="relative group">
+                <i class="bi bi-telephone absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></i>
+                <input 
+                  type="tel" 
+                  formControlName="phone" 
+                  placeholder="+1 (555) 000-0000" 
+                  class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                >
+              </div>
+            </div>
+
+            <!-- Website -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700 ml-1">Website</label>
+              <div class="relative group">
+                <i class="bi bi-globe absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></i>
+                <input 
+                  type="url" 
+                  formControlName="website" 
+                  placeholder="https://www.vendor.com" 
+                  class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                >
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="space-y-2 col-span-1 md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 ml-1">Business Address</label>
+              <div class="relative group">
+                <i class="bi bi-geo-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors"></i>
+                <textarea 
+                  formControlName="address" 
+                  rows="3" 
+                  placeholder="Street, City, State, ZIP" 
+                  class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all resize-none"
+                ></textarea>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Form Actions -->
+          <div class="mt-12 pt-8 border-t border-gray-100 flex items-center justify-end gap-4">
+            <a
+              routerLink="/vendors"
+              class="px-8 py-3.5 text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors"
+            >
+              Cancel
+            </a>
+            <button
+              type="submit"
+              [disabled]="vendorForm.invalid || loading"
+              class="relative px-10 py-3.5 bg-linear-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all overflow-hidden group"
+            >
+              <span *ngIf="!loading" class="flex items-center gap-2">
+                Create Vendor
+                <i class="bi bi-arrow-right-short text-xl group-hover:translate-x-1 transition-transform"></i>
+              </span>
+              <div *ngIf="loading" class="flex items-center gap-3">
+                <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>Processing...</span>
+              </div>
+            </button>
+          </div>
+        </form>
+      </div>
+
+
+    </div>
+  </div>
+</div>
