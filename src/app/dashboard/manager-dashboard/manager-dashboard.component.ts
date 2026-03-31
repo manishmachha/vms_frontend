@@ -53,7 +53,9 @@ interface RecentActivity {
           <h2 class="text-2xl font-bold text-gray-900">Operations Pulse</h2>
           <p class="text-gray-500">Real-time overview of workforce and recruitment</p>
         </div>
-        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div
+          class="hidden md:flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-100 shadow-sm"
+        >
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
           <span class="text-sm font-medium text-gray-600">Live System Status</span>
         </div>
@@ -69,26 +71,37 @@ interface RecentActivity {
         >
           <div class="relative z-10">
             <div class="flex items-center justify-between mb-3">
-              <div class="p-2 rounded-lg bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform">
+              <div
+                class="p-2 rounded-lg bg-white/20 backdrop-blur-sm group-hover:scale-110 transition-transform"
+              >
                 <i [class]="stat.icon + ' text-lg text-white'"></i>
               </div>
-              <span *ngIf="stat.trend" class="text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded backdrop-blur-sm">
+              <span
+                *ngIf="stat.trend"
+                class="text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded backdrop-blur-sm"
+              >
                 {{ stat.trend }}
               </span>
             </div>
-            <p class="text-xs font-semibold text-white/80 uppercase tracking-wider">{{ stat.label }}</p>
+            <p class="text-xs font-semibold text-white/80 uppercase tracking-wider">
+              {{ stat.label }}
+            </p>
             <p class="text-2xl font-bold text-white mt-1">
               {{ loading() ? '—' : stat.value }}
             </p>
           </div>
-          <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+          <div
+            class="absolute -right-4 -bottom-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700"
+          ></div>
         </a>
       </div>
 
       <!-- Main Insights Row -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Recruitment Funnel -->
-        <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col min-h-[300px]">
+        <div
+          class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col min-h-[300px]"
+        >
           <div class="flex items-center justify-between mb-8">
             <h3 class="font-bold text-gray-900 flex items-center gap-2">
               <div class="p-2 rounded-lg bg-indigo-50 text-indigo-600">
@@ -96,17 +109,32 @@ interface RecentActivity {
               </div>
               Recruitment Funnel
             </h3>
-            <span class="text-xs font-medium text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full uppercase tracking-wider">Active Pipeline</span>
+            <span
+              class="text-xs font-medium text-gray-400 bg-gray-50 px-2.5 py-1 rounded-full uppercase tracking-wider"
+              >Active Pipeline</span
+            >
           </div>
-          
+
           <div class="flex-1 flex items-center justify-between gap-2 px-4">
             <div *ngFor="let stage of funnelStages(); let i = index" class="flex-1 relative group">
-              <div class="text-center p-4 rounded-2xl transition-all duration-300 hover:shadow-lg border border-transparent hover:border-white"
-                   [style.background]="stage.bgColor">
-                <p class="text-3xl font-black mb-1 group-hover:scale-110 transition-transform" [style.color]="stage.color">{{ stage.count }}</p>
-                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-tighter">{{ stage.name }}</p>
+              <div
+                class="text-center p-4 rounded-2xl transition-all duration-300 hover:shadow-lg border border-transparent hover:border-white"
+                [style.background]="stage.bgColor"
+              >
+                <p
+                  class="text-3xl font-black mb-1 group-hover:scale-110 transition-transform"
+                  [style.color]="stage.color"
+                >
+                  {{ stage.count }}
+                </p>
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-tighter">
+                  {{ stage.name }}
+                </p>
               </div>
-              <div *ngIf="i < funnelStages().length - 1" class="absolute top-1/2 -right-1 transform -translate-y-1/2 z-10 hidden md:block">
+              <div
+                *ngIf="i < funnelStages().length - 1"
+                class="absolute top-1/2 -right-1 transform -translate-y-1/2 z-10 hidden md:block"
+              >
                 <div class="w-2 h-2 rounded-full bg-gray-200 border-2 border-white"></div>
               </div>
             </div>
@@ -122,11 +150,13 @@ interface RecentActivity {
             Source Analytics
           </h3>
           <div class="h-48 relative">
-            <canvas baseChart
+            <canvas
+              baseChart
               [data]="sourceChartData"
               [type]="'doughnut'"
               [options]="doughnutChartOptions"
-              class="w-full h-full">
+              class="w-full h-full"
+            >
             </canvas>
           </div>
         </div>
@@ -145,17 +175,21 @@ interface RecentActivity {
             </h3>
           </div>
           <div class="h-[280px]">
-            <canvas baseChart
+            <canvas
+              baseChart
               [data]="jobsChartData"
               [type]="'bar'"
               [options]="barChartOptions"
-              class="w-full h-full">
+              class="w-full h-full"
+            >
             </canvas>
           </div>
         </div>
 
         <!-- Recent Activity -->
-        <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+        <div
+          class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col"
+        >
           <h3 class="font-bold text-gray-900 mb-6 flex items-center gap-2">
             <div class="p-2 rounded-lg bg-amber-50 text-amber-600">
               <i class="bi bi-activity"></i>
@@ -163,9 +197,17 @@ interface RecentActivity {
             Recent Activity
           </h3>
           <div class="flex-1 space-y-5 overflow-y-auto max-h-[280px] custom-scrollbar pr-2">
-            <div *ngFor="let activity of recentActivities()" class="flex gap-4 group cursor-default">
+            <div
+              *ngFor="let activity of recentActivities()"
+              class="flex gap-4 group cursor-default"
+            >
               <div class="shrink-0">
-                <div [class]="'w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm transition-transform group-hover:rotate-12 ' + activity.iconBg">
+                <div
+                  [class]="
+                    'w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm transition-transform group-hover:rotate-12 ' +
+                    activity.iconBg
+                  "
+                >
                   <i [class]="activity.icon"></i>
                 </div>
               </div>
@@ -177,7 +219,10 @@ interface RecentActivity {
                 <p class="text-xs text-gray-500 line-clamp-1">{{ activity.description }}</p>
               </div>
             </div>
-            <div *ngIf="recentActivities().length === 0" class="flex flex-col items-center justify-center h-full py-10 opacity-40">
+            <div
+              *ngIf="recentActivities().length === 0"
+              class="flex flex-col items-center justify-center h-full py-10 opacity-40"
+            >
               <i class="bi bi-inbox text-4xl mb-2"></i>
               <p class="text-sm">No recent activities</p>
             </div>
@@ -187,27 +232,109 @@ interface RecentActivity {
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Interview Calendar -->
-        <div class="lg:col-span-12">
-          <app-interview-calendar></app-interview-calendar>
+        <div class="lg:col-span-8">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 h-full">
+            <h3 class="font-bold text-slate-800 text-lg mb-4">Interview Calendar</h3>
+            <app-interview-calendar></app-interview-calendar>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="lg:col-span-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 h-full">
+            <h3 class="font-bold text-slate-800 text-lg mb-4">Quick Actions</h3>
+
+            <div class="grid grid-cols-1 gap-4">
+              <a
+                routerLink="/jobs/create"
+                class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+              >
+                <div
+                  class="w-10 h-10 rounded-lg text-indigo-600 bg-indigo-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+                >
+                  <i class="bi bi-briefcase"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-slate-900 group-hover:text-indigo-600">
+                    Post New Job
+                  </h4>
+                  <p class="text-xs text-gray-500">Create a new job listing</p>
+                </div>
+              </a>
+
+              <a
+                routerLink="/users/"
+                class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+              >
+                <div
+                  class="w-10 h-10 rounded-lg text-purple-600 bg-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+                >
+                  <i class="bi bi-person-plus"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-slate-900 group-hover:text-purple-600">
+                    Manage Users
+                  </h4>
+                  <p class="text-xs text-gray-500">Admin accounts & roles</p>
+                </div>
+              </a>
+
+              <a
+                routerLink="/vendors"
+                class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+              >
+                <div
+                  class="w-10 h-10 rounded-lg text-teal-600 bg-teal-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+                >
+                  <i class="bi bi-shop"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-slate-900 group-hover:text-teal-600">
+                    View Vendors
+                  </h4>
+                  <p class="text-xs text-gray-500">Manage vendor organizations</p>
+                </div>
+              </a>
+
+              <a
+                routerLink="/applications"
+                class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+              >
+                <div
+                  class="w-10 h-10 rounded-lg text-emerald-600 bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+                >
+                  <i class="bi bi-file-earmark-check"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-slate-900 group-hover:text-emerald-600">
+                    Review Applications
+                  </h4>
+                  <p class="text-xs text-gray-500">Process pending submissions</p>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   `,
-  styles: [`
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #e5e7eb;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #d1d5db;
-    }
-  `]
+  styles: [
+    `
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e5e7eb;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #d1d5db;
+      }
+    `,
+  ],
 })
 export class ManagerDashboardComponent implements OnInit {
   authStore = inject(AuthStore);
@@ -227,7 +354,7 @@ export class ManagerDashboardComponent implements OnInit {
       icon: 'bi bi-person-badge-fill',
       bgStyle: 'linear-gradient(to bottom right, #3b82f6, #1d4ed8)',
       link: '/candidates',
-      trend: '+12.5%'
+      trend: '+12.5%',
     },
     {
       label: 'Open Jobs',
@@ -281,17 +408,17 @@ export class ManagerDashboardComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     indexAxis: 'y',
-    scales: { 
-      x: { 
+    scales: {
+      x: {
         beginAtZero: true,
-        grid: { display: false }
+        grid: { display: false },
       },
       y: {
-        grid: { display: false }
-      }
+        grid: { display: false },
+      },
     },
-    plugins: { 
-      legend: { display: false }
+    plugins: {
+      legend: { display: false },
     },
   };
 
@@ -299,11 +426,11 @@ export class ManagerDashboardComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '70%',
-    plugins: { 
-      legend: { 
+    plugins: {
+      legend: {
         position: 'bottom',
-        labels: { boxWidth: 8, usePointStyle: true, padding: 15, font: { size: 10 } } 
-      } 
+        labels: { boxWidth: 8, usePointStyle: true, padding: 15, font: { size: 10 } },
+      },
     },
   };
 
@@ -315,7 +442,7 @@ export class ManagerDashboardComponent implements OnInit {
         label: 'Applications',
         backgroundColor: '#6366f1',
         borderRadius: 6,
-        hoverBackgroundColor: '#4f46e5'
+        hoverBackgroundColor: '#4f46e5',
       },
     ],
   };
@@ -326,7 +453,7 @@ export class ManagerDashboardComponent implements OnInit {
       {
         data: [0, 0],
         backgroundColor: ['#8b5cf6', '#10b981'],
-        borderWidth: 0
+        borderWidth: 0,
       },
     ],
   };
@@ -347,17 +474,25 @@ export class ManagerDashboardComponent implements OnInit {
       jobs: this.jobService.getJobs(0, 100),
       applications: this.applicationService.getApplications(undefined, 0, 1000),
       projects: this.projectService.getProjects(),
-      interviews: this.interviewService.getAllInterviews()
+      interviews: this.interviewService.getAllInterviews(),
     }).subscribe({
       next: ({ candidates, jobs, applications, projects, interviews }) => {
         const apps = applications.content || [];
-        
+
         // Funnel Processing
         const applied = apps.filter((a: any) => a.status === 'APPLIED').length;
-        const screening = apps.filter((a: any) => ['SCREENING', 'SHORTLISTED'].includes(a.status)).length;
-        const interview = apps.filter((a: any) => ['INTERVIEW_SCHEDULED', 'INTERVIEW_PASSED', 'INTERVIEW_FAILED'].includes(a.status)).length;
-        const offer = apps.filter((a: any) => ['OFFER_RELEASED', 'OFFER_ACCEPTED', 'OFFERED'].includes(a.status)).length;
-        const hired = apps.filter((a: any) => ['ONBOARDING_IN_PROGRESS', 'ONBOARDED', 'CONVERTED_TO_FTE', 'HIRED'].includes(a.status)).length;
+        const screening = apps.filter((a: any) =>
+          ['SCREENING', 'SHORTLISTED'].includes(a.status),
+        ).length;
+        const interview = apps.filter((a: any) =>
+          ['INTERVIEW_SCHEDULED', 'INTERVIEW_PASSED', 'INTERVIEW_FAILED'].includes(a.status),
+        ).length;
+        const offer = apps.filter((a: any) =>
+          ['OFFER_RELEASED', 'OFFER_ACCEPTED', 'OFFERED'].includes(a.status),
+        ).length;
+        const hired = apps.filter((a: any) =>
+          ['ONBOARDING_IN_PROGRESS', 'ONBOARDED', 'CONVERTED_TO_FTE', 'HIRED'].includes(a.status),
+        ).length;
 
         // Update Stats
         const currentStats = this.stats();
@@ -372,8 +507,18 @@ export class ManagerDashboardComponent implements OnInit {
         // Update Funnel
         this.funnelStages.set([
           { name: 'Applied', count: applied, color: '#6366f1', bgColor: 'rgba(99, 102, 241, 0.1)' },
-          { name: 'Screening', count: screening, color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.1)' },
-          { name: 'Interview', count: interview, color: '#a855f7', bgColor: 'rgba(168, 85, 247, 0.1)' },
+          {
+            name: 'Screening',
+            count: screening,
+            color: '#8b5cf6',
+            bgColor: 'rgba(139, 92, 246, 0.1)',
+          },
+          {
+            name: 'Interview',
+            count: interview,
+            color: '#a855f7',
+            bgColor: 'rgba(168, 85, 247, 0.1)',
+          },
           { name: 'Offer', count: offer, color: '#fbbf24', bgColor: 'rgba(251, 191, 36, 0.1)' },
           { name: 'Hired', count: hired, color: '#10b981', bgColor: 'rgba(16, 185, 129, 0.1)' },
         ]);
@@ -389,7 +534,7 @@ export class ManagerDashboardComponent implements OnInit {
       error: (err) => {
         console.error('Unified Dashboard loading failed', err);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -413,7 +558,7 @@ export class ManagerDashboardComponent implements OnInit {
           label: 'Applications',
           backgroundColor: '#6366f1',
           borderRadius: 6,
-          hoverBackgroundColor: '#4f46e5'
+          hoverBackgroundColor: '#4f46e5',
         },
       ],
     };
@@ -428,7 +573,7 @@ export class ManagerDashboardComponent implements OnInit {
         {
           data: [vendorApps, directApps],
           backgroundColor: ['#8b5cf6', '#10b981'],
-          borderWidth: 0
+          borderWidth: 0,
         },
       ],
     };
@@ -445,7 +590,7 @@ export class ManagerDashboardComponent implements OnInit {
         description: `${app.candidate?.firstName} ${app.candidate?.lastName} applied for ${app.job?.title}`,
         time: 'Just now',
         icon: 'bi bi-person-plus-fill',
-        iconBg: 'bg-indigo-500'
+        iconBg: 'bg-indigo-500',
       });
     });
 
@@ -457,7 +602,7 @@ export class ManagerDashboardComponent implements OnInit {
         description: `${interview.application?.candidate?.firstName || 'Candidate'} scheduled for ${interview.type}`,
         time: 'Today',
         icon: 'bi bi-calendar-event-fill',
-        iconBg: 'bg-purple-500'
+        iconBg: 'bg-purple-500',
       });
     });
 
