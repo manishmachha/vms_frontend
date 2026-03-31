@@ -260,8 +260,7 @@ export class ApplicationDetailComponent implements OnInit {
       icon: 'psychology',
       color: 'text-rose-600',
       bgColor: 'bg-rose-50',
-      description:
-        'Probability that the resume was heavily generated or optimized using AI tools.',
+      description: 'Probability that the resume was heavily generated or optimized using AI tools.',
     },
     {
       title: 'Job Match',
@@ -345,7 +344,7 @@ export class ApplicationDetailComponent implements OnInit {
     this.analysisPollingSub = interval(5000)
       .pipe(
         startWith(0),
-        switchMap(() => this.appService.getLatestAnalysis(id))
+        switchMap(() => this.appService.getLatestAnalysis(id)),
       )
       .subscribe({
         next: (res: any) => {
@@ -385,27 +384,22 @@ export class ApplicationDetailComponent implements OnInit {
 
   loadPotentialCcUsers(vendorOrgId?: number) {
     const internalUsers$ = this.userService.getUsers().pipe(
-      map(res => (res as any).data || res),
-      catchError(() => of([]))
+      map((res) => (res as any).data || res),
+      catchError(() => of([])),
     );
-    
-    const vendorUsers$ = vendorOrgId 
-      ? this.userService.getUsersByOrganization(vendorOrgId).pipe(
-          map(res => (res as any).data || res),
-          catchError(() => of([]))
-        )
-      : of([]);
 
-    forkJoin([internalUsers$, vendorUsers$]).pipe(
-      map(([internal, vendor]: [any[], any[]]) => {
-        const combined = [...internal, ...vendor];
-        const unique = Array.from(new Map(combined.map(u => [u.id, u])).values());
-        return unique;
-      })
-    ).subscribe((unique) => {
-      this.potentialCcUsers.set(unique);
-      this.cdr.markForCheck();
-    });
+    forkJoin([internalUsers$])
+      .pipe(
+        map(([internal]: [any[]]) => {
+          const combined = [...internal];
+          const unique = Array.from(new Map(combined.map((u) => [u.id, u])).values());
+          return unique;
+        }),
+      )
+      .subscribe((unique) => {
+        this.potentialCcUsers.set(unique);
+        this.cdr.markForCheck();
+      });
   }
 
   loadBrandedResume(candidateId: string | number) {
@@ -464,7 +458,7 @@ export class ApplicationDetailComponent implements OnInit {
           durationMinutes: 30,
           type: 'TECHNICAL',
           ccUserIds: [],
-          schedulingNotes: ''
+          schedulingNotes: '',
         });
       },
       error: (err) => {
