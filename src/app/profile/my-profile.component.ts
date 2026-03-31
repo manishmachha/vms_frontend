@@ -157,11 +157,10 @@ import { User } from '../models/auth.model';
             <div class="flex items-center gap-3 mt-6">
               <button
                 (click)="saveProfile()"
-                [disabled]="profileSaving()"
-                class="px-6 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm shadow-indigo-200"
+                class="px-6 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-sm shadow-indigo-200"
               >
-                <i class="bi" [ngClass]="profileSaving() ? 'bi-arrow-repeat animate-spin' : 'bi-check2'"></i>
-                {{ profileSaving() ? 'Saving...' : 'Save Changes' }}
+                <i class="bi bi-check2"></i>
+                Save Changes
               </button>
               <button
                 (click)="resetForm()"
@@ -255,11 +254,10 @@ import { User } from '../models/auth.model';
             <div class="flex items-center gap-3 mt-6">
               <button
                 (click)="changePassword()"
-                [disabled]="passwordSaving()"
-                class="px-6 py-2.5 bg-rose-600 text-white font-semibold text-sm rounded-xl hover:bg-rose-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm shadow-rose-200"
+                class="px-6 py-2.5 bg-rose-600 text-white font-semibold text-sm rounded-xl hover:bg-rose-700 transition-colors flex items-center gap-2 shadow-sm shadow-rose-200"
               >
-                <i class="bi" [ngClass]="passwordSaving() ? 'bi-arrow-repeat animate-spin' : 'bi-lock'"></i>
-                {{ passwordSaving() ? 'Changing...' : 'Change Password' }}
+                <i class="bi bi-lock"></i>
+                Change Password
               </button>
             </div>
 
@@ -278,17 +276,14 @@ export class MyProfileComponent implements OnInit {
   private headerService = inject(HeaderService);
 
   profile = signal<User | null>(null);
-  loading = signal(true);
 
   // Edit profile form
   editForm = { firstName: '', lastName: '', phone: '' };
-  profileSaving = signal(false);
   profileSaved = signal(false);
   profileError = signal('');
 
   // Password form
   passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
-  passwordSaving = signal(false);
   passwordSaved = signal(false);
   passwordError = signal('');
 
@@ -303,7 +298,6 @@ export class MyProfileComponent implements OnInit {
   }
 
   loadProfile() {
-    this.loading.set(true);
     this.userService.getMe().subscribe({
       next: (user) => {
         this.profile.set(user);
@@ -312,7 +306,6 @@ export class MyProfileComponent implements OnInit {
           lastName: user.lastName || '',
           phone: user.phone || '',
         };
-        this.loading.set(false);
       },
       error: (err) => {
         console.error('Failed to load profile', err);
@@ -326,13 +319,11 @@ export class MyProfileComponent implements OnInit {
             phone: storeUser.phone || '',
           };
         }
-        this.loading.set(false);
       },
     });
   }
 
   saveProfile() {
-    this.profileSaving.set(true);
     this.profileError.set('');
     this.profileSaved.set(false);
 
@@ -346,12 +337,10 @@ export class MyProfileComponent implements OnInit {
           lastName: user.lastName,
           phone: user.phone,
         });
-        this.profileSaving.set(false);
         this.profileSaved.set(true);
         setTimeout(() => this.profileSaved.set(false), 3000);
       },
       error: (err) => {
-        this.profileSaving.set(false);
         this.profileError.set(err?.error?.message || 'Failed to update profile. Please try again.');
       },
     });
@@ -387,8 +376,6 @@ export class MyProfileComponent implements OnInit {
       return;
     }
 
-    this.passwordSaving.set(true);
-
     this.userService
       .changeMyPassword({
         currentPassword: this.passwordForm.currentPassword,
@@ -396,13 +383,11 @@ export class MyProfileComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.passwordSaving.set(false);
           this.passwordSaved.set(true);
           this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
           setTimeout(() => this.passwordSaved.set(false), 3000);
         },
         error: (err) => {
-          this.passwordSaving.set(false);
           this.passwordError.set(err?.error?.message || 'Failed to change password. Check your current password.');
         },
       });

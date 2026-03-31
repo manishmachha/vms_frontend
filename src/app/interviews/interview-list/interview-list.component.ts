@@ -88,7 +88,7 @@ import { AuthStore } from '../../services/auth.store';
       </div>
 
       <!-- Interview Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" *ngIf="!loading(); else loader">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div 
           *ngFor="let interview of filteredInterviews()"
           class="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 overflow-hidden group flex flex-col sm:flex-row"
@@ -164,15 +164,8 @@ import { AuthStore } from '../../services/auth.store';
           </div>
         </div>
       </div>
-
-      <ng-template #loader>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div *ngFor="let i of [1,2,3,4]" class="h-48 bg-gray-100 rounded-3xl animate-pulse"></div>
-        </div>
-      </ng-template>
-
       <!-- Empty State -->
-      <div *ngIf="!loading() && filteredInterviews().length === 0" class="flex flex-col items-center justify-center py-20 text-center opacity-40">
+      <div *ngIf="filteredInterviews().length === 0" class="flex flex-col items-center justify-center py-20 text-center opacity-40">
         <div class="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mb-4">
           <i class="bi bi-calendar-x text-4xl"></i>
         </div>
@@ -186,7 +179,6 @@ export class InterviewListComponent implements OnInit {
   private interviewService = inject(InterviewService);
   private authStore = inject(AuthStore);
 
-  loading = signal(true);
   searchQuery = '';
   activeTab = signal('upcoming');
   interviews = signal<Interview[]>([]);
@@ -209,7 +201,6 @@ export class InterviewListComponent implements OnInit {
   }
 
   loadInterviews() {
-    this.loading.set(true);
     const fetchObservable = this.authStore.isVendor()
       ? this.interviewService.getVendorInterviews()
       : this.interviewService.getAllInterviews();
@@ -219,9 +210,8 @@ export class InterviewListComponent implements OnInit {
         this.interviews.set(res || []);
         this.updateStats(res || []);
         this.applyFilters();
-        this.loading.set(false);
       },
-      error: () => this.loading.set(false)
+      error: (err) => console.error(err)
     });
   }
 

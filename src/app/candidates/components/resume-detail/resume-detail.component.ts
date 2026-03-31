@@ -13,14 +13,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   imports: [CommonModule, RouterModule],
   template: `
     <div class="resume-detail-container">
-      @if (loading()) {
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading resume details...</p>
-        </div>
-      }
 
-      @if (!loading() && resume()) {
+      @if (resume()) {
         <div class="detail-layout">
           <!-- Sidebar -->
           <div class="sidebar">
@@ -140,25 +134,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
     `
       .resume-detail-container {
         padding: 0 8px;
-      }
-      .loading-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--bs-secondary, #6c757d);
-      }
-      .spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid var(--bs-border-color, #dee2e6);
-        border-top-color: #1a237e;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin: 0 auto 16px;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
       }
       .detail-layout {
         display: flex;
@@ -387,7 +362,6 @@ export class ResumeDetailComponent implements OnInit {
 
   resume = signal<BrandedResume | null>(null);
   versions = signal<BrandedResume[]>([]);
-  loading = signal(true);
   pdfUrl = signal<SafeResourceUrl | null>(null);
 
   ngOnInit() {
@@ -401,11 +375,9 @@ export class ResumeDetailComponent implements OnInit {
   }
 
   loadResume(id: string) {
-    this.loading.set(true);
     this.brandedResumeService.getById(id).subscribe({
       next: (r) => {
         this.resume.set(r);
-        this.loading.set(false);
         this.headerService.setTitle(
           `${r.candidate?.firstName} ${r.candidate?.lastName} — v${r.version}`,
           'Branded resume preview',
@@ -430,7 +402,6 @@ export class ResumeDetailComponent implements OnInit {
         }
       },
       error: () => {
-        this.loading.set(false);
         this.snackBar.open('Failed to load resume', 'Close', { duration: 3000 });
       },
     });

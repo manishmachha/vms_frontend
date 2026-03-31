@@ -103,9 +103,6 @@ export class ApplicationDetailComponent implements OnInit {
   timeline = signal<any[]>([]);
   documents = signal<any[]>([]);
 
-  loading = signal(true);
-  analyzing = signal(false);
-  isUploading = signal(false);
   isPollingAnalysis = signal(true);
 
   // Interview State
@@ -363,11 +360,9 @@ export class ApplicationDetailComponent implements OnInit {
   }
 
   loadApplication(id: string | number) {
-    this.loading.set(true);
     this.appService.getApplicationDetails(id).subscribe({
       next: (app) => {
         this.application.set(app);
-        this.loading.set(false);
         if (app.candidate?.id) {
           this.loadBrandedResume(app.candidate.id);
         }
@@ -378,7 +373,7 @@ export class ApplicationDetailComponent implements OnInit {
           this.loadPotentialCcUsers();
         }
       },
-      error: () => this.loading.set(false),
+      error: (error) => console.error(error),
     });
   }
 
@@ -409,12 +404,21 @@ export class ApplicationDetailComponent implements OnInit {
     });
   }
 
-  loadAnalysis(id: string | number) {
-    this.appService.getLatestAnalysis(id).subscribe({
+  loadAnalysis(id: string | number, isPolling = false) {
+    this.appService.getLatestAnalysis(id, isPolling).subscribe({
       next: (res) => {
         this.analysis.set(res);
+        // If analysis is still not available and we are in a polling context or just started one
+        if (!res && this.isPollingAnalysis()) {
+          setTimeout(() => this.loadAnalysis(id, true), 3000);
+        } else {
+          this.isPollingAnalysis.set(false);
+        }
       },
-      error: () => console.log('Analysis not found or failed'),
+      error: () => {
+        console.log('Analysis not found or failed');
+        this.isPollingAnalysis.set(false);
+      },
     });
   }
 
@@ -470,15 +474,16 @@ export class ApplicationDetailComponent implements OnInit {
   runAnalysis() {
     const appId = this.application()?.id;
     if (!appId) return;
-    this.analyzing.set(true);
+    this.isPollingAnalysis.set(true);
     this.appService.runAnalysis(appId).subscribe({
       next: () => {
         setTimeout(() => {
           this.loadAnalysis(appId);
-          this.analyzing.set(false);
         }, 5000);
       },
-      error: () => this.analyzing.set(false),
+      error: () => {
+        this.isPollingAnalysis.set(false);
+      },
     });
   }
 
@@ -535,16 +540,13 @@ export class ApplicationDetailComponent implements OnInit {
   uploadDocument() {
     const appId = this.application()?.id;
     if (!this.selectedFile || !appId) return;
-    this.isUploading.set(true);
     this.appService.uploadDocument(appId, this.selectedCategory, this.selectedFile).subscribe({
       next: () => {
-        this.isUploading.set(false);
         this.selectedFile = null;
         this.loadDocuments(appId);
         this.loadTimeline(appId); // Refresh timeline to show upload event
       },
       error: (err) => {
-        this.isUploading.set(false);
         console.error('Failed to upload document', err);
         this.dialogService.open('Error', 'Failed to upload document. Please try again.');
       },

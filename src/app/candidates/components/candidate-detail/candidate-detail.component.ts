@@ -12,11 +12,11 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { JobApplication } from '../../../models/application.model';
 import { Interview } from '../../../models/interview.model';
+import { MatIconModule } from '@angular/material/icon';
 import { HubDashboardBannerComponent } from '../../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
 import { DashboardStatsResponse } from '../../../models/dashboard-stats.model';
 
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
-import { LoadingModalComponent } from '../../../layout/components/loading-modal/loading-modal.component';
 import { ConfirmModalComponent } from '../../../layout/components/confirm-modal/confirm-modal.component';
 import { ClientSubmissionsComponent } from '../client-submissions/client-submissions.component';
 
@@ -29,10 +29,10 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
     MatDialogModule,
     BaseChartDirective,
     OrganizationLogoComponent,
-    LoadingModalComponent,
     ConfirmModalComponent,
     ClientSubmissionsComponent,
     HubDashboardBannerComponent,
+    MatIconModule,
   ],
   template: `
     <div class="container mx-auto px-4 py-8" *ngIf="candidate()">
@@ -343,9 +343,9 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
               </div>
             </div>
 
-            <div *ngIf="!analysis()" class="flex flex-col items-center justify-center py-12">
-               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
-               <p class="text-gray-500 font-medium text-sm">Analyzing resume with AI...</p>
+            <div *ngIf="!analysis()" class="flex flex-col items-center justify-center py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+               <mat-icon class="text-gray-300 text-4xl mb-4">analytics</mat-icon>
+               <p class="text-gray-500 font-medium text-sm">Resume analysis pending or in progress...</p>
             </div>
 
             <div *ngIf="analysis()" class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
@@ -822,13 +822,6 @@ import { ClientSubmissionsComponent } from '../client-submissions/client-submiss
           </div>
         </div>
 
-      <!-- Loading Overlay -->
-      <app-loading-modal
-        [isOpen]="uploading()"
-        title="Updating Resume..."
-        message="Parsing new details using AI"
-      ></app-loading-modal>
-
       <!-- Confirmation Modal -->
       <app-confirm-modal
         [isOpen]="showDeleteConfirm()"
@@ -866,7 +859,6 @@ export class CandidateDetailComponent implements OnInit {
   brandedResume = signal<BrandedResume | null>(null);
   applications = signal<JobApplication[]>([]);
   interviews = signal<Interview[]>([]);
-  uploading = signal(false);
   skillsExpanded = signal(false);
   showDeleteConfirm = signal(false);
   showArchiveConfirm = signal(false);
@@ -1168,16 +1160,13 @@ export class CandidateDetailComponent implements OnInit {
     const file = event.target.files[0];
     const c = this.candidate();
     if (file && c) {
-      this.uploading.set(true);
       this.candidateService.updateResume(c.id, file).subscribe({
         next: (updated) => {
           this.candidate.set(updated);
-          this.uploading.set(false);
           this.snackBar.open('Resume updated and profile refreshed!', 'OK', { duration: 3000 });
         },
         error: (err) => {
           console.error(err);
-          this.uploading.set(false);
           this.snackBar.open('Failed to update resume', 'Close', { duration: 3000 });
         },
       });

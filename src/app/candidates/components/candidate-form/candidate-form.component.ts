@@ -4,12 +4,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CandidateService } from '../../services/candidate.service';
 import { Candidate } from '../../models/candidate.model';
-import { LoadingModalComponent } from '../../../layout/components/loading-modal/loading-modal.component';
 
 @Component({
   selector: 'app-candidate-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoadingModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './candidate-form.component.html',
 })
 export class CandidateFormComponent {
@@ -33,9 +32,6 @@ export class CandidateFormComponent {
 
   isEditMode = signal(false);
   candidateId = signal<string | null>(null);
-  uploading = signal(false);
-  parsing = signal(false);
-  saving = signal(false);
   uploadError = signal<string | null>(null);
 
   constructor() {
@@ -74,23 +70,17 @@ export class CandidateFormComponent {
   }
 
   uploadAndParse(file: File) {
-    this.uploading.set(true);
-    this.parsing.set(true);
     this.uploadError.set(null);
 
     this.candidateService.uploadResume(file).subscribe({
       next: (candidate: Candidate) => {
         // Since backend saves validation is bypassed or auto-filled.
         // We can redirect to edit mode for this new candidate to allow user verification.
-        this.uploading.set(false);
-        this.parsing.set(false);
         this.router.navigate(['/candidates']);
       },
       error: (err) => {
         console.error('Upload failed', err);
         this.uploadError.set('Failed to upload/parse resume. Please try manual entry.');
-        this.uploading.set(false);
-        this.parsing.set(false);
       },
     });
   }
@@ -98,7 +88,6 @@ export class CandidateFormComponent {
   onSubmit() {
     if (this.form.invalid) return;
 
-    this.saving.set(true);
     const formVal = this.form.value;
     const skillsArray =
       formVal.skills
@@ -115,21 +104,17 @@ export class CandidateFormComponent {
     if (this.isEditMode() && this.candidateId()) {
       this.candidateService.updateCandidate(this.candidateId()!, payload).subscribe({
         next: () => {
-          this.saving.set(false);
           this.router.navigate(['/candidates']);
         },
-        error: () => this.saving.set(false),
       });
     } else {
       this.candidateService.createManual(payload).subscribe({
         next: (candidate) => {
-          this.saving.set(false);
           this.router.navigate(['/candidates']);
         },
         error: (err) => {
           console.error('Manual creation failed', err);
           this.uploadError.set('Failed to create candidate manually.');
-          this.saving.set(false);
         },
       });
     }

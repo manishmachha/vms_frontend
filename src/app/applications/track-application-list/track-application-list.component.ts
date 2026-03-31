@@ -106,7 +106,7 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
         <!-- DATA VIEW (CARD GRID) -->
         <div class="bg-gray-50/30 p-6">
           <div
-            *ngIf="!loading() && dataSource.filteredData.length > 0"
+            *ngIf="dataSource.filteredData.length > 0"
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             <div
@@ -210,7 +210,7 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
 
           <!-- Empty State (No results) -->
           <div
-            *ngIf="!loading() && dataSource.filteredData.length === 0"
+            *ngIf="dataSource.filteredData.length === 0"
             class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200"
           >
             <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
@@ -219,14 +219,6 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
             <h3 class="text-lg font-bold text-gray-900">No applications found</h3>
             <p class="text-sm text-gray-500 mt-1 max-w-[240px] text-center">
               Try adjusting your search or filters to see more applications.
-            </p>
-          </div>
-
-          <!-- Loading State -->
-          <div *ngIf="loading()" class="flex flex-col items-center justify-center py-24">
-            <mat-spinner diameter="40" strokeWidth="3"></mat-spinner>
-            <p class="text-sm font-medium text-gray-400 mt-4 animate-pulse">
-              Loading applications...
             </p>
           </div>
         </div>
@@ -251,7 +243,6 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   // State
   dataSource = new MatTableDataSource<JobApplication>([]);
   unreadAppIds = new Set<string>();
-  loading = signal<boolean>(true);
 
   // Filters
   searchText = '';
@@ -299,8 +290,6 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   loadApplications() {
-    this.loading.set(true);
-
     // Fetch a large page to simulate "All" for client-side ops
     this.appService.getApplications(undefined, 0, 1000, 'OUTBOUND').subscribe({
       next: (page) => {
@@ -311,13 +300,12 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
           return bHasNotif - aHasNotif;
         });
         this.dataSource.data = sorted;
-        this.loading.set(false);
 
         if (this.dataSource.paginator) {
           this.dataSource.paginator.firstPage();
         }
       },
-      error: () => this.loading.set(false),
+      error: (error) => console.error(error),
     });
   }
 

@@ -157,17 +157,13 @@
           </a>
           <button
             type="submit"
-            [disabled]="userForm.invalid || loading"
+            [disabled]="userForm.invalid"
             class="relative px-10 py-3.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-indigo-500/25 active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all overflow-hidden group"
           >
-            <span *ngIf="!loading" class="flex items-center gap-2">
+            <span class="flex items-center gap-2">
               {{ isEditMode() ? 'Save Changes' : 'Create User' }}
               <i class="bi bi-arrow-right-short text-xl group-hover:translate-x-1 transition-transform"></i>
             </span>
-            <div *ngIf="loading" class="flex items-center gap-3">
-              <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              <span>Processing...</span>
-            </div>
           </button>
         </div>
       </form>

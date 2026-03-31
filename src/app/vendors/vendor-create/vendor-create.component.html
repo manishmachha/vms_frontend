@@ -109,17 +109,13 @@
             </a>
             <button
               type="submit"
-              [disabled]="vendorForm.invalid || loading"
+              [disabled]="vendorForm.invalid"
               class="relative px-10 py-3.5 bg-linear-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all overflow-hidden group"
             >
-              <span *ngIf="!loading" class="flex items-center gap-2">
+              <span class="flex items-center gap-2">
                 Create Vendor
                 <i class="bi bi-arrow-right-short text-xl group-hover:translate-x-1 transition-transform"></i>
               </span>
-              <div *ngIf="loading" class="flex items-center gap-3">
-                <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                <span>Processing...</span>
-              </div>
             </button>
           </div>
         </form>

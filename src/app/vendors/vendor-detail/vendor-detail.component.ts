@@ -32,9 +32,6 @@ import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
   ],
   template: `
     <div class=" mx-auto space-y-8 p-6">
-      <div *ngIf="loading()" class="flex justify-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
 
       <ng-container *ngIf="vendor() as organization">
         <!-- Dashboard Banner -->
@@ -199,7 +196,6 @@ export class VendorDetailComponent implements OnInit {
 
   vendor = signal<any>(null);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
-  loading = signal(true);
 
   // Public View State
   jobs = signal<Job[]>([]);
@@ -236,14 +232,10 @@ export class VendorDetailComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadVendor(id);
-    } else {
-      this.loading.set(false);
     }
   }
 
   loadVendor(id: string) {
-    this.loading.set(true);
-
     this.organizationService.getOrganizationById(id).subscribe({
       next: (data) => {
         this.vendor.set(data);
@@ -256,12 +248,9 @@ export class VendorDetailComponent implements OnInit {
 
         // Fetch Public Jobs
         this.jobs.set([]);
-
-        this.loading.set(false);
       },
       error: () => {
         console.error('Failed to load vendor');
-        this.loading.set(false);
       },
     });
   }

@@ -414,12 +414,11 @@ import { MatSelectModule } from '@angular/material/select';
             type="button"
             (click)="submit()"
             [disabled]="
-              form.invalid || isSubmitting || (!selectedFile && !candidateIdControl.value)
+              form.invalid || (!selectedFile && !candidateIdControl.value)
             "
             class="ml-auto flex items-center rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition hover:shadow-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
-            <i *ngIf="isSubmitting" class="bi bi-arrow-repeat mr-2 animate-spin"></i>
-            {{ isSubmitting ? 'Submitting...' : 'Submit Application' }}
+            Submit Application
           </button>
         </div>
       </div>
@@ -440,7 +439,6 @@ export class ApplicationFormComponent implements OnInit {
   currentStep = signal(0);
   steps = ['Personal', 'Experience', 'Resume'];
   isDragging = false;
-  isSubmitting = false;
 
   form = this.fb.group({
     firstName: ['', Validators.required],
@@ -607,7 +605,6 @@ export class ApplicationFormComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
     const formData = new FormData();
     const payload = {
       ...this.form.value,
@@ -635,7 +632,6 @@ export class ApplicationFormComponent implements OnInit {
           duration: 3000,
           panelClass: ['error-snackbar'],
         });
-        this.isSubmitting = false;
       },
     });
   }

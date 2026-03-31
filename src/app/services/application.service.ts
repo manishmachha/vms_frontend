@@ -58,8 +58,8 @@ export class ApplicationService {
     return this.api.post<JobApplication>(`/applications/${id}/decision`, { approved, feedback });
   }
 
-  getLatestAnalysis(id: string | number) {
-    return this.api.get<any>(`/applications/${id}/analysis`);
+  getLatestAnalysis(id: string | number, skipLoader = false) {
+    return this.api.get<any>(`/applications/${id}/analysis`, undefined, undefined, skipLoader);
   }
 
   getDocuments(id: string | number) {

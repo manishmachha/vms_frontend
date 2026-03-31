@@ -1,10 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpParams, HttpHeaders } from '@angular/common/http';
 import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Page } from '../models/page.model';
 import { ApiResponse } from '../models/auth.model';
 import { environment } from '../../environments/environment';
+import { ApiService } from './api.service';
 
 export interface Notification {
   id: number;
@@ -29,8 +30,8 @@ export interface NotificationCounts {
   providedIn: 'root',
 })
 export class NotificationService {
-  private http = inject(HttpClient);
-  private baseUrl = `${environment.apiUrl}/notifications`;
+  private apiService = inject(ApiService);
+  private baseUrl = `/notifications`;
 
   // Centralized signal for notification counts
   readonly notificationCounts = signal<NotificationCounts | null>(null);
@@ -63,13 +64,8 @@ export class NotificationService {
       .set('page', page)
       .set('size', size)
       .set('unreadOnly', unreadOnly);
-    let headers;
-    if (skipLoading) {
-      
-    }
-    return this.http
-      .get<ApiResponse<Page<Notification>>>(this.baseUrl, { params, headers })
-      .pipe(map((res) => res.data));
+    
+    return this.apiService.get<Page<Notification>>(this.baseUrl, params, undefined, skipLoading);
   }
 
   getNotificationsByCategory(
@@ -79,74 +75,35 @@ export class NotificationService {
     skipLoading: boolean = false,
   ) {
     let params = new HttpParams().set('page', page).set('size', size);
-    let headers;
-    if (skipLoading) {
-      
-    }
-    return this.http
-      .get<ApiResponse<Page<Notification>>>(`${this.baseUrl}/category/${category}`, {
-        params,
-        headers,
-      })
-      .pipe(map((res) => res.data));
+    return this.apiService.get<Page<Notification>>(`${this.baseUrl}/category/${category}`, params, undefined, skipLoading);
   }
 
   getUnreadCount(skipLoading: boolean = false) {
-    let headers;
-    if (skipLoading) {
-      
-    }
-    return this.http
-      .get<ApiResponse<number>>(`${this.baseUrl}/unread-count`, { headers })
-      .pipe(map((res) => res.data));
+    return this.apiService.get<number>(`${this.baseUrl}/unread-count`, undefined, undefined, skipLoading);
   }
 
   getCountByCategory(skipLoading: boolean = false) {
-    let headers;
-    if (skipLoading) {
-      
-    }
-    return this.http
-      .get<ApiResponse<NotificationCounts>>(`${this.baseUrl}/count-by-category`, { headers })
-      .pipe(map((res) => res.data));
+    return this.apiService.get<NotificationCounts>(`${this.baseUrl}/count-by-category`, undefined, undefined, skipLoading);
   }
 
   getUnreadEntityIds(category: string) {
-    return this.http
-      .get<ApiResponse<number[]>>(`${this.baseUrl}/unread-entity-ids/${category}`)
-      .pipe(map((res) => res.data));
+    return this.apiService.get<number[]>(`${this.baseUrl}/unread-entity-ids/${category}`);
   }
 
   markAsRead(id: number | string, skipLoading: boolean = false) {
-    let headers;
-    if (skipLoading) {
-      
-    }
-    return this.http
-      .post<ApiResponse<void>>(`${this.baseUrl}/${id}/read`, {}, { headers })
-      .pipe(map((res) => res.data));
+    return this.apiService.post<void>(`${this.baseUrl}/${id}/read`, {}, undefined, skipLoading);
   }
 
   markAllAsRead(skipLoading: boolean = false) {
-    let headers;
-    if (skipLoading) {
-      
-    }
-    return this.http
-      .post<ApiResponse<number>>(`${this.baseUrl}/mark-all-read`, {}, { headers })
-      .pipe(map((res) => res.data));
+    return this.apiService.post<number>(`${this.baseUrl}/mark-all-read`, {}, undefined, skipLoading);
   }
 
   deleteNotification(id: number | string) {
-    return this.http
-      .delete<ApiResponse<void>>(`${this.baseUrl}/${id}`)
-      .pipe(map((res) => res.data));
+    return this.apiService.delete<void>(`${this.baseUrl}/${id}`);
   }
 
   deleteAllRead() {
-    return this.http
-      .delete<ApiResponse<number>>(`${this.baseUrl}/read`)
-      .pipe(map((res) => res.data));
+    return this.apiService.delete<number>(`${this.baseUrl}/read`);
   }
 
   // Helper to get icon class based on category

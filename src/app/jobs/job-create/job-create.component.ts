@@ -230,24 +230,11 @@ import { JobService } from '../../services/job.service';
               </button>
               <button
                 type="submit"
-                [disabled]="jobForm.invalid || isSubmitting()"
+                [disabled]="jobForm.invalid"
                 class="px-6 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                <i
-                  class="bi"
-                  [class.bi-send]="!isSubmitting()"
-                  [class.bi-arrow-repeat]="isSubmitting()"
-                  [class.animate-spin]="isSubmitting()"
-                ></i>
-                {{
-                  isSubmitting()
-                    ? isEditing()
-                      ? 'Updating...'
-                      : 'Submitting...'
-                    : isEditing()
-                      ? 'Update Job'
-                      : 'Submit Job'
-                }}
+                <i class="bi bi-send"></i>
+                {{ isEditing() ? 'Update Job' : 'Submit Job' }}
               </button>
             </div>
           </div>
@@ -262,7 +249,6 @@ export class JobCreateComponent {
   router = inject(Router);
   route = inject(ActivatedRoute);
 
-  isSubmitting = signal(false);
   isEditing = signal(false);
   jobId = signal<string | null>(null);
 
@@ -307,16 +293,12 @@ export class JobCreateComponent {
 
   onSubmit() {
     if (this.jobForm.valid) {
-      this.isSubmitting.set(true);
       const formValue = this.jobForm.value;
 
       if (this.isEditing() && this.jobId()) {
         this.jobService.updateJob(this.jobId()!, formValue as any).subscribe({
           next: () => {
             this.router.navigate(['/jobs', this.jobId()]);
-          },
-          error: () => {
-            this.isSubmitting.set(false);
           },
         });
       } else {
@@ -325,9 +307,6 @@ export class JobCreateComponent {
         this.jobService.createJob(formValue as any).subscribe({
           next: () => {
             this.router.navigate(['/jobs']);
-          },
-          error: () => {
-            this.isSubmitting.set(false);
           },
         });
       }

@@ -52,12 +52,6 @@
       </div>
     </div>
 
-    <app-loading-modal
-      [isOpen]="uploading() || parsing()"
-      [title]="parsing() ? 'Analyzing with AI...' : 'Uploading...'"
-      [message]="parsing() ? 'Extracting details from resume' : 'Please wait'"
-    ></app-loading-modal>
-
     <div *ngIf="uploadError()" class="mt-4 p-4 rounded-md bg-red-50 text-red-700">
       {{ uploadError() }}
     </div>
@@ -219,10 +213,10 @@
       </button>
       <button
         type="submit"
-        [disabled]="form.invalid || saving()"
+        [disabled]="form.invalid"
         class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
       >
-        {{ saving() ? 'Saving...' : 'Save' }}
+        Save
       </button>
     </div>
   </form>

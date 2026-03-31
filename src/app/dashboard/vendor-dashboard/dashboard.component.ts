@@ -182,7 +182,7 @@ interface StatCard {
               <div>
                 <p class="text-sm font-medium text-gray-500">{{ stat.label }}</p>
                 <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1">
-                  {{ loading() ? '—' : stat.value }}
+                  {{ stat.value }}
                 </p>
                 <p
                   *ngIf="stat.trend"
@@ -286,25 +286,16 @@ interface StatCard {
               </button>
             </div>
             <div class="p-6">
-              <div *ngIf="loadingActivity()" class="space-y-4">
-                <div *ngFor="let _ of [1, 2, 3]" class="flex gap-4">
-                  <div class="w-10 h-10 rounded-full skeleton"></div>
-                  <div class="flex-1 space-y-2">
-                    <div class="h-4 w-3/4 skeleton"></div>
-                    <div class="h-3 w-1/2 skeleton"></div>
-                  </div>
-                </div>
-              </div>
 
               <div
-                *ngIf="!loadingActivity() && recentActivity().length === 0"
+                *ngIf="recentActivity().length === 0"
                 class="text-center text-gray-500 py-8"
               >
                 <i class="bi bi-activity text-4xl mb-3 block text-gray-300"></i>
                 <p class="text-sm">No recent activity found</p>
               </div>
 
-              <div *ngIf="!loadingActivity() && recentActivity().length > 0" class="space-y-6">
+              <div *ngIf="recentActivity().length > 0" class="space-y-6">
                 <div *ngFor="let activity of recentActivity()" class="flex gap-4 relative">
                   <!-- Timeline Line -->
                   <div
@@ -334,10 +325,7 @@ interface StatCard {
               <h3 class="text-lg font-bold text-gray-900">Pipeline Overview</h3>
             </div>
             <div class="p-6">
-              <div *ngIf="loadingPipeline()" class="space-y-4">
-                <div *ngFor="let _ of [1, 2, 3, 4]" class="h-8 skeleton rounded-full"></div>
-              </div>
-              <div *ngIf="!loadingPipeline()" class="space-y-4">
+              <div class="space-y-4">
                 <div *ngFor="let stage of pipelineStages()" class="relative">
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-sm font-medium text-gray-700">{{ stage.name }}</span>
@@ -509,17 +497,7 @@ interface StatCard {
             </a>
           </div>
           <div class="p-6">
-            <div *ngIf="loading(); else recentAppsList" class="space-y-4">
-              <div *ngFor="let _ of [1, 2, 3]" class="flex gap-4">
-                <div class="w-10 h-10 rounded-full skeleton"></div>
-                <div class="flex-1 space-y-2">
-                  <div class="h-4 w-3/4 skeleton"></div>
-                  <div class="h-3 w-1/2 skeleton"></div>
-                </div>
-              </div>
-            </div>
-
-            <ng-template #recentAppsList>
+            <div class="space-y-4">
               <div *ngIf="vendorRecentApps().length === 0" class="text-center text-gray-500 py-8">
                 <div
                   class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center"
@@ -576,7 +554,7 @@ interface StatCard {
                   </div>
                 </div>
               </div>
-            </ng-template>
+            </div>
           </div>
         </div>
       </ng-container>
@@ -596,12 +574,7 @@ export class VendorDashboardComponent implements OnInit {
   projectService = inject(ProjectService);
   dashboardService = inject(DashboardService);
 
-  // --- Common Logic ---
-  loading = signal(true);
-
   // --- Solventek State ---
-  loadingActivity = signal(true);
-  loadingPipeline = signal(true);
   solventekStats = signal<StatCard[]>([
     {
       label: 'Active Jobs',
@@ -772,7 +745,6 @@ export class VendorDashboardComponent implements OnInit {
 
   // --- SOLVENTEK LOGIC ---
   loadSolventekData() {
-    this.loading.set(true);
     // ... existing logic ...
     forkJoin({
       jobs: this.jobService.getJobs(0, 1),
@@ -789,12 +761,10 @@ export class VendorDashboardComponent implements OnInit {
         currentStats[2].value = results.applications.totalElements;
         currentStats[3].value = apps.filter((a) => a.status === 'APPLIED').length;
         this.solventekStats.set([...currentStats]);
-        this.loading.set(false);
+        this.solventekStats.set([...currentStats]);
 
         this.processPipeline(apps, results.applications.totalElements);
-        this.loadingPipeline.set(false);
         this.recentActivity.set(results.activity.content);
-        this.loadingActivity.set(false);
 
         if (results.dashboardStats) {
           this.updateCharts(results.dashboardStats);
@@ -802,9 +772,6 @@ export class VendorDashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading dashboard data', err);
-        this.loading.set(false);
-        this.loadingActivity.set(false);
-        this.loadingPipeline.set(false);
       },
     });
   }
@@ -902,7 +869,6 @@ export class VendorDashboardComponent implements OnInit {
 
   // --- VENDOR LOGIC ---
   loadVendorData() {
-    this.loading.set(true);
     this.jobService.getJobs().subscribe((page) => this.activeJobsCount.set(page.totalElements));
     this.applicationService.getApplications(undefined, 0, 100, 'OUTBOUND').subscribe({
       next: (page: any) => {
@@ -915,11 +881,9 @@ export class VendorDashboardComponent implements OnInit {
         this.shortlistedCount.set(shortlisted);
         const uniqueCandidates = new Set(apps.map((a: any) => a.email)).size;
         this.candidatesCount.set(uniqueCandidates);
-        this.loading.set(false);
       },
       error: (err: any) => {
         console.error('Failed to load vendor stats', err);
-        this.loading.set(false);
       },
     });
   }

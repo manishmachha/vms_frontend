@@ -39,16 +39,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         </div>
       </div>
 
-      <!-- Loading -->
-      @if (loading()) {
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading branded resumes...</p>
-        </div>
-      }
-
       <!-- Empty  -->
-      @if (!loading() && filteredResumes().length === 0) {
+      @if (filteredResumes().length === 0) {
         <div class="empty-state">
           <i class="bi bi-file-earmark-pdf"></i>
           <h3>No Branded Resumes</h3>
@@ -57,7 +49,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       }
 
       <!-- Resume Grid -->
-      @if (!loading() && filteredResumes().length > 0) {
+      @if (filteredResumes().length > 0) {
         <div class="resume-grid">
           @for (resume of filteredResumes(); track resume.id) {
             <div
@@ -120,7 +112,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
       }
 
       <!-- Summary -->
-      @if (!loading()) {
+      @if (filteredResumes().length > 0) {
         <div class="summary-bar">
           Showing {{ filteredResumes().length }} of {{ resumes().length }} branded resumes
         </div>
@@ -174,31 +166,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         cursor: pointer;
         color: var(--bs-body-color, #212529);
       }
-      .loading-state,
-      .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: var(--bs-secondary, #6c757d);
-      }
       .empty-state i {
         font-size: 48px;
         margin-bottom: 12px;
         display: block;
         opacity: 0.4;
-      }
-      .spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid var(--bs-border-color, #dee2e6);
-        border-top-color: var(--bs-primary, #1a237e);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin: 0 auto 16px;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
       }
       .resume-grid {
         display: grid;
@@ -373,7 +345,6 @@ export class ResumeListComponent implements OnInit {
   searchQuery = signal('');
   statusFilter = signal('ALL');
   sortField = signal('createdAt');
-  loading = signal(true);
 
   filteredResumes = computed(() => {
     let results = this.resumes();
@@ -420,15 +391,12 @@ export class ResumeListComponent implements OnInit {
   }
 
   loadResumes() {
-    this.loading.set(true);
     this.brandedResumeService.getAll().subscribe({
       next: (data) => {
         this.resumes.set(data);
-        this.loading.set(false);
       },
       error: (err) => {
         console.error('Failed to load branded resumes', err);
-        this.loading.set(false);
       },
     });
   }

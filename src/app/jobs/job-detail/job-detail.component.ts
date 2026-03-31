@@ -686,7 +686,6 @@ export class JobDetailComponent implements OnInit {
   showApplyModal = false;
   myCandidates = signal<Candidate[]>([]);
   selectedCandidateId = '';
-  loadingCandidates = false;
   applications = signal<JobApplication[]>([]);
   groupedApplications = computed(() => {
     const apps = this.applications();

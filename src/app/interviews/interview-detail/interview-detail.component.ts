@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, RouterLink, MatIconModule],
   template: `
-    <div class="space-y-6 animate-fade-in pb-10" *ngIf="interview(); else loader">
+    <div class="space-y-6 animate-fade-in pb-10" *ngIf="interview()">
       <!-- Breadcrumb / Back -->
       <div class="flex items-center gap-2">
         <a routerLink="/interviews" class="p-2 rounded-xl bg-white border border-gray-100 text-gray-500 hover:text-indigo-600 hover:border-indigo-100 transition-all">
@@ -210,18 +210,6 @@ import { MatIconModule } from '@angular/material/icon';
         </div>
       </div>
     </div>
-
-    <!-- Loading Skeleton -->
-    <ng-template #loader>
-      <div class="space-y-6 animate-pulse">
-        <div class="h-10 w-48 bg-gray-100 rounded-xl"></div>
-        <div class="h-40 bg-gray-100 rounded-3xl"></div>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="h-60 bg-gray-100 rounded-3xl"></div>
-          <div class="lg:col-span-2 h-60 bg-gray-100 rounded-3xl"></div>
-        </div>
-      </div>
-    </ng-template>
   `
 })
 export class InterviewDetailComponent implements OnInit {

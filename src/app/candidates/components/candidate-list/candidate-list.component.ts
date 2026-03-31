@@ -27,8 +27,6 @@ export class CandidateListComponent implements OnInit {
   searchQuery = signal('');
   unreadCandidateIds = new Set<string>();
 
-  loading = signal(true);
-
   ngOnInit() {
     this.headerService.setTitle(
       'Candidates',
@@ -51,7 +49,6 @@ export class CandidateListComponent implements OnInit {
   }
 
   loadCandidates() {
-    this.loading.set(true);
     this.candidateService.getCandidates().subscribe({
       next: (data) => {
         // Sort: notified candidates first
@@ -63,11 +60,9 @@ export class CandidateListComponent implements OnInit {
 
         this.candidates.set(sorted);
         this.filterCandidates();
-        this.loading.set(false);
       },
       error: (err) => {
         console.error('Failed to load candidates', err);
-        this.loading.set(false);
       },
     });
   }

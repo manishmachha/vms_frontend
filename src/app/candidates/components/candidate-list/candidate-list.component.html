@@ -43,28 +43,8 @@
     />
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div
-      *ngFor="let i of [1, 2, 3, 4, 5, 6]"
-      class="bg-white rounded-lg shadow-sm p-6 animate-pulse"
-    >
-      <div class="flex items-center space-x-4">
-        <div class="rounded-full bg-gray-200 h-12 w-12"></div>
-        <div class="flex-1 space-y-2">
-          <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </div>
-      <div class="mt-4 space-y-2">
-        <div class="h-3 bg-gray-200 rounded w-full"></div>
-        <div class="h-3 bg-gray-200 rounded w-5/6"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- Empty State -->
-  <div *ngIf="!loading() && filteredCandidates().length === 0" class="text-center py-12">
+  <div *ngIf="filteredCandidates().length === 0" class="text-center py-12">
     <svg
       class="mx-auto h-12 w-12 text-gray-400"
       fill="none"
@@ -106,7 +86,7 @@
 
   <!-- Candidate Grid -->
   <div
-    *ngIf="!loading() && filteredCandidates().length > 0"
+    *ngIf="filteredCandidates().length > 0"
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
   >
     <div

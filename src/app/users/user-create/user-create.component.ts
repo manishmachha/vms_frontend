@@ -54,7 +54,6 @@ export class UserCreateComponent implements OnInit {
 
   vendors: Vendor[] = [];
   organizations: Organization[] = [];
-  loading = false;
 
   solventekRoles = [
     { value: 'SUPER_ADMIN', label: 'Super Admin' },
@@ -80,7 +79,6 @@ export class UserCreateComponent implements OnInit {
   }
 
   loadUserForEdit(id: number) {
-    this.loading = true;
     this.userService.getUser(id).subscribe({
       next: (user) => {
         this.userForm.patchValue({
@@ -92,10 +90,8 @@ export class UserCreateComponent implements OnInit {
           role: user.role,
           organizationId: user.organizationId || user.orgId
         });
-        this.loading = false;
       },
       error: (err) => {
-        this.loading = false;
         console.error('Error loading user:', err);
         this.snackBar.open('Error loading user data', 'Close', { duration: 3000 });
       }
@@ -126,7 +122,6 @@ export class UserCreateComponent implements OnInit {
   onSubmit() {
     if (this.userForm.invalid) return;
 
-    this.loading = true;
     const userData = this.userForm.getRawValue();
     
     const request = this.isEditMode() 
@@ -135,12 +130,10 @@ export class UserCreateComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        this.loading = false;
         this.snackBar.open(`User ${this.isEditMode() ? 'updated' : 'created'} successfully`, 'Close', { duration: 3000 });
         this.router.navigate(['/organization/users']);
       },
       error: (err) => {
-        this.loading = false;
         console.error(`Error ${this.isEditMode() ? 'updating' : 'creating'} user:`, err);
         this.snackBar.open(`Error ${this.isEditMode() ? 'updating' : 'creating'} user`, 'Close', { duration: 3000 });
       }

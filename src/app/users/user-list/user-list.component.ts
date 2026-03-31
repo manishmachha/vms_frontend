@@ -25,7 +25,6 @@ export class UserListComponent implements OnInit {
   users = signal<User[]>([]);
   filteredUsers = signal<User[]>([]);
   searchQuery = signal('');
-  loading = signal(true);
 
   ngOnInit() {
     this.headerService.setTitle(
@@ -37,17 +36,14 @@ export class UserListComponent implements OnInit {
   }
 
   loadUsers() {
-    this.loading.set(true);
     this.userService.getUsers().subscribe({
       next: (data) => {
         this.users.set(data);
         this.filterUsers();
-        this.loading.set(false);
       },
       error: (err) => {
         console.error('Failed to load users', err);
         this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
-        this.loading.set(false);
       }
     });
   }

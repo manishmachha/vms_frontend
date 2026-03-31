@@ -86,9 +86,6 @@ interface RecentActivity {
             <p class="text-xs font-semibold text-white/80 uppercase tracking-wider">
               {{ stat.label }}
             </p>
-            <p class="text-2xl font-bold text-white mt-1">
-              {{ loading() ? '—' : stat.value }}
-            </p>
           </div>
           <div
             class="absolute -right-4 -bottom-4 w-16 h-16 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700"
@@ -346,7 +343,6 @@ export class ManagerDashboardComponent implements OnInit {
   interviewService = inject(InterviewService);
   candidateService = inject(CandidateService);
 
-  loading = signal(true);
   stats = signal<StatCard[]>([
     {
       label: 'Candidates',
@@ -468,7 +464,6 @@ export class ManagerDashboardComponent implements OnInit {
   }
 
   loadData() {
-    this.loading.set(true);
     forkJoin({
       candidates: this.candidateService.getCandidates(),
       jobs: this.jobService.getJobs(0, 100),
@@ -529,11 +524,9 @@ export class ManagerDashboardComponent implements OnInit {
         // Process Recent Activity
         this.processActivity(apps, interviews);
 
-        this.loading.set(false);
       },
       error: (err) => {
         console.error('Unified Dashboard loading failed', err);
-        this.loading.set(false);
       },
     });
   }

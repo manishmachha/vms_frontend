@@ -86,16 +86,10 @@ import { ModalComponent } from '../../../layout/components/modal/modal.component
           </button>
           <button
             type="submit"
-            [disabled]="projectForm.invalid || isSaving"
+            [disabled]="projectForm.invalid"
             class="flex-1 btn-primary py-3 px-4 rounded-xl font-medium disabled:opacity-50 flex justify-center items-center gap-2"
           >
-            <span
-              *ngIf="isSaving"
-              class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
-            ></span>
-            <span>{{
-              isSaving ? 'Saving...' : editProject ? 'Update Project' : 'Create Project'
-            }}</span>
+            <span>{{ editProject ? 'Update Project' : 'Create Project' }}</span>
           </button>
         </div>
       </form>
@@ -112,7 +106,6 @@ export class AddProjectModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private projectService = inject(ProjectService);
 
-  isSaving = false;
 
   projectForm = this.fb.group({
     name: ['', Validators.required],
@@ -150,7 +143,6 @@ export class AddProjectModalComponent implements OnChanges {
 
   saveProject() {
     if (this.projectForm.valid) {
-      this.isSaving = true;
       const formVal = this.projectForm.value;
       const payload: any = {
         name: formVal.name,
@@ -169,13 +161,11 @@ export class AddProjectModalComponent implements OnChanges {
 
       request$.subscribe({
         next: () => {
-          this.isSaving = false;
           this.saved.emit();
           this.onClose();
         },
         error: (err: any) => {
           console.error(err);
-          this.isSaving = false;
         },
       });
     }

@@ -1,9 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpContext, HttpContextToken } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { ApiResponse } from '../models/auth.model';
+
+export const SKIP_LOADER = new HttpContextToken<boolean>(() => false);
 
 /**
  * Centralized API service that:
@@ -18,54 +20,60 @@ export class ApiService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
 
-  get<T>(path: string, params?: HttpParams, headers?: HttpHeaders): Observable<T> {
+  get<T>(path: string, params?: HttpParams, headers?: HttpHeaders, skipLoader = false): Observable<T> {
+    const context = new HttpContext().set(SKIP_LOADER, skipLoader);
     return this.http
-      .get<ApiResponse<T>>(`${this.baseUrl}${path}`, { params, headers })
+      .get<ApiResponse<T>>(`${this.baseUrl}${path}`, { params, headers, context })
       .pipe(
         map((response) => response.data),
         catchError(this.handleError),
       );
   }
 
-  post<T>(path: string, body: any = {}, headers?: HttpHeaders): Observable<T> {
+  post<T>(path: string, body: any = {}, headers?: HttpHeaders, skipLoader = false): Observable<T> {
+    const context = new HttpContext().set(SKIP_LOADER, skipLoader);
     return this.http
-      .post<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers })
+      .post<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers, context })
       .pipe(
         map((response) => response.data),
         catchError(this.handleError),
       );
   }
 
-  put<T>(path: string, body: any = {}, headers?: HttpHeaders, params?: HttpParams): Observable<T> {
+  put<T>(path: string, body: any = {}, headers?: HttpHeaders, params?: HttpParams, skipLoader = false): Observable<T> {
+    const context = new HttpContext().set(SKIP_LOADER, skipLoader);
     return this.http
-      .put<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers, params })
+      .put<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers, params, context })
       .pipe(
         map((response) => response.data),
         catchError(this.handleError),
       );
   }
 
-  patch<T>(path: string, body: any = {}, headers?: HttpHeaders): Observable<T> {
+  patch<T>(path: string, body: any = {}, headers?: HttpHeaders, skipLoader = false): Observable<T> {
+    const context = new HttpContext().set(SKIP_LOADER, skipLoader);
     return this.http
-      .patch<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers })
+      .patch<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers, context })
       .pipe(
         map((response) => response.data),
         catchError(this.handleError),
       );
   }
 
-  delete<T>(path: string, headers?: HttpHeaders): Observable<T> {
+  delete<T>(path: string, headers?: HttpHeaders, skipLoader = false): Observable<T> {
+    const context = new HttpContext().set(SKIP_LOADER, skipLoader);
     return this.http
-      .delete<ApiResponse<T>>(`${this.baseUrl}${path}`, { headers })
+      .delete<ApiResponse<T>>(`${this.baseUrl}${path}`, { headers, context })
       .pipe(
         map((response) => response.data),
         catchError(this.handleError),
       );
   }
 
-  download(path: string): Observable<Blob> {
+  download(path: string, skipLoader = false): Observable<Blob> {
+    const context = new HttpContext().set(SKIP_LOADER, skipLoader);
     return this.http
-      .get(`${this.baseUrl}${path}`, { responseType: 'blob' })
+      .get(`${this.baseUrl}${path}`, { responseType: 'blob', context })
       .pipe(catchError(this.handleError));
   }
 

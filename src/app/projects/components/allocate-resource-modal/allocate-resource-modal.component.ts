@@ -86,14 +86,10 @@ import { ModalComponent } from '../../../layout/components/modal/modal.component
           </button>
           <button
             type="submit"
-            [disabled]="allocateForm.invalid || isSaving"
+            [disabled]="allocateForm.invalid"
             class="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex items-center gap-2"
           >
-            <span
-              *ngIf="isSaving"
-              class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
-            ></span>
-            <span>{{ isSaving ? 'Confirming...' : 'Confirm Allocation' }}</span>
+            <span>Confirm Allocation</span>
           </button>
         </div>
       </form>
@@ -113,7 +109,6 @@ export class AllocateResourceModalComponent implements OnChanges {
   private projectService = inject(ProjectService);
   private dialogService = inject(DialogService);
 
-  isSaving = false;
 
   allocateForm = this.fb.group({
     candidateId: ['', Validators.required],
@@ -130,7 +125,6 @@ export class AllocateResourceModalComponent implements OnChanges {
 
   allocateUser() {
     if (this.allocateForm.valid && this.projectId) {
-      this.isSaving = true;
       const val = this.allocateForm.value;
 
       const candidateIdVal = Number(val.candidateId);
@@ -144,12 +138,10 @@ export class AllocateResourceModalComponent implements OnChanges {
 
       this.projectService.allocateUser(this.projectId, req).subscribe({
         next: () => {
-          this.isSaving = false;
           this.saved.emit();
           this.onClose();
         },
         error: () => {
-          this.isSaving = false;
           this.dialogService.open('Error', 'Failed to allocate resource');
         },
       });

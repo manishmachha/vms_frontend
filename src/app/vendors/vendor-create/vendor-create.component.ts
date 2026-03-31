@@ -41,22 +41,17 @@ export class VendorCreateComponent {
     website: ['']
   });
 
-  loading = false;
-
   onSubmit() {
     if (this.vendorForm.invalid) return;
 
-    this.loading = true;
     const vendorData = { ...this.vendorForm.value, orgType: 'VENDOR' };
 
     this.organizationService.createOrganization(vendorData).subscribe({
       next: (vendor) => {
-        this.loading = false;
         this.snackBar.open('Vendor created successfully', 'Close', { duration: 3000 });
         this.router.navigate(['/vendors']);
       },
       error: (err) => {
-        this.loading = false;
         this.snackBar.open('Error creating vendor', 'Close', { duration: 3000 });
       }
     });
