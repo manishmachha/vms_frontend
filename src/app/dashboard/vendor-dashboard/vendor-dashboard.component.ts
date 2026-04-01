@@ -191,7 +191,7 @@ export class VendorDashboardComponent implements OnInit {
     return this.authStore.orgType() === 'VENDOR';
   }
   isAdmin() {
-    return this.authStore.userRole() === 'SUPER_ADMIN' || this.authStore.userRole() === 'HR_ADMIN';
+    return this.authStore.userRole() === 'SUPER_ADMIN' || this.authStore.userRole() === 'MANAGER';
   }
 
   getBannerGradient(): string {

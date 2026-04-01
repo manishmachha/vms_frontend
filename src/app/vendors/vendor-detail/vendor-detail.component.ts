@@ -59,12 +59,12 @@ export class VendorDetailComponent implements OnInit {
   canEdit = computed(() => {
     const role = this.authStore.userRole();
     // Allow SUPER_ADMIN or HR_ADMIN to edit vendor details
-    return role === 'SUPER_ADMIN' || role === 'HR_ADMIN';
+    return role === 'SUPER_ADMIN' || role === 'MANAGER';
   });
 
   canAction = computed(() => {
     const role = this.authStore.userRole();
-    return role === 'SUPER_ADMIN' || role === 'HR_ADMIN';
+    return role === 'SUPER_ADMIN' || role === 'MANAGER';
   });
 
   canUpdateStatus = computed(() => {
@@ -90,8 +90,8 @@ export class VendorDetailComponent implements OnInit {
 
         // Fetch Stats
         this.organizationService.getDashboardStats(id).subscribe({
-          next: stats => this.dashboardStats.set(stats),
-          error: err => console.error('Failed to load dashboard stats', err)
+          next: (stats) => this.dashboardStats.set(stats),
+          error: (err) => console.error('Failed to load dashboard stats', err),
         });
 
         // Fetch Public Jobs
@@ -102,7 +102,6 @@ export class VendorDetailComponent implements OnInit {
       },
     });
   }
-
 
   // approve/reject removed as per simplified VendorStatus
 
