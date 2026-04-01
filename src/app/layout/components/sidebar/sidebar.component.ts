@@ -17,7 +17,6 @@ import { AuthStore } from '../../../services/auth.store';
 export type UserRole =
   | 'SUPER_ADMIN'
   | 'MANAGER'
-  | 'ADMIN'
   | 'TALENT_ACQUISITION'
   | 'EMPLOYEE'
   | 'VENDOR';
@@ -67,14 +66,14 @@ export class SidebarComponent implements OnInit {
           label: 'Overview',
           route: '/dashboard',
           icon: 'bi bi-speedometer2',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'EMPLOYEE', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'EMPLOYEE', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
         },
         {
           label: 'Users',
           route: '/users/',
           icon: 'bi bi-building',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
+          roles: ['SUPER_ADMIN', 'MANAGER'],
           orgTypes: ['SOLVENTEK'],
         },
       ],
@@ -87,7 +86,7 @@ export class SidebarComponent implements OnInit {
           label: 'Vendors',
           route: '/vendors',
           icon: 'bi bi-shop',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN'],
+          roles: ['SUPER_ADMIN', 'MANAGER'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'ORGANIZATION',
         },
@@ -101,7 +100,7 @@ export class SidebarComponent implements OnInit {
           label: 'Jobs',
           route: '/jobs',
           icon: 'bi bi-briefcase-fill',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
           notificationCategory: 'JOB',
         },
@@ -109,14 +108,14 @@ export class SidebarComponent implements OnInit {
           label: 'Candidates',
           route: '/candidates',
           icon: 'bi bi-person-badge',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
         },
         {
           label: 'Applications',
           route: '/applications',
           icon: 'bi bi-file-earmark-text',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'APPLICATION',
         },
@@ -124,7 +123,7 @@ export class SidebarComponent implements OnInit {
           label: 'Interviews',
           route: '/interviews',
           icon: 'bi bi-calendar-event',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
         },
         {
@@ -145,14 +144,14 @@ export class SidebarComponent implements OnInit {
           label: 'Clients',
           route: '/clients',
           icon: 'bi bi-briefcase',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
         },
         {
           label: 'Projects',
           route: '/projects',
           icon: 'bi bi-kanban',
-          roles: ['SUPER_ADMIN', 'MANAGER', 'ADMIN', 'TALENT_ACQUISITION'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'PROJECT',
         },

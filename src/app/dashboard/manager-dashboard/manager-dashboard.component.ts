@@ -187,7 +187,7 @@ export class ManagerDashboardComponent implements OnInit {
       interviews: this.interviewService.getAllInterviews(),
     }).subscribe({
       next: ({ candidates, jobs, applications, projects, interviews }) => {
-        const apps = applications.content || [];
+        const apps = (applications as any)?.content || (Array.isArray(applications) ? applications : []);
 
         // Funnel Processing
         const applied = apps.filter((a: any) => a.status === 'APPLIED').length;
@@ -205,14 +205,16 @@ export class ManagerDashboardComponent implements OnInit {
         ).length;
 
         // Update Stats
-        const currentStats = this.stats();
-        currentStats[0].value = candidates.length; // Total Candidates
-        currentStats[1].value = jobs.totalElements; // Open Jobs
-        currentStats[2].value = applications.totalElements; // Pipeline
-        currentStats[3].value = projects.length; // Projects
-        currentStats[4].value = interview;
-        currentStats[5].value = offer;
-        this.stats.set([...currentStats]);
+        this.stats.update((currentStats) => {
+          const stats = [...currentStats];
+          stats[0].value = (candidates as any)?.length || 0;
+          stats[1].value = (jobs as any)?.totalElements ?? (jobs as any)?.length ?? 0;
+          stats[2].value = (applications as any)?.totalElements ?? (applications as any)?.length ?? 0;
+          stats[3].value = (projects as any)?.length || 0;
+          stats[4].value = interview || 0;
+          stats[5].value = offer || 0;
+          return stats;
+        });
 
         // Update Funnel
         this.funnelStages.set([

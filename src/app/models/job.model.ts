@@ -12,7 +12,7 @@ export type JobStatus =
   | 'CLOSED';
 
 // ===== Employment Type (matches backend EmploymentType enum) =====
-export type EmploymentType = 'FTE' | 'C2H' | 'CONTRACT';
+export type EmploymentType = 'FTE' | 'C2H';
 
 // ===== Job (matches backend Job entity) =====
 export interface Job {
