@@ -982,9 +982,26 @@
 
             <div class="col-span-2">
               <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">CC Users (Solventek / Vendor)</label>
-              <select multiple formControlName="ccUserIds" class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 min-h-[100px]">
-                @for (user of potentialCcUsers(); track user.id) {
-                  <option [value]="user.id">{{ user.firstName }} {{ user.lastName }} ({{ user.type }})</option>
+              
+              <!-- User Search -->
+              <div class="relative group mb-3">
+                <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
+                <input 
+                  type="text" 
+                  [ngModel]="userSearchTerm()" 
+                  (ngModelChange)="userSearchTerm.set($event)"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Search by name, email or organization..." 
+                  class="input-modern pl-12 bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 h-10!"
+                >
+              </div>
+
+              <select multiple formControlName="ccUserIds" class="input-modern bg-gray-50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 min-h-[120px]">
+                @for (user of filteredCcUsers(); track user.id) {
+                  <option [value]="user.id">
+                    {{ user.firstName }} {{ user.lastName }} 
+                    ({{ user.organizationName || 'No Organization' }})
+                  </option>
                 }
               </select>
               <p class="text-[10px] text-gray-500 mt-1 px-1">Hold Ctrl/Cmd to select multiple users</p>

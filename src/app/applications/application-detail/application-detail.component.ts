@@ -109,6 +109,21 @@ export class ApplicationDetailComponent implements OnInit {
   interviews = signal<Interview[]>([]);
   showScheduleModal = signal(false);
   potentialCcUsers = signal<any[]>([]);
+  userSearchTerm = signal('');
+
+  filteredCcUsers = computed(() => {
+    const term = this.userSearchTerm().toLowerCase();
+    const users = this.potentialCcUsers();
+    if (!term) return users;
+    return users.filter(
+      (u) =>
+        u.firstName?.toLowerCase().includes(term) ||
+        u.lastName?.toLowerCase().includes(term) ||
+        u.email?.toLowerCase().includes(term) ||
+        u.organizationName?.toLowerCase().includes(term),
+    );
+  });
+
   scheduleForm = this.fb.group({
     scheduledAt: ['', Validators.required],
     durationMinutes: [30, [Validators.required, Validators.min(15)]],

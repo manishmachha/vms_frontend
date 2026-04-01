@@ -28,6 +28,7 @@ export interface User {
   status?: boolean;
   type?: string; // 'SOLVENTEK' | 'VENDOR'
   role?: string; // 'SUPER_ADMIN' | 'MANAGER' | 'TALENT_ACQUISITION' | 'VENDOR'
+  organizationName?: string;
   organizationId?: number;
   orgId?: number;
   createdAt?: string;
