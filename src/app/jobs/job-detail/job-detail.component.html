@@ -108,8 +108,24 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Left Column: Details -->
-      <div class="lg:col-span-2 space-y-6">
+      <!-- Main Content (Tabbed) -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
+          <mat-tab-group
+            animationDuration="300ms"
+            mat-stretch-tabs="false"
+            mat-align-tabs="start"
+            class="flex-1"
+          >
+            <!-- Overview Tab -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <div class="flex items-center gap-2 px-2">
+                  <mat-icon class="text-indigo-500">article</mat-icon>
+                  <span class="font-bold">Overview</span>
+                </div>
+              </ng-template>
+              <div class="p-6 space-y-6 bg-gray-50/30 overflow-y-auto h-full">
         <!-- Description Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
@@ -244,6 +260,27 @@
           </div>
         </div>
       </div>
+    </mat-tab>
+
+          <!-- Activity Log Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <div class="flex items-center gap-2 px-2">
+                <mat-icon class="text-blue-500">history</mat-icon>
+                <span class="font-bold">Activity Log</span>
+              </div>
+            </ng-template>
+            <div class="p-6 bg-gray-50/30 overflow-y-auto h-full">
+              <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <mat-icon class="text-blue-500">timeline</mat-icon>
+                Job Lifecycle Audit
+              </h3>
+              <app-timeline [events]="timelineEvents()" entityType="JOB" [entityId]="job()!.id"></app-timeline>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
 
       <!-- Right Column: Actions and Info -->
       <div class="space-y-6">
@@ -408,17 +445,6 @@
           </div>
         </div>
 
-        <!-- Timeline Card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
-            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">
-              Activity Timeline
-            </h3>
-          </div>
-          <div class="p-6">
-            <app-timeline [entityType]="'JOB'" [entityId]="job()!.id"></app-timeline>
-          </div>
-        </div>
       </div>
     </div>
 

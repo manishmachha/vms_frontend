@@ -875,55 +875,7 @@
                   </div>
 
                   <!-- Feed -->
-                  <div class="space-y-8 relative pl-4">
-                    <div class="absolute top-0 bottom-0 left-[27px] w-px bg-gray-200"></div>
-
-                    <div *ngFor="let event of timeline()" class="relative z-10">
-                      <div class="flex items-start gap-4">
-                        <!-- Icon -->
-                        <div
-                          class="h-10 w-10 rounded-full border-4 border-gray-50 flex items-center justify-center shadow-sm shrink-0"
-                          [ngClass]="{
-                            'bg-blue-500': ['STATUS_CHANGE', 'APPLY'].includes(event.action),
-                            'bg-indigo-500': event.action === 'COMMENT',
-                            'bg-green-500': ['INTERVIEW_SCHEDULE', 'CLIENT_DECISION'].includes(
-                              event.action
-                            ),
-                            'bg-amber-500': event.action === 'DOCUMENT_UPLOAD',
-                          }"
-                        >
-                          <mat-icon class="text-[18px] w-[18px] h-[18px] leading-none text-white!">
-                            {{
-                              event.action === 'COMMENT'
-                                ? 'chat_bubble'
-                                : event.action === 'DOCUMENT_UPLOAD'
-                                  ? 'description'
-                                  : event.action === 'INTERVIEW_SCHEDULE'
-                                    ? 'event'
-                                    : ['STATUS_CHANGE', 'CLIENT_DECISION'].includes(event.action)
-                                      ? 'check'
-                                      : 'history'
-                            }}
-                          </mat-icon>
-                        </div>
-
-                        <!-- Content -->
-                        <div
-                          class="flex-1 bg-white p-4 rounded-xl border border-gray-200 shadow-sm relative arrow-left"
-                        >
-                          <div class="flex justify-between items-start mb-2">
-                            <span class="font-bold text-gray-900 text-sm">{{
-                              event.title || event.action
-                            }}</span>
-                            <span class="text-xs text-gray-400 font-medium">{{
-                              event.createdAt | date: 'short'
-                            }}</span>
-                          </div>
-                          <p class="text-sm text-gray-600 leading-relaxed">{{ event.message }}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <app-timeline [events]="timelineEvents()" entityType="APPLICATION" [entityId]="app.id"></app-timeline>
                 </div>
               </mat-tab>
             </mat-tab-group>

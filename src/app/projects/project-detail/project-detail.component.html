@@ -106,8 +106,24 @@
     </div>
   </div>
 
-  <!-- Main Content Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Main Content (Tabbed) -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
+    <mat-tab-group
+      animationDuration="300ms"
+      mat-stretch-tabs="false"
+      mat-align-tabs="start"
+      class="flex-1"
+    >
+      <!-- Overview Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2 px-2">
+            <mat-icon class="text-indigo-500">dashboard</mat-icon>
+            <span class="font-bold">Overview</span>
+          </div>
+        </ng-template>
+        <div class="p-6 space-y-8 bg-gray-50/30 overflow-y-auto h-full">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Team Allocation Chart -->
     <div
       class="lg:col-span-1 bg-white rounded-xl p-6 border border-gray-100 shadow-sm overflow-visible"
@@ -289,36 +305,27 @@
         </table>
       </div>
     </div>
-  </div>
-
-  <!-- Timeline Section -->
-  <div
-    *ngIf="allocations().length > 0"
-    class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm"
-  >
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Allocation Timeline</h3>
-    <div class="space-y-3">
-      <div *ngFor="let alloc of allocations()" class="flex items-center gap-4">
-        <div class="w-32 text-sm text-gray-600 truncate">
-          {{ (alloc.user || alloc.candidateDetails)?.firstName }}
-          {{ (alloc.user || alloc.candidateDetails)?.lastName?.charAt(0) }}.
-        </div>
-        <div class="flex-1 h-8 bg-gray-100 rounded-lg relative overflow-hidden">
-          <div
-            class="absolute h-full rounded-lg flex items-center justify-center text-xs text-white font-medium"
-            [style.left.%]="getTimelineOffset(alloc)"
-            [style.width.%]="getTimelineWidth(alloc)"
-            [style.background]="getColor(alloc)"
-          >
-            {{ alloc.allocationPercentage }}%
           </div>
         </div>
-      </div>
-    </div>
-    <div class="flex justify-between mt-2 text-xs text-gray-400">
-      <span>{{ project()?.startDate | date: 'MMM d' }}</span>
-      <span>{{ project()?.endDate ? (project()?.endDate | date: 'MMM d') : 'Ongoing' }}</span>
-    </div>
+      </mat-tab>
+
+      <!-- Activity Log Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <div class="flex items-center gap-2 px-2">
+            <mat-icon class="text-blue-500">history</mat-icon>
+            <span class="font-bold">Activity Log</span>
+          </div>
+        </ng-template>
+        <div class="p-6 bg-gray-50/30 overflow-y-auto h-full">
+          <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <mat-icon class="text-blue-500">timeline</mat-icon>
+            Project Execution Audit
+          </h3>
+          <app-timeline [events]="timelineEvents()" entityType="PROJECT" [entityId]="project()!.id.toString()"></app-timeline>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
   </div>
 
 </div>

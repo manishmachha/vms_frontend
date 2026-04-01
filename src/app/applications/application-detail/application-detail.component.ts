@@ -38,6 +38,8 @@ import { Interview, InterviewType } from '../../models/interview.model';
 import { ChangeDetectorRef } from '@angular/core';
 import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 import { ScheduleInterviewDialogComponent } from '../dialogs/schedule-interview-dialog/schedule-interview-dialog.component';
+import { TimelineComponent } from '../../layout/components/timeline/timeline.component';
+import { TimelineEvent, TimelineService } from '../../services/timeline.service';
 
 @Component({
   selector: 'app-application-detail',
@@ -56,6 +58,7 @@ import { ScheduleInterviewDialogComponent } from '../dialogs/schedule-interview-
     BaseChartDirective,
     OrganizationLogoComponent,
     ClientSubmissionsComponent,
+    TimelineComponent
   ],
   templateUrl: './application-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,6 +75,7 @@ export class ApplicationDetailComponent implements OnInit {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
+  private timelineService = inject(TimelineService);
 
   // Permission Signal
   // Permission Signals
@@ -103,7 +107,7 @@ export class ApplicationDetailComponent implements OnInit {
   dashboardStats = signal<DashboardStatsResponse | null>(null);
   brandedResume = signal<BrandedResume | null>(null);
   analysis = signal<any>(null);
-  timeline = signal<any[]>([]);
+  timelineEvents = signal<TimelineEvent[]>([]);
   documents = signal<any[]>([]);
 
   isPollingAnalysis = signal(true);
@@ -391,10 +395,8 @@ export class ApplicationDetailComponent implements OnInit {
   }
 
   loadTimeline(id: string | number) {
-    this.appService.getTimeline(id).subscribe({
-      next: (page) => {
-        this.timeline.set(page.content ? page.content : page);
-      },
+    this.timelineService.getTimeline('APPLICATION', String(id)).subscribe({
+      next: (res) => this.timelineEvents.set(res.content),
     });
   }
 

@@ -193,374 +193,411 @@
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Main Content -->
-    <div class="lg:col-span-2 space-y-6">
-      <!-- Applied Jobs Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <i class="bi bi-briefcase-fill text-indigo-500"></i> Applied Jobs
-        </h3>
-        <div class="space-y-4" *ngIf="applications().length > 0; else noApps">
-          <div *ngFor="let app of applications()" class="p-4 rounded-xl border border-gray-100 hover:border-indigo-100 transition-colors bg-gray-50/30">
-            <div class="flex justify-between items-start">
-              <div>
-                <h4 class="font-bold text-gray-900">{{ app.job.title }}</h4>
-                <p class="text-xs text-gray-500">{{ app.job.organization?.name }}</p>
-              </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider" 
-                    [ngClass]="{
-                      'bg-blue-100 text-blue-700': app.status === 'APPLIED',
-                      'bg-yellow-100 text-yellow-700': ['L1_INTERVIEW', 'L2_INTERVIEW', 'L3_INTERVIEW', 'INTERVIEW_SCHEDULED'].includes(app.status || ''),
-                      'bg-green-100 text-green-700': ['OFFERED', 'ONBOARDED'].includes(app.status || ''),
-                      'bg-red-100 text-red-700': ['REJECTED', 'FAILED'].includes(app.status || ''),
-                      'bg-gray-100 text-gray-700': true
-                    }">
-                {{ app.status }}
-              </span>
-            </div>
-            <div class="mt-3 flex justify-between items-center">
-              <span class="text-xs text-gray-400">Applied on {{ app.createdAt | date:'mediumDate' }}</span>
-              <a [routerLink]="['/applications', app.id]" class="text-xs font-bold text-indigo-600 hover:underline">View Application</a>
-            </div>
-          </div>
-        </div>
-        <ng-template #noApps>
-          <div class="text-center py-8">
-            <i class="bi bi-inbox text-4xl text-gray-200 mb-2 block"></i>
-            <p class="text-gray-400 italic text-sm">No job applications found for this candidate.</p>
-          </div>
-        </ng-template>
-      </div>
-
-      <!-- Scheduled Interviews Section -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <i class="bi bi-calendar-check-fill text-indigo-500"></i> Scheduled Interviews
-        </h3>
-        <div class="space-y-4" *ngIf="interviews().length > 0; else noInterviews">
-          <div *ngFor="let interview of interviews()" class="p-4 rounded-xl border border-gray-100 hover:border-indigo-100 transition-colors bg-gray-50/30">
-            <div class="flex justify-between items-start">
-              <div>
-                <h4 class="font-bold text-gray-900">{{ interview.type }} Round</h4>
-                <p class="text-xs text-gray-500">for {{ interview.application?.job?.title }}</p>
-              </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                    [ngClass]="{
-                      'bg-green-100 text-green-700': interview.status === 'COMPLETED',
-                      'bg-blue-100 text-blue-700': interview.status === 'SCHEDULED',
-                      'bg-red-100 text-red-700': interview.status === 'CANCELLED'
-                    }">
-                {{ interview.status }}
-              </span>
-            </div>
-            <div class="mt-4 flex items-center gap-4">
-              <div class="flex items-center gap-1.5 text-xs text-gray-600">
-                <i class="bi bi-clock text-indigo-400"></i>
-                {{ interview.scheduledAt | date:'medium' }}
-              </div>
-              <div class="flex items-center gap-1.5 text-xs text-gray-600" *ngIf="interview.durationMinutes">
-                <i class="bi bi-hourglass-split text-indigo-400"></i>
-                {{ interview.durationMinutes }} min
-              </div>
-            </div>
-            <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-              <div class="flex items-center gap-2" *ngIf="interview.interviewer">
-                <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">
-                  {{ interview.interviewer.firstName[0] }}{{ interview.interviewer.lastName[0] }}
-                </div>
-                <span class="text-xs text-gray-600">{{ interview.interviewer.firstName }} {{ interview.interviewer.lastName }}</span>
-              </div>
-              <a *ngIf="interview.meetingLink" [href]="interview.meetingLink" target="_blank" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
-                <i class="bi bi-camera-video"></i> Join Meeting
-              </a>
-            </div>
-          </div>
-        </div>
-        <ng-template #noInterviews>
-          <div class="text-center py-8">
-            <i class="bi bi-calendar-x text-4xl text-gray-200 mb-2 block"></i>
-            <p class="text-gray-400 italic text-sm">No interviews scheduled yet.</p>
-          </div>
-        </ng-template>
-      </div>
-
-      <!-- Client Submissions Section (Visible to Solventek) -->
-      <div *ngIf="authStore.orgType() === 'SOLVENTEK' && candidate()?.id">
-        <app-client-submissions [candidateId]="candidate()!.id"></app-client-submissions>
-      </div>
-
-      <!-- AI Analysis Report (Solventek Only) -->
-      <div
-        *ngIf="authStore.orgType() === 'SOLVENTEK'"
-        class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden relative"
-      >
-        <div class="flex items-center gap-3 mb-6 relative z-10">
-          <div
-            class="h-10 w-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200"
-          >
-            <i class="bi bi-cpu-fill text-xl"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-gray-900">AI Resume Audit</h3>
-            <p class="text-xs text-gray-500 font-medium">AUTOMATED QUALITY & RISK ASSESSMENT</p>
-          </div>
-        </div>
-
-        <div *ngIf="!analysis()" class="flex flex-col items-center justify-center py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
-           <mat-icon class="text-gray-300 text-4xl mb-4">analytics</mat-icon>
-           <p class="text-gray-500 font-medium text-sm">Resume analysis pending or in progress...</p>
-        </div>
-
-        <div *ngIf="analysis()" class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-          <!-- Chart -->
-          <div class="h-64">
-            <canvas
-              baseChart
-              [data]="radarChartData()"
-              [options]="radarChartOptions"
-              [type]="radarChartType"
-            >
-            </canvas>
-          </div>
-
-          <!-- Scores Grid -->
-          <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-3">
-              <!-- Overall Risk -->
-              <div class="p-3 rounded-xl bg-gray-50 border border-gray-100 col-span-2">
-                <span
-                  class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1"
-                  >Overall Risk</span
-                >
-                <div class="flex items-baseline gap-2">
-                  <span class="text-3xl font-black text-gray-900">{{
-                    analysis().overallRiskScore
-                  }}</span>
-                  <span class="text-sm font-medium text-gray-500">/ 100</span>
-                </div>
-                <div class="h-1.5 w-full bg-gray-200 rounded-full mt-2 overflow-hidden">
-                  <div
-                    class="h-full rounded-full transition-all duration-500"
-                    [style.width.%]="analysis().overallRiskScore"
-                    [ngClass]="{
-                      'bg-green-500': analysis().overallRiskScore < 30,
-                      'bg-yellow-500':
-                        analysis().overallRiskScore >= 30 && analysis().overallRiskScore < 70,
-                      'bg-red-500': analysis().overallRiskScore >= 70,
-                    }"
-                  ></div>
-                </div>
-              </div>
-
-              <!-- Consistency -->
-              <div class="p-3 rounded-xl bg-blue-50/50 border border-blue-100">
-                <span
-                  class="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1"
-                  >Consistency</span
-                >
-                <span class="text-xl font-bold text-blue-900"
-                  >{{ analysis().overallConsistencyScore || 0 }}%</span
-                >
-              </div>
-
-              <!-- Timeline -->
-              <div class="p-3 rounded-xl bg-purple-50/50 border border-purple-100">
-                <span
-                  class="text-[10px] font-bold text-purple-400 uppercase tracking-wider block mb-1"
-                  >Timeline</span
-                >
-                <span class="text-xl font-bold text-purple-900"
-                  >{{ analysis().timelineRiskScore || 0 }}%</span
-                >
-              </div>
-
-              <!-- Skills -->
-              <div class="p-3 rounded-xl bg-amber-50/50 border border-amber-100">
-                <span
-                  class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-1"
-                  >Skill Inflation</span
-                >
-                <span class="text-xl font-bold text-amber-900"
-                  >{{ analysis().skillInflationRiskScore || 0 }}%</span
-                >
-              </div>
-
-              <!-- Credibility -->
-              <div class="p-3 rounded-xl bg-indigo-50/50 border border-indigo-100">
-                <span
-                  class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block mb-1"
-                  >Credibility</span
-                >
-                <span class="text-xl font-bold text-indigo-900"
-                  >{{ analysis().projectCredibilityRiskScore || 0 }}%</span
-                >
-              </div>
-
-              <!-- AI Content -->
-              <div class="p-3 rounded-xl bg-rose-50/50 border border-rose-100">
-                <span
-                  class="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1"
-                  >AI Content</span
-                >
-                <span class="text-xl font-bold text-rose-900"
-                  >{{ analysis().aiContentScore || 0 }}%</span
-                >
-              </div>
-
-              <!-- Job Match -->
-              <div class="p-3 rounded-xl bg-teal-50/50 border border-teal-100">
-                <span
-                  class="text-[10px] font-bold text-teal-400 uppercase tracking-wider block mb-1"
-                  >Job Match</span
-                >
-                <span class="text-xl font-bold text-teal-900"
-                  >{{ analysis().jobMatchScore || 0 }}%</span
-                >
-              </div>
-
-              <!-- Skill Match -->
-              <div class="p-3 rounded-xl bg-cyan-50/50 border border-cyan-100">
-                <span
-                  class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1"
-                  >Skill Match</span
-                >
-                <span class="text-xl font-bold text-cyan-900"
-                  >{{ analysis().skillMatchScore || 0 }}%</span
-                >
-              </div>
-            </div>
-
-            <div
-              *ngIf="!analysis().redFlags || analysis().redFlags.length === 0"
-              class="flex flex-col items-center justify-center p-4 bg-green-50 rounded-xl border border-green-100 text-center mt-2"
-            >
-              <i class="bi bi-check-circle-fill text-xl text-green-500 mb-1"></i>
-              <p class="text-xs font-bold text-gray-900">No Major Issues</p>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="mt-6 pt-6 border-t border-gray-100 relative z-10"
-          *ngIf="analysis()?.summary"
+    <!-- Main Content (Tabbed) -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
+        <mat-tab-group
+          animationDuration="300ms"
+          mat-stretch-tabs="false"
+          mat-align-tabs="start"
+          class="flex-1"
         >
-          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Executive Summary
-          </h4>
-          <p class="text-sm text-gray-600 leading-relaxed">{{ analysis().summary }}</p>
-        </div>
-      </div>
-
-      <!-- Score Breakdown Info Card (Solventek Only) -->
-      <div
-        *ngIf="authStore.orgType() === 'SOLVENTEK'"
-        class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden"
-      >
-        <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2 relative z-10">
-          <i class="bi bi-bar-chart-fill text-indigo-500"></i> Score Breakdown
-        </h3>
-
-        <div class="space-y-4 relative z-10">
-          <div *ngFor="let def of riskDefinitions" class="flex gap-4">
-            <div
-              [class]="
-                'h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ' +
-                def.bgColor +
-                ' ' +
-                def.color
-              "
-            >
-              <i
-                class="bi"
-                [ngClass]="{
-                  'bi-exclamation-triangle': def.icon === 'warning',
-                  'bi-patch-check': def.icon === 'verified',
-                  'bi-graph-up-arrow': def.icon === 'trending_up',
-                  'bi-clock-history': def.icon === 'history',
-                  'bi-briefcase': def.icon === 'engineering',
-                }"
-              ></i>
-            </div>
-            <div>
-              <h4 class="text-sm font-bold text-gray-900">{{ def.title }}</h4>
-              <p class="text-xs text-gray-500 leading-relaxed">{{ def.description }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Summary -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <i class="bi bi-person-lines-fill text-indigo-500"></i> Professional Summary
-        </h3>
-        <p class="text-gray-600 leading-relaxed whitespace-pre-line">
-          {{ candidate()!.summary || 'No summary available.' }}
-        </p>
-      </div>
-
-      <!-- Experience and Education Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Experience -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
-          <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <i class="bi bi-briefcase text-indigo-500"></i> Experience
-          </h3>
-
-          <div class="space-y-8" *ngIf="getExperience().length > 0; else noExp">
-            <div
-              *ngFor="let exp of getExperience()"
-              class="relative pl-8 border-l-2 border-gray-100 last:border-0 pb-8 last:pb-0"
-            >
-              <div
-                class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-white border-2 border-indigo-500"
-              ></div>
-              <div class="mb-1">
-                <h4 class="text-base font-bold text-gray-900">{{ exp.title }}</h4>
-                <p class="text-sm font-medium text-indigo-600">{{ exp.company }}</p>
+          <!-- Overview Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <div class="flex items-center gap-2 px-2">
+                <mat-icon class="text-indigo-500">person</mat-icon>
+                <span class="font-bold">Overview</span>
               </div>
-              <p class="text-xs text-gray-400 mb-3 block">
-                {{ exp.start }} - {{ exp.end || (exp.isCurrent ? 'Present' : '') }}
-              </p>
-              <p class="text-sm text-gray-600" *ngIf="exp.description">
-                {{ exp.description }}
-              </p>
-            </div>
-          </div>
-          <ng-template #noExp>
-            <p class="text-gray-400 italic">No experience details parsed.</p>
-          </ng-template>
-        </div>
+            </ng-template>
+            <div class="p-6 space-y-6 bg-gray-50/30 overflow-y-auto h-full">
+              <!-- Applied Jobs Section -->
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <i class="bi bi-briefcase-fill text-indigo-500"></i> Applied Jobs
+                </h3>
+                <div class="space-y-4" *ngIf="applications().length > 0; else noApps">
+                  <div *ngFor="let app of applications()" class="p-4 rounded-xl border border-gray-100 hover:border-indigo-100 transition-colors bg-gray-50/30">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <h4 class="font-bold text-gray-900">{{ app.job.title }}</h4>
+                        <p class="text-xs text-gray-500">{{ app.job.organization?.name }}</p>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider" 
+                            [ngClass]="{
+                              'bg-blue-100 text-blue-700': app.status === 'APPLIED',
+                              'bg-yellow-100 text-yellow-700': ['L1_INTERVIEW', 'L2_INTERVIEW', 'L3_INTERVIEW', 'INTERVIEW_SCHEDULED'].includes(app.status || ''),
+                              'bg-green-100 text-green-700': ['OFFERED', 'ONBOARDED'].includes(app.status || ''),
+                              'bg-red-100 text-red-700': ['REJECTED', 'FAILED'].includes(app.status || ''),
+                              'bg-gray-100 text-gray-700': true
+                            }">
+                        {{ app.status }}
+                      </span>
+                    </div>
+                    <div class="mt-3 flex justify-between items-center">
+                      <span class="text-xs text-gray-400">Applied on {{ app.createdAt | date:'mediumDate' }}</span>
+                      <a [routerLink]="['/applications', app.id]" class="text-xs font-bold text-indigo-600 hover:underline">View Application</a>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noApps>
+                  <div class="text-center py-8">
+                    <i class="bi bi-inbox text-4xl text-gray-200 mb-2 block"></i>
+                    <p class="text-gray-400 italic text-sm">No job applications found for this candidate.</p>
+                  </div>
+                </ng-template>
+              </div>
 
-        <!-- Education (If available in JSON) -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
-          <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <i class="bi bi-mortarboard text-indigo-500"></i> Education
-          </h3>
-          <div class="space-y-6" *ngIf="getEducation().length > 0; else noEdu">
-            <div *ngFor="let edu of getEducation()" class="flex gap-4">
+              <!-- Scheduled Interviews Section -->
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <i class="bi bi-calendar-check-fill text-indigo-500"></i> Scheduled Interviews
+                </h3>
+                <div class="space-y-4" *ngIf="interviews().length > 0; else noInterviews">
+                  <div *ngFor="let interview of interviews()" class="p-4 rounded-xl border border-gray-100 hover:border-indigo-100 transition-colors bg-gray-50/30">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <h4 class="font-bold text-gray-900">{{ interview.type }} Round</h4>
+                        <p class="text-xs text-gray-500">for {{ interview.application?.job?.title }}</p>
+                      </div>
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                            [ngClass]="{
+                              'bg-green-100 text-green-700': interview.status === 'COMPLETED',
+                              'bg-blue-100 text-blue-700': interview.status === 'SCHEDULED',
+                              'bg-red-100 text-red-700': interview.status === 'CANCELLED'
+                            }">
+                        {{ interview.status }}
+                      </span>
+                    </div>
+                    <div class="mt-4 flex items-center gap-4">
+                      <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                        <i class="bi bi-clock text-indigo-400"></i>
+                        {{ interview.scheduledAt | date:'medium' }}
+                      </div>
+                      <div class="flex items-center gap-1.5 text-xs text-gray-600" *ngIf="interview.durationMinutes">
+                        <i class="bi bi-hourglass-split text-indigo-400"></i>
+                        {{ interview.durationMinutes }} min
+                      </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                      <div class="flex items-center gap-2" *ngIf="interview.interviewer">
+                        <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">
+                          {{ interview.interviewer.firstName[0] }}{{ interview.interviewer.lastName[0] }}
+                        </div>
+                        <span class="text-xs text-gray-600">{{ interview.interviewer.firstName }} {{ interview.interviewer.lastName }}</span>
+                      </div>
+                      <a *ngIf="interview.meetingLink" [href]="interview.meetingLink" target="_blank" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                        <i class="bi bi-camera-video"></i> Join Meeting
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <ng-template #noInterviews>
+                  <div class="text-center py-8">
+                    <i class="bi bi-calendar-x text-4xl text-gray-200 mb-2 block"></i>
+                    <p class="text-gray-400 italic text-sm">No interviews scheduled yet.</p>
+                  </div>
+                </ng-template>
+              </div>
+
+              <!-- Client Submissions Section (Visible to Solventek) -->
+              <div *ngIf="authStore.orgType() === 'SOLVENTEK' && candidate()?.id">
+                <app-client-submissions [candidateId]="candidate()!.id"></app-client-submissions>
+              </div>
+
+              <!-- AI Analysis Report (Solventek Only) -->
               <div
-                class="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0"
+                *ngIf="authStore.orgType() === 'SOLVENTEK'"
+                class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden relative"
               >
-                <i class="bi bi-building-check"></i>
+                <div class="flex items-center gap-3 mb-6 relative z-10">
+                  <div
+                    class="h-10 w-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200"
+                  >
+                    <i class="bi bi-cpu-fill text-xl"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-bold text-gray-900">AI Resume Audit</h3>
+                    <p class="text-xs text-gray-500 font-medium">AUTOMATED QUALITY & RISK ASSESSMENT</p>
+                  </div>
+                </div>
+
+                <div *ngIf="!analysis()" class="flex flex-col items-center justify-center py-12 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                   <mat-icon class="text-gray-300 text-4xl mb-4">analytics</mat-icon>
+                   <p class="text-gray-500 font-medium text-sm">Resume analysis pending or in progress...</p>
+                </div>
+
+                <div *ngIf="analysis()" class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                  <!-- Chart -->
+                  <div class="h-64">
+                    <canvas
+                      baseChart
+                      [data]="radarChartData()"
+                      [options]="radarChartOptions"
+                      [type]="radarChartType"
+                    >
+                    </canvas>
+                  </div>
+
+                  <!-- Scores Grid -->
+                  <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                      <!-- Overall Risk -->
+                      <div class="p-3 rounded-xl bg-gray-50 border border-gray-100 col-span-2">
+                        <span
+                          class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1"
+                          >Overall Risk</span
+                        >
+                        <div class="flex items-baseline gap-2">
+                          <span class="text-3xl font-black text-gray-900">{{
+                            analysis().overallRiskScore
+                          }}</span>
+                          <span class="text-sm font-medium text-gray-500">/ 100</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-gray-200 rounded-full mt-2 overflow-hidden">
+                          <div
+                            class="h-full rounded-full transition-all duration-500"
+                            [style.width.%]="analysis().overallRiskScore"
+                            [ngClass]="{
+                              'bg-green-500': analysis().overallRiskScore < 30,
+                              'bg-yellow-500':
+                                analysis().overallRiskScore >= 30 && analysis().overallRiskScore < 70,
+                              'bg-red-500': analysis().overallRiskScore >= 70,
+                            }"
+                          ></div>
+                        </div>
+                      </div>
+
+                      <!-- Consistency -->
+                      <div class="p-3 rounded-xl bg-blue-50/50 border border-blue-100">
+                        <span
+                          class="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1"
+                          >Consistency</span
+                        >
+                        <span class="text-xl font-bold text-blue-900"
+                          >{{ analysis().overallConsistencyScore || 0 }}%</span
+                        >
+                      </div>
+
+                      <!-- Timeline -->
+                      <div class="p-3 rounded-xl bg-purple-50/50 border border-purple-100">
+                        <span
+                          class="text-[10px] font-bold text-purple-400 uppercase tracking-wider block mb-1"
+                          >Timeline</span
+                        >
+                        <span class="text-xl font-bold text-purple-900"
+                          >{{ analysis().timelineRiskScore || 0 }}%</span
+                        >
+                      </div>
+
+                      <!-- Skills -->
+                      <div class="p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+                        <span
+                          class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-1"
+                          >Skill Inflation</span
+                        >
+                        <span class="text-xl font-bold text-amber-900"
+                          >{{ analysis().skillInflationRiskScore || 0 }}%</span
+                        >
+                      </div>
+
+                      <!-- Credibility -->
+                      <div class="p-3 rounded-xl bg-indigo-50/50 border border-indigo-100">
+                        <span
+                          class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block mb-1"
+                          >Credibility</span
+                        >
+                        <span class="text-xl font-bold text-indigo-900"
+                          >{{ analysis().projectCredibilityRiskScore || 0 }}%</span
+                        >
+                      </div>
+
+                      <!-- AI Content -->
+                      <div class="p-3 rounded-xl bg-rose-50/50 border border-rose-100">
+                        <span
+                          class="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1"
+                          >AI Content</span
+                        >
+                        <span class="text-xl font-bold text-rose-900"
+                          >{{ analysis().aiContentScore || 0 }}%</span
+                        >
+                      </div>
+
+                      <!-- Job Match -->
+                      <div class="p-3 rounded-xl bg-teal-50/50 border border-teal-100">
+                        <span
+                          class="text-[10px] font-bold text-teal-400 uppercase tracking-wider block mb-1"
+                          >Job Match</span
+                        >
+                        <span class="text-xl font-bold text-teal-900"
+                          >{{ analysis().jobMatchScore || 0 }}%</span
+                        >
+                      </div>
+
+                      <!-- Skill Match -->
+                      <div class="p-3 rounded-xl bg-cyan-50/50 border border-cyan-100">
+                        <span
+                          class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1"
+                          >Skill Match</span
+                        >
+                        <span class="text-xl font-bold text-cyan-900"
+                          >{{ analysis().skillMatchScore || 0 }}%</span
+                        >
+                      </div>
+                    </div>
+
+                    <div
+                      *ngIf="!analysis().redFlags || analysis().redFlags.length === 0"
+                      class="flex flex-col items-center justify-center p-4 bg-green-50 rounded-xl border border-green-100 text-center mt-2"
+                    >
+                      <i class="bi bi-check-circle-fill text-xl text-green-500 mb-1"></i>
+                      <p class="text-xs font-bold text-gray-900">No Major Issues</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="mt-6 pt-6 border-t border-gray-100 relative z-10"
+                  *ngIf="analysis()?.summary"
+                >
+                  <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                    Executive Summary
+                  </h4>
+                  <p class="text-sm text-gray-600 leading-relaxed">{{ analysis().summary }}</p>
+                </div>
               </div>
-              <div>
-                <h4 class="font-bold text-gray-900">{{ edu.institution }}</h4>
-                <p class="text-sm text-gray-600">
-                  {{ edu.degree }}
-                  <span *ngIf="edu.fieldOfStudy">in {{ edu.fieldOfStudy }}</span>
+
+              <!-- Score Breakdown Info Card (Solventek Only) -->
+              <div
+                *ngIf="authStore.orgType() === 'SOLVENTEK'"
+                class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden"
+              >
+                <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2 relative z-10">
+                  <i class="bi bi-bar-chart-fill text-indigo-500"></i> Score Breakdown
+                </h3>
+
+                <div class="space-y-4 relative z-10">
+                  <div *ngFor="let def of riskDefinitions" class="flex gap-4">
+                    <div
+                      [class]="
+                        'h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ' +
+                        def.bgColor +
+                        ' ' +
+                        def.color
+                      "
+                    >
+                      <i
+                        class="bi"
+                        [ngClass]="{
+                          'bi-exclamation-triangle': def.icon === 'warning',
+                          'bi-patch-check': def.icon === 'verified',
+                          'bi-graph-up-arrow': def.icon === 'trending_up',
+                          'bi-clock-history': def.icon === 'history',
+                          'bi-briefcase': def.icon === 'engineering',
+                        }"
+                      ></i>
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-bold text-gray-900">{{ def.title }}</h4>
+                      <p class="text-xs text-gray-500 leading-relaxed">{{ def.description }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Summary -->
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <i class="bi bi-person-lines-fill text-indigo-500"></i> Professional Summary
+                </h3>
+                <p class="text-gray-600 leading-relaxed whitespace-pre-line">
+                  {{ candidate()!.summary || 'No summary available.' }}
                 </p>
-                <p class="text-xs text-gray-400">{{ edu.startYear }} - {{ edu.endYear }}</p>
+              </div>
+
+              <!-- Experience and Education Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Experience -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
+                  <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="bi bi-briefcase text-indigo-500"></i> Experience
+                  </h3>
+
+                  <div class="space-y-8" *ngIf="getExperience().length > 0; else noExp">
+                    <div
+                      *ngFor="let exp of getExperience()"
+                      class="relative pl-8 border-l-2 border-gray-100 last:border-0 pb-8 last:pb-0"
+                    >
+                      <div
+                        class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-white border-2 border-indigo-500"
+                      ></div>
+                      <div class="mb-1">
+                        <h4 class="text-base font-bold text-gray-900">{{ exp.title }}</h4>
+                        <p class="text-sm font-medium text-indigo-600">{{ exp.company }}</p>
+                      </div>
+                      <p class="text-xs text-gray-400 mb-3 block">
+                        {{ exp.start }} - {{ exp.end || (exp.isCurrent ? 'Present' : '') }}
+                      </p>
+                      <p class="text-sm text-gray-600" *ngIf="exp.description">
+                        {{ exp.description }}
+                      </p>
+                    </div>
+                  </div>
+                  <ng-template #noExp>
+                    <p class="text-gray-400 italic">No experience details parsed.</p>
+                  </ng-template>
+                </div>
+
+                <!-- Education (If available in JSON) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
+                  <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="bi bi-mortarboard text-indigo-500"></i> Education
+                  </h3>
+                  <div class="space-y-6" *ngIf="getEducation().length > 0; else noEdu">
+                    <div *ngFor="let edu of getEducation()" class="flex gap-4">
+                      <div
+                        class="h-10 w-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0"
+                      >
+                        <i class="bi bi-building-check"></i>
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-gray-900">{{ edu.institution }}</h4>
+                        <p class="text-sm text-gray-600">
+                          {{ edu.degree }}
+                          <span *ngIf="edu.fieldOfStudy">in {{ edu.fieldOfStudy }}</span>
+                        </p>
+                        <p class="text-xs text-gray-400">{{ edu.startYear }} - {{ edu.endYear }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noEdu>
+                    <p class="text-gray-400 italic">No education details parsed.</p>
+                  </ng-template>
+                </div>
               </div>
             </div>
-          </div>
-          <ng-template #noEdu>
-            <p class="text-gray-400 italic">No education details parsed.</p>
-          </ng-template>
-        </div>
+          </mat-tab>
+
+          <!-- Activity Log Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <div class="flex items-center gap-2 px-2">
+                <mat-icon class="text-blue-500">history</mat-icon>
+                <span class="font-bold">Activity Log</span>
+              </div>
+            </ng-template>
+            <div class="p-6 bg-gray-50/30 overflow-y-auto h-full">
+              <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <mat-icon class="text-blue-500">timeline</mat-icon>
+                Candidate Activity Audit
+              </h3>
+              <app-timeline [events]="timelineEvents()" entityType="CANDIDATE" [entityId]="candidate()!.id"></app-timeline>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
       </div>
     </div>
-
+ 
     <!-- Sidebar -->
     <div class="space-y-6">
       <!-- Detected Issues (Solventek Only) - Moved here -->
