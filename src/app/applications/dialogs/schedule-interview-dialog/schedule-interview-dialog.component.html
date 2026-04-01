@@ -10,15 +10,69 @@
   </div>
 
   <form [formGroup]="scheduleForm" (ngSubmit)="scheduleInterview()" class="space-y-6">
+    <!-- Application Info / Selection -->
+    <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50 mb-4">
+      <label class="flex items-center gap-2 text-xs font-black text-indigo-900 uppercase tracking-widest mb-3 px-1">
+        <i class="bi bi-person-badge text-sm"></i>
+        Candidate & Job Details
+      </label>
+
+      <!-- Case 1: Application ID provided (Pre-selected) -->
+      <div *ngIf="data?.applicationId" class="flex items-center justify-between bg-white p-3 rounded-xl border border-indigo-100 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+            {{ (data.candidateName || 'C').charAt(0) }}
+          </div>
+          <div>
+            <p class="text-sm font-bold text-gray-900">{{ data.candidateName || 'Candidate' }}</p>
+            <p class="text-xs text-gray-500">{{ data.jobTitle || 'Position' }}</p>
+          </div>
+        </div>
+        <div class="px-2 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-lg uppercase">
+          Pre-selected
+        </div>
+      </div>
+      
+      <!-- Case 2: No Application ID (Searchable Selection) -->
+      <div *ngIf="!data?.applicationId" class="space-y-3">
+        <!-- Search -->
+        <div class="relative group">
+          <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
+          <input 
+            type="text" 
+            [ngModel]="appSearchTerm()" 
+            (ngModelChange)="appSearchTerm.set($event)"
+            [ngModelOptions]="{standalone: true}"
+            placeholder="Search candidates or jobs..." 
+            class="input-modern pl-4 pr-12 bg-white border-gray-200 hover:border-indigo-200 focus:border-indigo-500 shadow-sm h-10!"
+          >
+        </div>
+
+        <select 
+          formControlName="applicationId" 
+          class="input-modern bg-white border-gray-200 hover:border-indigo-200 focus:border-indigo-500 shadow-sm"
+        >
+          <option [value]="null" disabled>-- Choose an Application --</option>
+          @for (app of filteredApplications(); track app.id) {
+            <option [value]="app.id">
+              {{ app.candidate.firstName }} {{ app.candidate.lastName }} - {{ app.job.title }}
+            </option>
+          }
+        </select>
+        <p *ngIf="filteredApplications().length === 0" class="text-[10px] text-amber-600 mt-2 px-1 font-bold">
+          <i class="bi bi-exclamation-triangle"></i> No active applications found matching your search.
+        </p>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="col-span-1 md:col-span-2">
         <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Interview Date & Time</label>
         <div class="relative group">
-          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">calendar_today</mat-icon>
           <input 
             type="datetime-local" 
             formControlName="scheduledAt" 
-            class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+            class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
           >
         </div>
       </div>
@@ -49,12 +103,12 @@
       <div class="col-span-1 md:col-span-2">
         <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Meeting Link (Optional)</label>
         <div class="relative group">
-          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">videocam</mat-icon>
+          <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">videocam</mat-icon>
           <input 
             type="text" 
             formControlName="meetingLink" 
             placeholder="Zoom, Google Meet, Teams link..." 
-            class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+            class="input-modern pr-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
           >
         </div>
       </div>
@@ -64,7 +118,7 @@
         
         <!-- User Search -->
         <div class="relative group mb-3">
-          <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
+          <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
           <input 
             type="text" 
             [ngModel]="userSearchTerm()" 

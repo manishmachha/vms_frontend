@@ -9,6 +9,7 @@ import { ProjectService } from '../../services/project.service';
 import { Project } from '../../models/project.model';
 import { ClientFormComponent } from '../components/client-form/client-form.component';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
+import { HeaderService } from '../../services/header.service';
 
 @Component({
   selector: 'app-client-list',
@@ -21,7 +22,7 @@ export class ClientListComponent implements OnInit {
   private clientService = inject(ClientService);
   private projectService = inject(ProjectService);
   private dialog = inject(MatDialog);
-
+  private headerService = inject(HeaderService);
   clients = signal<Client[]>([]);
   projects = signal<Project[]>([]);
 
@@ -30,6 +31,11 @@ export class ClientListComponent implements OnInit {
   activeMenuId: number | null = null;
 
   ngOnInit() {
+    this.headerService.setTitle(
+      'Clients',
+      'Manage your clients and their projects',
+      'bi bi-building',
+    );
     this.loadData();
     document.addEventListener('click', () => (this.activeMenuId = null));
   }

@@ -6,18 +6,22 @@ import { InterviewService } from '../../services/interview.service';
 import { Interview } from '../../models/interview.model';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthStore } from '../../services/auth.store';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ScheduleInterviewDialogComponent } from '../../applications/dialogs/schedule-interview-dialog/schedule-interview-dialog.component';
+import { HeaderService } from '../../services/header.service';
 
 @Component({
   selector: 'app-interview-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatIconModule],
+  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatDialogModule],
   templateUrl: './interview-list.component.html',
   styleUrls: ['./interview-list.component.css'],
 })
 export class InterviewListComponent implements OnInit {
   private interviewService = inject(InterviewService);
-  private authStore = inject(AuthStore);
-
+  public authStore = inject(AuthStore);
+  private dialog = inject(MatDialog);
+  private headerService = inject(HeaderService);
   searchQuery = '';
   activeTab = signal('upcoming');
   interviews = signal<Interview[]>([]);
@@ -36,6 +40,11 @@ export class InterviewListComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.headerService.setTitle(
+      'Interviews',
+      'Manage your interviews',
+      'bi bi-calendar-check',
+    );
     this.loadInterviews();
   }
 
@@ -120,5 +129,23 @@ export class InterviewListComponent implements OnInit {
       case 'NO_SHOW': return 'bg-amber-100 text-amber-700 border border-amber-200';
       default: return 'bg-gray-100 text-gray-700 border border-gray-200';
     }
+  }
+
+  openScheduleDialog(interview?: Interview) {
+    const dialogRef = this.dialog.open(ScheduleInterviewDialogComponent, {
+      width: '600px',
+      data: { 
+        applicationId: interview?.application?.id,
+        candidateName: interview ? `${interview.application?.candidate?.firstName} ${interview.application?.candidate?.lastName}` : null,
+        jobTitle: interview?.application?.job?.title
+      },
+      panelClass: 'modern-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadInterviews();
+      }
+    });
   }
 }

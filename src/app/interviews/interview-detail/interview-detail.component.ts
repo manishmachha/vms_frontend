@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { InterviewService } from '../../services/interview.service';
 import { Interview } from '../../models/interview.model';
 import { MatIconModule } from '@angular/material/icon';
+import { HeaderService } from '../../services/header.service';
 
 @Component({
   selector: 'app-interview-detail',
@@ -15,10 +16,15 @@ import { MatIconModule } from '@angular/material/icon';
 export class InterviewDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private interviewService = inject(InterviewService);
-
+  private headerService = inject(HeaderService);
   interview = signal<Interview | null>(null);
 
   ngOnInit() {
+    this.headerService.setTitle(
+      'Interview Details',
+      'Review interview details',
+      'bi bi-calendar-check',
+    );
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.loadInterview(params['id']);

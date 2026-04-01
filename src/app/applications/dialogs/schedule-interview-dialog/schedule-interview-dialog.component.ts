@@ -10,7 +10,9 @@ import { catchError, map } from 'rxjs/operators';
 import { InterviewService } from '../../../services/interview.service';
 import { UserService } from '../../../services/user.service';
 import { AuthStore } from '../../../services/auth.store';
+import { ApplicationService } from '../../../services/application.service';
 import { InterviewType } from '../../../models/interview.model';
+import { JobApplication } from '../../../models/application.model';
 
 @Component({
   selector: 'app-schedule-interview-dialog',
@@ -29,9 +31,13 @@ export class ScheduleInterviewDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private interviewService = inject(InterviewService);
   private userService = inject(UserService);
+  private applicationService = inject(ApplicationService);
   private authStore = inject(AuthStore);
   public dialogRef = inject(MatDialogRef<ScheduleInterviewDialogComponent>);
   public data = inject(MAT_DIALOG_DATA);
+
+  applications = signal<JobApplication[]>([]);
+  appSearchTerm = signal('');
 
   potentialCcUsers = signal<any[]>([]);
   userSearchTerm = signal('');
@@ -49,7 +55,20 @@ export class ScheduleInterviewDialogComponent implements OnInit {
     );
   });
 
+  filteredApplications = computed(() => {
+    const term = this.appSearchTerm().toLowerCase();
+    const apps = this.applications();
+    if (!term) return apps;
+    return apps.filter(
+      (a) =>
+        a.candidate?.firstName.toLowerCase().includes(term) ||
+        a.candidate?.lastName.toLowerCase().includes(term) ||
+        a.job?.title.toLowerCase().includes(term)
+    );
+  });
+
   scheduleForm = this.fb.group({
+    applicationId: [this.data?.applicationId || null, Validators.required],
     scheduledAt: ['', Validators.required],
     durationMinutes: [30, [Validators.required, Validators.min(15)]],
     type: ['TECHNICAL' as InterviewType, Validators.required],
@@ -60,6 +79,16 @@ export class ScheduleInterviewDialogComponent implements OnInit {
 
   ngOnInit() {
     this.loadPotentialCcUsers();
+    if (!this.data?.applicationId) {
+      this.loadApplications();
+    }
+  }
+
+  loadApplications() {
+    this.applicationService.getApplications(undefined, 0, 100, 'INBOUND').subscribe({
+      next: (res) => this.applications.set(res.content || []),
+      error: (err) => console.error('Failed to load applications', err)
+    });
   }
 
   loadPotentialCcUsers() {
@@ -77,9 +106,10 @@ export class ScheduleInterviewDialogComponent implements OnInit {
   scheduleInterview() {
     if (this.scheduleForm.invalid) return;
 
+    const formValue = this.scheduleForm.value;
     const request = {
-      ...this.scheduleForm.value,
-      applicationId: Number(this.data.applicationId),
+      ...formValue,
+      applicationId: Number(formValue.applicationId),
       interviewerId: this.authStore.user()?.id || 1,
     };
 

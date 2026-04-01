@@ -19,6 +19,7 @@ import { DashboardStatsResponse } from '../../../models/dashboard-stats.model';
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
 import { ClientSubmissionsComponent } from '../client-submissions/client-submissions.component';
 import { DialogService } from '../../../services/dialog.service';
+import { HeaderService } from '../../../services/header.service';
 
 @Component({
   selector: 'app-candidate-detail',
@@ -45,7 +46,7 @@ export class CandidateDetailComponent implements OnInit {
   private brandedResumeService = inject(BrandedResumeService);
   public authStore = inject(AuthStore);
   private dialogService = inject(DialogService);
-
+  private headerService = inject(HeaderService);
   candidate = signal<Candidate | null>(null);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
   brandedResume = signal<BrandedResume | null>(null);
@@ -55,6 +56,11 @@ export class CandidateDetailComponent implements OnInit {
 
 
   ngOnInit() {
+    this.headerService.setTitle(
+      'Candidate Details',
+      'Review candidate details',
+      'bi bi-person-lines-fill',
+    );
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {

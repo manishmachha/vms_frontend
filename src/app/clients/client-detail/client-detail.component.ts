@@ -8,6 +8,7 @@ import { Project } from '../../models/project.model';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { HubDashboardBannerComponent } from '../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
 import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
+import { HeaderService } from '../../services/header.service';
 
 @Component({
   selector: 'app-client-detail',
@@ -20,7 +21,7 @@ export class ClientDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private clientService = inject(ClientService);
   private projectService = inject(ProjectService);
-
+  private headerService = inject(HeaderService);
   client = signal<Client | undefined>(undefined);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
   clientProjects = signal<Project[]>([]);
@@ -30,6 +31,11 @@ export class ClientDetailComponent implements OnInit {
   });
 
   ngOnInit() {
+    this.headerService.setTitle(
+      'Client Details',
+      'Review client details and projects',
+      'bi bi-building',
+    );
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
