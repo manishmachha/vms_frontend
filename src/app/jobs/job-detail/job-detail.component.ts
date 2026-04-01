@@ -17,6 +17,9 @@ import { DialogService } from '../../services/dialog.service';
 import { JobEnrichDialogComponent } from '../dialogs/job-enrich-dialog/job-enrich-dialog.component';
 import { JobVerifyDialogComponent } from '../dialogs/job-verify-dialog/job-verify-dialog.component';
 import { JobStatusDialogComponent } from '../dialogs/job-status-dialog/job-status-dialog.component';
+import { TimelineService, TimelineEvent } from '../../services/timeline.service';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-job-detail',
@@ -28,6 +31,8 @@ import { JobStatusDialogComponent } from '../dialogs/job-status-dialog/job-statu
     FormsModule,
     TimelineComponent,
     OrganizationLogoComponent,
+    MatTabsModule,
+    MatIconModule
   ],
   templateUrl: './job-detail.component.html',
   styleUrls: ['./job-detail.component.css'],
@@ -42,8 +47,10 @@ export class JobDetailComponent implements OnInit {
   dialog = inject(MatDialog);
   headerService = inject(HeaderService);
   dialogService = inject(DialogService);
+  timelineService = inject(TimelineService);
 
   job = signal<Job | null>(null);
+  timelineEvents = signal<TimelineEvent[]>([]);
   myCandidates = signal<Candidate[]>([]);
   selectedCandidateId = '';
   applications = signal<JobApplication[]>([]);
@@ -72,7 +79,15 @@ export class JobDetailComponent implements OnInit {
       this.applicationService.getApplications(id).subscribe((res) => {
         this.applications.set(res.content);
       });
+      this.loadTimeline(id);
     }
+  }
+
+  loadTimeline(id: string) {
+    this.timelineService.getTimeline('JOB', id).subscribe({
+      next: (res) => this.timelineEvents.set(res.content),
+      error: (err) => console.error('Failed to load timeline', err),
+    });
   }
 
   // Permission Checks - Allow all Solventek admins/TA (non-employee) for basic management

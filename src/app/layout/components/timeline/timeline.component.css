@@ -1,1 +1,28 @@
 /* Timeline Styles */
+
+.arrow-left::after, .arrow-left::before {
+  right: 100%;
+  top: 20px;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.arrow-left::after {
+  border-right-color: #ffffff;
+  border-width: 8px;
+  margin-top: -8px;
+}
+
+.arrow-left::before {
+  border-right-color: #e5e7eb; /* border-gray-200 */
+  border-width: 9px;
+  margin-top: -9px;
+}
+
+:host ::ng-deep .text-white\! {
+  color: white !important;
+}
