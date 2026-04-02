@@ -44,6 +44,10 @@
               <i class="bi bi-clock-history text-gray-400"></i>
               <span class="font-medium">{{ interview()?.application?.job?.experience }} Exp.</span>
             </div>
+            <div class="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100" *ngIf="interview()?.application?.job?.requestId">
+              <i class="bi bi-hash"></i>
+              <span class="text-xs font-bold uppercase tracking-wider">{{ interview()?.application?.job?.requestId }}</span>
+            </div>
           </div>
           
           <div class="flex flex-wrap gap-4">
@@ -60,15 +64,36 @@
       </div>
 
       <div class="flex items-center gap-3 self-end lg:self-center">
+        <!-- Join Interview -->
         <a 
           *ngIf="interview()?.meetingLink"
           [href]="interview()?.meetingLink" 
           target="_blank"
-          class="px-8 py-3.5 rounded-2xl bg-indigo-600 text-white font-bold text-sm shadow-xl shadow-indigo-600/20 hover:scale-[1.02] hover:shadow-indigo-600/30 transition-all flex items-center gap-2"
+          class="px-6 py-3 rounded-2xl bg-indigo-600 text-white font-bold text-xs shadow-xl shadow-indigo-600/20 hover:scale-[1.02] hover:shadow-indigo-600/30 transition-all flex items-center gap-2"
         >
           <i class="bi bi-camera-video"></i>
-          Join Interview
+          Join
         </a>
+
+        <!-- Edit Interview (Only if not completed) -->
+        <button 
+          *ngIf="interview()?.status !== 'COMPLETED'"
+          (click)="openEditDialog()"
+          class="px-6 py-3 rounded-2xl bg-white border border-gray-100 text-gray-700 font-bold text-xs shadow-sm hover:border-indigo-100 hover:text-indigo-600 transition-all flex items-center gap-2"
+        >
+          <i class="bi bi-pencil-square"></i>
+          Edit
+        </button>
+
+        <!-- Submit Feedback -->
+        <button 
+          (click)="openFeedbackDialog()"
+          class="px-6 py-3 rounded-2xl bg-emerald-600 text-white font-bold text-xs shadow-xl shadow-emerald-500/20 hover:scale-[1.02] hover:shadow-emerald-500/30 transition-all flex items-center gap-2"
+        >
+          <i class="bi bi-check2-circle"></i>
+          Feedback
+        </button>
+
         <button 
           class="w-12 h-12 rounded-2xl bg-white border border-gray-100 text-gray-400 flex items-center justify-center hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm"
         >
@@ -180,9 +205,22 @@
           </div>
           <p class="text-gray-900 font-bold mb-1">Awaiting Evaluation</p>
           <p class="text-sm text-gray-500 max-w-xs mb-6">Feedback from the interviewer hasn't been submitted yet.</p>
-          <button class="px-6 py-2.5 rounded-xl bg-gray-900 text-white font-bold text-xs shadow-md hover:bg-gray-800 transition-colors">
-            Request Feedback
-          </button>
+          <div class="flex gap-3">
+            <button 
+                (click)="requestFeedback()"
+                class="px-6 py-2.5 rounded-xl bg-gray-900 text-white font-bold text-xs shadow-md hover:bg-gray-800 transition-colors flex items-center gap-2"
+            >
+                <i class="bi bi-bell"></i>
+                Request Feedback
+            </button>
+            <button 
+                (click)="openFeedbackDialog()"
+                class="px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md hover:bg-emerald-700 transition-colors flex items-center gap-2"
+            >
+                <i class="bi bi-pencil-square"></i>
+                Submit Now
+            </button>
+          </div>
         </div>
 
         <ng-template #feedbackBody>

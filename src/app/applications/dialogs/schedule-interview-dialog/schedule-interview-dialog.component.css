@@ -1,0 +1,92 @@
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+}
+
+/* Searchable Dropdown Styles */
+.search-results-container {
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    background-color: white !important;
+    z-index: 1000 !important;
+    border: 1px solid #e2e8f0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+}
+
+.result-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item:hover {
+    background-color: #f1f5f9;
+}
+
+.result-item.selected {
+    background-color: #eef2ff;
+    border-left: 3px solid #4f46e5;
+}
+
+/* Chip Styles */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background-color: #f1f5f9;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.chip:hover {
+    background-color: #e2e8f0;
+}
+
+.chip-remove {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: #cbd5e1;
+    color: white;
+    font-size: 10px;
+}
+
+.chip-remove:hover {
+    background-color: #94a3b8;
+}
+
+/* Shadow for input on focus */
+.input-modern:focus {
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}

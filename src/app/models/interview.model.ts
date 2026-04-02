@@ -1,3 +1,6 @@
+import { Job } from './job.model';
+import { Organization } from './organization.model';
+
 export type InterviewType = 'SCREENING' | 'TECHNICAL' | 'HR' | 'CLIENT_ROUND' | 'FINAL';
 export type InterviewStatus = 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
 
@@ -6,21 +9,7 @@ export interface Interview {
   applicationId: number;
   application?: {
     id: number;
-    job?: {
-      id: number;
-      title: string;
-      description?: string;
-      requirements?: string;
-      experience?: string;
-      skills?: string;
-      location?: string | null;
-      status?: string;
-      employmentType?: string;
-      organization?: {
-        id: number;
-        name: string;
-      };
-    };
+    job?: Job;
     candidate?: {
       id: number;
       firstName: string;

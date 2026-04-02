@@ -99,7 +99,7 @@ export class ProjectListComponent implements OnInit {
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query) ||
+          (p.requestId && p.requestId.toLowerCase().includes(query)) ||
           p.client?.name?.toLowerCase().includes(query),
       );
     }

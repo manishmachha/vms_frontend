@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between mb-6 p-1">
     <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
       <mat-icon class="text-indigo-600!">event</mat-icon> 
-      Schedule Interview
+      {{ isEditMode ? 'Update' : 'Schedule' }} Interview
     </h3>
     <button mat-icon-button (click)="dialogRef.close()" class="text-gray-400 hover:text-gray-600 transition-colors">
       <mat-icon>close</mat-icon>
@@ -10,58 +10,68 @@
   </div>
 
   <form [formGroup]="scheduleForm" (ngSubmit)="scheduleInterview()" class="space-y-6">
-    <!-- Application Info / Selection -->
-    <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50 mb-4">
+    <div class="max-h-[65vh] overflow-y-auto pr-2 space-y-6 custom-scrollbar">
+      <!-- Application Info / Selection -->
+      <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50 mb-4">
       <label class="flex items-center gap-2 text-xs font-black text-indigo-900 uppercase tracking-widest mb-3 px-1">
         <i class="bi bi-person-badge text-sm"></i>
         Candidate & Job Details
       </label>
 
-      <!-- Case 1: Application ID provided (Pre-selected) -->
-      <div *ngIf="data?.applicationId" class="flex items-center justify-between bg-white p-3 rounded-xl border border-indigo-100 shadow-sm">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
-            {{ (data.candidateName || 'C').charAt(0) }}
+      <!-- Case 1 & 2 combined: Searchable Selection -->
+      <div class="space-y-3">
+        <div *ngIf="selectedApp(); else searchApp" class="flex items-center justify-between bg-white p-3 rounded-xl border border-indigo-100 shadow-sm animate-in fade-in zoom-in duration-300">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+              {{ selectedApp()?.candidate?.firstName?.charAt(0) }}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-900">{{ selectedApp()?.candidate?.firstName }} {{ selectedApp()?.candidate?.lastName }}</p>
+              <div class="flex items-center gap-2">
+                <p class="text-xs text-gray-500">{{ selectedApp()?.job?.title }}</p>
+                <span *ngIf="selectedApp()?.job?.requestId" class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-1 py-0.5 rounded border border-indigo-100 uppercase tracking-tighter">
+                  {{ selectedApp()?.job?.requestId }}
+                </span>
+              </div>
+            </div>
           </div>
-          <div>
-            <p class="text-sm font-bold text-gray-900">{{ data.candidateName || 'Candidate' }}</p>
-            <p class="text-xs text-gray-500">{{ data.jobTitle || 'Position' }}</p>
-          </div>
-        </div>
-        <div class="px-2 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-lg uppercase">
-          Pre-selected
-        </div>
-      </div>
-      
-      <!-- Case 2: No Application ID (Searchable Selection) -->
-      <div *ngIf="!data?.applicationId" class="space-y-3">
-        <!-- Search -->
-        <div class="relative group">
-          <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
-          <input 
-            type="text" 
-            [ngModel]="appSearchTerm()" 
-            (ngModelChange)="appSearchTerm.set($event)"
-            [ngModelOptions]="{standalone: true}"
-            placeholder="Search candidates or jobs..." 
-            class="input-modern pl-4 pr-12 bg-white border-gray-200 hover:border-indigo-200 focus:border-indigo-500 shadow-sm h-10!"
-          >
+          <button type="button" (click)="clearApplicationSelection()" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase bg-indigo-50 px-3 py-1 rounded-lg">
+            Change
+          </button>
         </div>
 
-        <select 
-          formControlName="applicationId" 
-          class="input-modern bg-white border-gray-200 hover:border-indigo-200 focus:border-indigo-500 shadow-sm"
-        >
-          <option [value]="null" disabled>-- Choose an Application --</option>
-          @for (app of filteredApplications(); track app.id) {
-            <option [value]="app.id">
-              {{ app.candidate.firstName }} {{ app.candidate.lastName }} - {{ app.job.title }}
-            </option>
-          }
-        </select>
-        <p *ngIf="filteredApplications().length === 0" class="text-[10px] text-amber-600 mt-2 px-1 font-bold">
-          <i class="bi bi-exclamation-triangle"></i> No active applications found matching your search.
-        </p>
+        <ng-template #searchApp>
+          <div class="relative group" [class.z-50]="showAppResults() && appSearchTerm()">
+            <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
+            <input 
+              type="text" 
+              [ngModel]="appSearchTerm()" 
+              (ngModelChange)="appSearchTerm.set($event); showAppResults.set(true)"
+              (focus)="showAppResults.set(true)"
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Search candidates or jobs..." 
+              class="input-modern pl-4 pr-12 bg-white border-gray-200 hover:border-indigo-200 focus:border-indigo-500 shadow-sm h-11!"
+            >
+            
+            <!-- Search Results Dropdown -->
+            <div *ngIf="showAppResults() && appSearchTerm()" class="absolute left-0 right-0 top-full mt-2 search-results-container custom-scrollbar animate-in slide-in-from-top-2 duration-200">
+              @for (app of filteredApplications(); track app.id) {
+                <div (click)="selectApplication(app)" class="result-item">
+                  <p class="text-sm font-bold text-gray-900">{{ app.candidate.firstName }} {{ app.candidate.lastName }}</p>
+                  <div class="flex items-center justify-between">
+                    <p class="text-[10px] text-gray-500">{{ app.job.title }}</p>
+                    <span *ngIf="app.job.requestId" class="text-[9px] font-bold text-indigo-600 bg-indigo-100/50 px-1 py-0.5 rounded uppercase tracking-tighter">
+                      {{ app.job.requestId }}
+                    </span>
+                  </div>
+                </div>
+              }
+              <div *ngIf="filteredApplications().length === 0" class="p-4 text-center">
+                <p class="text-xs text-amber-600 font-bold">No matches found</p>
+              </div>
+            </div>
+          </div>
+        </ng-template>
       </div>
     </div>
 
@@ -116,36 +126,67 @@
       <div class="col-span-1 md:col-span-2">
         <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">CC Users (Notification)</label>
         
-        <!-- User Search -->
-        <div class="relative group mb-3">
-          <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">search</mat-icon>
-          <input 
-            type="text" 
-            [ngModel]="userSearchTerm()" 
-            (ngModelChange)="userSearchTerm.set($event)"
-            [ngModelOptions]="{standalone: true}"
-            placeholder="Search by name, email or organization..." 
-            class="input-modern pl-12 bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 h-10!"
-          >
-        </div>
+        <!-- Integrated Search & Select for CC Users -->
+        <div class="space-y-3">
+          <!-- Selected Users Chips -->
+          <div *ngIf="selectedCcUsers().length > 0" class="flex flex-wrap gap-2 p-3 bg-white border border-gray-100 rounded-2xl shadow-inner min-h-[50px]">
+            @for (user of selectedCcUsers(); track user.id) {
+              <div class="chip animate-in fade-in zoom-in duration-200">
+                {{ user.firstName }} {{ user.lastName }}
+                <span (click)="removeCcUser(user.id)" class="chip-remove">
+                  <i class="bi bi-x"></i>
+                </span>
+              </div>
+            }
+          </div>
 
-        <select 
-          multiple 
-          formControlName="ccUserIds" 
-          class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 min-h-[140px]"
-        >
-          @for (user of filteredCcUsers(); track user.id) {
-            <option [value]="user.id">
-              {{ user.firstName }} {{ user.lastName }} 
-              ({{ user.organizationName || 'No Organization' }})
-            </option>
-          }
-        </select>
-        <p class="text-[10px] text-gray-400 mt-2 px-1 font-medium italic">
-          Tip: Hold Ctrl/Cmd to select multiple recipients
-        </p>
+          <!-- Search Input -->
+          <div class="relative group" [class.z-50]="showCcResults() && userSearchTerm()">
+            <mat-icon class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400! group-focus-within:text-indigo-600! transition-colors">person_add</mat-icon>
+            <input 
+              type="text" 
+              [ngModel]="userSearchTerm()" 
+              (ngModelChange)="userSearchTerm.set($event); showCcResults.set(true)"
+              (focus)="showCcResults.set(true)"
+              [ngModelOptions]="{standalone: true}"
+              placeholder="Search by name, email or organization..." 
+              class="input-modern pl-12 bg-white border-gray-200 hover:border-indigo-200 focus:border-indigo-500 shadow-sm h-11!"
+            >
+
+            <!-- CC Search Results Dropdown -->
+            <div *ngIf="showCcResults() && userSearchTerm()" class="absolute left-0 right-0 top-full mt-2 search-results-container custom-scrollbar animate-in slide-in-from-top-2 duration-200">
+              @for (user of filteredCcUsers(); track user.id) {
+                <div 
+                  (click)="toggleCcUser(user)" 
+                  class="result-item flex items-center justify-between"
+                  [class.selected]="isCcSelected(user.id)"
+                >
+                  <div>
+                    <p class="text-sm font-bold text-gray-900">{{ user.firstName }} {{ user.lastName }}</p>
+                    <p class="text-[10px] text-gray-500">{{ user.organizationName || 'No Organization' }}</p>
+                  </div>
+                  <mat-icon *ngIf="isCcSelected(user.id)" class="text-indigo-600! text-sm!">check_circle</mat-icon>
+                </div>
+              }
+              <div *ngIf="filteredCcUsers().length === 0" class="p-4 text-center">
+                <p class="text-xs text-gray-400 font-medium">No users found</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-span-1 md:col-span-2">
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 px-1">Scheduling Notes</label>
+        <textarea 
+          formControlName="schedulingNotes" 
+          rows="3"
+          placeholder="Additional notes for the interviewer and candidate..." 
+          class="input-modern bg-gray-50/50 border-gray-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+        ></textarea>
       </div>
     </div>
+</div>
 
     <div class="flex justify-end gap-3 pt-6 border-t border-gray-50">
       <button
@@ -160,7 +201,7 @@
         [disabled]="scheduleForm.invalid"
         class="px-8 py-2.5 bg-linear-to-r from-indigo-600 to-indigo-700 text-white rounded-xl hover:from-indigo-700 hover:to-indigo-800 font-bold transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:shadow-none"
       >
-        Schedule Interview
+        {{ isEditMode ? 'Update' : 'Schedule' }} Interview
       </button>
     </div>
   </form>

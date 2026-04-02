@@ -13,7 +13,7 @@
           type="text" 
           [(ngModel)]="searchQuery"
           (input)="onSearch()"
-          placeholder="Search interviews..."
+          placeholder="Search by candidate, title, or Request ID..."
           class="pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-2xl w-full md:w-80 shadow-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-hidden transition-all text-sm"
         >
       </div>
@@ -105,10 +105,14 @@
           <div class="flex items-start justify-between gap-3 mb-4">
             <div>
               <h4 class="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                {{ interview.application?.candidate?.firstName }} {{ interview.application?.candidate?.lastName }}
-              </h4>
-              <p class="text-sm font-medium text-gray-500">{{ interview.application?.job?.title }}</p>
-            </div>
+                </h4>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <p class="text-sm font-medium text-gray-500">{{ interview.application?.job?.title }}</p>
+                  <span *ngIf="interview.application?.job?.requestId" class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 text-[10px] font-bold border border-indigo-100">
+                    {{ interview.application?.job?.requestId }}
+                  </span>
+                </div>
+              </div>
             <span [class]="'px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-xs ' + getStatusClass(interview)">
               {{ interview.status }}
             </span>

@@ -373,6 +373,12 @@
                   {{ job()?.id }}
                 </dd>
               </div>
+              <div *ngIf="job()?.requestId" class="flex justify-between items-center">
+                <dt class="text-sm text-gray-500">Request ID</dt>
+                <dd class="text-sm font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-1 rounded">
+                  {{ job()?.requestId }}
+                </dd>
+              </div>
               <div class="flex justify-between items-center">
                 <dt class="text-sm text-gray-500">Employment Type</dt>
                 <dd class="text-sm font-medium text-gray-900">

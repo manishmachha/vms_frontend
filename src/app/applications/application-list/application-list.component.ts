@@ -83,6 +83,8 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
         name.includes(search) ||
         (data.candidate?.email?.toLowerCase().includes(search) ?? false) ||
         (data.candidate?.currentCompany?.toLowerCase().includes(search) ?? false) ||
+        (data.job?.requestId?.toLowerCase().includes(search) ?? false) ||
+        (data.job?.title?.toLowerCase().includes(search) ?? false) ||
         data.status.toLowerCase().includes(search);
 
       // 2. Risk & Consistency Filters

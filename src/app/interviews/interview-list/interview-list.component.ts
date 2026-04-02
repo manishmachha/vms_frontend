@@ -106,7 +106,8 @@ export class InterviewListComponent implements OnInit {
       filtered = filtered.filter(i => 
         i.application?.candidate?.firstName.toLowerCase().includes(query) ||
         i.application?.candidate?.lastName.toLowerCase().includes(query) ||
-        i.application?.job?.title.toLowerCase().includes(query)
+        i.application?.job?.title.toLowerCase().includes(query) ||
+        (i.application?.job?.requestId && i.application.job.requestId.toLowerCase().includes(query))
       );
     }
 

@@ -12,6 +12,14 @@ export class InterviewService {
     return this.api.post<Interview>('/interviews/schedule', request);
   }
 
+  updateInterview(id: number, request: any) {
+    return this.api.put<Interview>(`/interviews/${id}`, request);
+  }
+
+  requestFeedback(id: number) {
+    return this.api.post<any>(`/interviews/${id}/request-feedback`, {});
+  }
+
   getInterviewsByApplication(applicationId: number) {
     return this.api.get<Interview[]>(`/interviews/application/${applicationId}`);
   }

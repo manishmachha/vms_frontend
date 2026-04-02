@@ -26,6 +26,7 @@ import { JobApplication } from '../../../models/application.model';
     MatButtonModule,
   ],
   templateUrl: './schedule-interview-dialog.component.html',
+  styleUrl: './schedule-interview-dialog.component.css',
 })
 export class ScheduleInterviewDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -41,6 +42,13 @@ export class ScheduleInterviewDialogComponent implements OnInit {
 
   potentialCcUsers = signal<any[]>([]);
   userSearchTerm = signal('');
+  isEditMode = false;
+  interviewId: number | null = null;
+
+  showAppResults = signal(false);
+  showCcResults = signal(false);
+  selectedApp = signal<JobApplication | null>(null);
+  selectedCcUsers = signal<any[]>([]);
 
   filteredCcUsers = computed(() => {
     const term = this.userSearchTerm().toLowerCase();
@@ -63,7 +71,8 @@ export class ScheduleInterviewDialogComponent implements OnInit {
       (a) =>
         a.candidate?.firstName.toLowerCase().includes(term) ||
         a.candidate?.lastName.toLowerCase().includes(term) ||
-        a.job?.title.toLowerCase().includes(term)
+        a.job?.title.toLowerCase().includes(term) ||
+        (a.job?.requestId && a.job.requestId.toLowerCase().includes(term))
     );
   });
 
@@ -79,9 +88,76 @@ export class ScheduleInterviewDialogComponent implements OnInit {
 
   ngOnInit() {
     this.loadPotentialCcUsers();
-    if (!this.data?.applicationId) {
+    
+    if (this.data?.interview) {
+      this.isEditMode = true;
+      this.interviewId = this.data.interview.id;
+      this.patchForm(this.data.interview);
+    } else if (!this.data?.applicationId) {
       this.loadApplications();
     }
+  }
+
+  patchForm(interview: any) {
+    const scheduledAt = interview.scheduledAt ? new Date(interview.scheduledAt).toISOString().slice(0, 16) : '';
+    this.scheduleForm.patchValue({
+      applicationId: interview.application?.id,
+      scheduledAt,
+      durationMinutes: interview.durationMinutes,
+      type: interview.type,
+      meetingLink: interview.meetingLink,
+      schedulingNotes: interview.schedulingNotes,
+      ccUserIds: interview.ccUsers?.map((u: any) => u.id) || []
+    });
+
+    if (interview.application) {
+        this.selectedApp.set(interview.application);
+    }
+    if (interview.ccUsers) {
+        this.selectedCcUsers.set(interview.ccUsers);
+    }
+  }
+
+  selectApplication(app: JobApplication) {
+    this.selectedApp.set(app);
+    this.scheduleForm.patchValue({ applicationId: app.id });
+    this.showAppResults.set(false);
+    this.appSearchTerm.set('');
+  }
+
+  clearApplicationSelection() {
+    this.selectedApp.set(null);
+    this.scheduleForm.patchValue({ applicationId: null });
+    if (this.applications().length === 0) {
+        this.loadApplications();
+    }
+  }
+
+  toggleCcUser(user: any) {
+    const current = this.selectedCcUsers();
+    const index = current.findIndex(u => u.id === user.id);
+    
+    let updated;
+    if (index > -1) {
+      updated = current.filter(u => u.id !== user.id);
+    } else {
+      updated = [...current, user];
+    }
+    
+    this.selectedCcUsers.set(updated);
+    this.scheduleForm.patchValue({ ccUserIds: updated.map(u => u.id) });
+    this.userSearchTerm.set('');
+    this.showCcResults.set(false);
+  }
+
+  removeCcUser(userId: number) {
+    const updated = this.selectedCcUsers().filter(u => u.id !== userId);
+    this.selectedCcUsers.set(updated);
+    this.scheduleForm.patchValue({ ccUserIds: updated.map(u => u.id) });
+  }
+
+  isCcSelected(userId: number): boolean {
+    return this.selectedCcUsers().some(u => u.id === userId);
   }
 
   loadApplications() {
@@ -113,12 +189,16 @@ export class ScheduleInterviewDialogComponent implements OnInit {
       interviewerId: this.authStore.user()?.id || 1,
     };
 
-    this.interviewService.scheduleInterview(request).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: () => {
-        // We could use a global error snackbar or similar
-        console.error('Failed to schedule interview');
-      }
-    });
+    if (this.isEditMode && this.interviewId) {
+      this.interviewService.updateInterview(this.interviewId, request).subscribe({
+        next: () => this.dialogRef.close(true),
+        error: (err) => console.error('Failed to update interview', err)
+      });
+    } else {
+      this.interviewService.scheduleInterview(request).subscribe({
+        next: () => this.dialogRef.close(true),
+        error: (err) => console.error('Failed to schedule interview', err)
+      });
+    }
   }
 }

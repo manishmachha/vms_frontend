@@ -29,6 +29,7 @@ export interface Job {
   billRate?: number;
   payRate?: number;
   aiInsights?: Record<string, unknown>;
+  requestId?: string;
   organization?: Organization;
   createdAt?: string;
   updatedAt?: string;

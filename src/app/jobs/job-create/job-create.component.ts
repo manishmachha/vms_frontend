@@ -30,6 +30,7 @@ export class JobCreateComponent implements OnInit {
     employmentType: ['C2H', Validators.required],
     billRate: [null as number | null],
     payRate: [null as number | null],
+    requestId: [''],
     status: ['SUBMITTED'],
   });
 
@@ -54,6 +55,7 @@ export class JobCreateComponent implements OnInit {
         employmentType: job.employmentType,
         billRate: job.billRate,
         payRate: job.payRate,
+        requestId: job.requestId,
         status: job.status,
       } as any);
     });

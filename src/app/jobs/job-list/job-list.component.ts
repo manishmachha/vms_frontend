@@ -82,6 +82,7 @@ export class JobListComponent implements OnInit {
         (j) =>
           j.title.toLowerCase().includes(q) ||
           j.organization?.name.toLowerCase().includes(q) ||
+          (j.requestId && j.requestId.toLowerCase().includes(q)) ||
           (j.location && j.location.toLowerCase().includes(q)),
       );
     }

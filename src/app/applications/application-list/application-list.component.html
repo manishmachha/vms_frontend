@@ -23,7 +23,7 @@
             type="text"
             [(ngModel)]="filterValues.searchTerm"
             (ngModelChange)="applyFilter()"
-            placeholder="Search candidates, companies..."
+            placeholder="Search candidates, Request ID, title..."
             class="input-modern pl-11! py-2.5! bg-white shadow-sm"
           />
         </div>
@@ -142,7 +142,12 @@
               ></app-organization-logo>
               <div class="flex flex-col min-w-0">
                 <span class="text-sm font-bold text-gray-900 leading-tight truncate">{{ app.job.title }}</span>
-                <span class="text-xs text-gray-500 mt-0.5 font-medium">{{ app.job.organization?.name }}</span>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-xs text-gray-500 font-medium">{{ app.job.organization?.name }}</span>
+                  <span *ngIf="app.job.requestId" class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 uppercase tracking-tighter">
+                    {{ app.job.requestId }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

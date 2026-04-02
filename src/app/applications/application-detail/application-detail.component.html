@@ -286,6 +286,12 @@
                               >
                                 {{ app.job.experience }}+ Years Exp
                               </span>
+                              <span
+                                class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-wide border border-indigo-100"
+                                *ngIf="app.job.requestId"
+                              >
+                                REQ: {{ app.job.requestId }}
+                              </span>
                             </div>
                           </div>
                           <!-- Bill Rate (Manager Only) -->
