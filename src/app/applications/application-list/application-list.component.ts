@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, AfterViewInit, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, ViewChild, AfterViewInit, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -47,8 +47,10 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   private appService = inject(ApplicationService);
   private router = inject(Router);
   private notificationService = inject(NotificationService);
+  private cdr = inject(ChangeDetectorRef);
   dataSource = new MatTableDataSource<JobApplication>([]);
   unreadAppIds = new Set<string>();
+  totalElements = 0;
 
   filterValues = {
     searchTerm: '',
@@ -56,6 +58,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
     maxRisk: null as number | null,
     minMatch: null as number | null,
     maxMatch: null as number | null,
+    status: '' as string,
   };
 
   isMobile = signal(false);
@@ -122,58 +125,95 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
-  loadApplications() {
+  loadApplications(pageIndex?: number, pageSize?: number) {
+    const p = pageIndex ?? this.paginator?.pageIndex ?? 0;
+    const s = pageSize ?? this.paginator?.pageSize ?? 9;
+
     this.appService
-      .getApplications(undefined, 0, 20, 'INBOUND')
-      .pipe()
-      .subscribe((page) => {
+      .getApplications(
+        undefined,
+        p,
+        s,
+        'INBOUND',
+        this.filterValues.searchTerm,
+        this.filterValues.status as any,
+      )
+      .subscribe((page: any) => {
+        setTimeout(() => {
+          this.totalElements = page.totalElements || 0;
+          this.cdr.detectChanges();
+        });
+        
         // If empty, just set and return
         if (!page.content || page.content.length === 0) {
           this.dataSource.data = [];
           return;
         }
 
-        // Create an array of observables for analysis
-        const analysisRequests = page.content.map((app) =>
+        // Enrichment logic
+        const analysisRequests = page.content.map((app: any) =>
           this.appService.getLatestAnalysis(app.id).pipe(
-            // Catch error so one failure doesn't break the whole list
-            // Return null or undefined if failed
             map((res) => ({ appId: app.id, analysis: res })),
             catchError(() => of({ appId: app.id, analysis: null })),
           ),
         );
 
-        // Wait for all analysis requests
-        forkJoin(analysisRequests).subscribe((results) => {
-          const enrichedApps = page.content.map((app) => {
-            const res = results.find((r) => r.appId === app.id);
+        forkJoin<any[]>(analysisRequests).subscribe((results) => {
+          const enrichedApps = page.content.map((app: any) => {
+            const res = results.find((r: any) => r.appId === app.id);
             if (res && res.analysis) {
               app.latestAnalysis = res.analysis;
             }
             return app;
           });
 
+          // Client-side filtering as fallback/analytical filter
+          const filtered = enrichedApps.filter((app: any) => {
+            // 1. Risk/Match Filters (Analytical - requires enrichment)
+            const analysis = app.latestAnalysis;
+            const risk = analysis?.overallRiskScore ?? 0;
+            const match = analysis?.jobMatchScore ?? 0;
+
+            if (this.filterValues.maxRisk != null && risk > this.filterValues.maxRisk)
+              return false;
+            if (this.filterValues.minMatch != null && match < this.filterValues.minMatch)
+              return false;
+
+            // 2. Status Fallback (if server-side didn't handle it)
+            if (
+              this.filterValues.status &&
+              app.status.toLowerCase() !== this.filterValues.status.toLowerCase()
+            )
+              return false;
+
+            return true;
+          });
+
           // Sort: notified apps first
-          const sorted = [...enrichedApps].sort((a, b) => {
+          const sorted = [...filtered].sort((a, b) => {
             const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
             const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
             return bHasNotif - aHasNotif;
           });
 
           this.dataSource.data = sorted;
+          this.cdr.detectChanges();
         });
       });
   }
 
+  onPageChange(event: any) {
+    this.loadApplications(event.pageIndex, event.pageSize);
+  }
+
   applyFilter() {
-    this.dataSource.filter = JSON.stringify(this.filterValues);
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
     }
+    this.loadApplications();
   }
 
   viewDetails(app: JobApplication) {

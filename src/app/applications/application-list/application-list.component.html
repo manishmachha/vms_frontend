@@ -13,7 +13,7 @@
     <div class="p-5 border-b border-gray-100 bg-gray-50/50">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
         <!-- Search Input -->
-        <div class="md:col-span-5 relative group">
+        <div class="md:col-span-4 relative group">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <mat-icon class="text-gray-400 group-focus-within:text-indigo-500 transition-colors"
               >search</mat-icon
@@ -23,46 +23,53 @@
             type="text"
             [(ngModel)]="filterValues.searchTerm"
             (ngModelChange)="applyFilter()"
-            placeholder="Search candidates, Request ID, title..."
+            placeholder="Search candidates, Request ID..."
             class="input-modern pl-11! py-2.5! bg-white shadow-sm"
           />
         </div>
 
-        <!-- Risk Filter -->
-        <div class="md:col-span-3 flex items-center gap-2">
-          <input
-            type="number"
-            [(ngModel)]="filterValues.minRisk"
+        <!-- Status Filter -->
+        <div class="md:col-span-3 relative group">
+          <select
+            [(ngModel)]="filterValues.status"
             (ngModelChange)="applyFilter()"
-            placeholder="Min Risk"
-            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm"
-          />
-          <span class="text-black font-medium">-</span>
+            class="input-modern py-2.5! px-3! bg-white shadow-sm w-full appearance-none pr-10!"
+          >
+            <option value="">All Statuses</option>
+            <option value="APPLIED">Applied</option>
+            <option value="SHORTLISTED">Shortlisted</option>
+            <option value="INTERVIEW_SCHEDULED">Interview Scheduled</option>
+            <option value="L1_INTERVIEW">L1 Interview</option>
+            <option value="L2_INTERVIEW">L2 Interview</option>
+            <option value="L3_INTERVIEW">L3 Interview</option>
+            <option value="REJECTED">Rejected</option>
+            <option value="OFFERED">Offered</option>
+            <option value="ONBOARDED">Onboarded</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+            <mat-icon class="text-gray-400 opacity-60">expand_more</mat-icon>
+          </div>
+        </div>
+
+        <!-- Risk Filter -->
+        <div class="md:col-span-2 flex items-center gap-2">
           <input
             type="number"
             [(ngModel)]="filterValues.maxRisk"
             (ngModelChange)="applyFilter()"
             placeholder="Max Risk"
-            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm"
+            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm text-xs"
           />
         </div>
 
         <!-- Match Filter -->
-        <div class="md:col-span-3 flex items-center gap-2">
+        <div class="md:col-span-2 flex items-center gap-2">
           <input
             type="number"
             [(ngModel)]="filterValues.minMatch"
             (ngModelChange)="applyFilter()"
             placeholder="Min Match"
-            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm"
-          />
-          <span class="text-black font-medium">-</span>
-          <input
-            type="number"
-            [(ngModel)]="filterValues.maxMatch"
-            (ngModelChange)="applyFilter()"
-            placeholder="Max Match"
-            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm"
+            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm text-xs"
           />
         </div>
 
@@ -79,6 +86,7 @@
                 maxRisk: null,
                 minMatch: null,
                 maxMatch: null,
+                status: ''
               };
               applyFilter()
             "
@@ -91,22 +99,15 @@
     </div>
 
     <!-- CARD GRID VIEW (ALL SCREENS) -->
-    <div class="bg-gray-50/50 p-6">
+    <div class="bg-gray-50/50 p-6 min-h-[400px]">
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         <div
-          *ngFor="let app of dataSource.filteredData"
+          *ngFor="let app of dataSource.data"
           class="card-modern p-5 flex flex-col gap-5 relative group hover:border-indigo-200 transition-all cursor-pointer"
           [ngClass]="hasNotification(app.id) ? 'ring-2 ring-red-200 border-red-300 bg-red-50/10' : 'bg-white hover:shadow-lg'"
           (click)="viewDetails(app)"
         >
-          <!-- Notification Indicator -->
-          <div *ngIf="hasNotification(app.id)" class="absolute top-4 right-4 z-10">
-            <span class="flex h-3.5 w-3.5">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-500 shadow-sm"></span>
-            </span>
-          </div>
-
+          <!-- ... rest of card content remains the same ... -->
           <!-- Header: Candidate & Match -->
           <div class="flex justify-between items-start">
             <div class="flex items-center gap-4">
@@ -199,11 +200,34 @@
           </ng-template>
         </div>
       </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="dataSource.data.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+        <div class="p-4 rounded-full bg-gray-50 text-gray-300 mb-4">
+          <mat-icon class="text-4xl text-gray-200">file_copy</mat-icon>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900">No applications found</h3>
+        <p class="text-gray-500 max-w-xs text-center mt-2">Adjust your filters or try searching for something else.</p>
+        <button mat-button color="primary" class="mt-6 font-bold" (click)="
+          filterValues = {
+            searchTerm: '',
+            minRisk: null,
+            maxRisk: null,
+            minMatch: null,
+            maxMatch: null,
+            status: ''
+          };
+          applyFilter()
+        ">Clear All Filters</button>
+      </div>
     </div>
 
     <mat-paginator
-      [pageSizeOptions]="[9, 18, 27, 90]"
-      aria-label="Select page of accounts"
+      [length]="totalElements"
+      [pageSize]="9"
+      [pageSizeOptions]="[9, 18, 27, 45]"
+      (page)="onPageChange($event)"
+      aria-label="Select page of applications"
       class="border-t border-gray-100"
     ></mat-paginator>
   </div>

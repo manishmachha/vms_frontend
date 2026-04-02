@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCalendar, MatCalendarCellClassFunction, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -6,17 +6,19 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { InterviewService } from '../../../services/interview.service';
 import { Interview } from '../../../models/interview.model';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-interview-calendar',
   standalone: true,
-  imports: [CommonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule],
+  imports: [CommonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule, RouterLink],
   templateUrl: './interview-calendar.component.html',
   styleUrls: ['./interview-calendar.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
 export class InterviewCalendarComponent implements OnInit {
   interviewService = inject(InterviewService);
+  cdr = inject(ChangeDetectorRef);
   interviews = signal<Interview[]>([]);
   selectedDate = new Date();
   selectedInterviews = signal<Interview[]>([]);
@@ -36,7 +38,10 @@ export class InterviewCalendarComponent implements OnInit {
       // Build a Set of date strings for O(1) lookup
       this.interviewDateSet.clear();
       data.forEach((i) => {
-        this.interviewDateSet.add(this.formatDate(new Date(i.scheduledAt)));
+        if (i.scheduledAt) {
+          const date = new Date(i.scheduledAt);
+          this.interviewDateSet.add(this.formatDate(date));
+        }
       });
 
       this.updateSelectedInterviews();
@@ -44,9 +49,12 @@ export class InterviewCalendarComponent implements OnInit {
       // Force calendar to re-render cell classes after data loads
       setTimeout(() => {
         if (this.calendarRef) {
+          // Both approaches to trigger a re-render
           this.calendarRef.updateTodaysDate();
+          this.calendarRef.stateChanges.next();
+          this.cdr.detectChanges();
         }
-      });
+      }, 100);
     });
   }
 

@@ -14,6 +14,7 @@ import { UserService } from '../../services/user.service';
 import { ProjectService } from '../../services/project.service';
 import { InterviewService } from '../../services/interview.service';
 import { CandidateService } from '../../services/candidate.service';
+import { Interview } from '../../models/interview.model';
 
 interface StatCard {
   label: string;
@@ -93,7 +94,7 @@ export class ManagerDashboardComponent implements OnInit {
       value: 0,
       icon: 'bi bi-camera-video-fill',
       bgStyle: 'linear-gradient(to bottom right, #8b5cf6, #7c3aed)',
-      link: '/applications',
+      link: '/interviews',
     },
     {
       label: 'Offers',
@@ -113,6 +114,7 @@ export class ManagerDashboardComponent implements OnInit {
   ]);
 
   recentActivities = signal<RecentActivity[]>([]);
+  recentInterviews = signal<Interview[]>([]);
 
   // Chart Configurations
   barChartOptions: ChartConfiguration['options'] = {
@@ -240,6 +242,13 @@ export class ManagerDashboardComponent implements OnInit {
 
         // Process Recent Activity
         this.processActivity(apps, interviews);
+
+        // Process Recent Interviews
+        this.recentInterviews.set(
+          (interviews as any[] || [])
+            .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
+            .slice(0, 10)
+        );
 
       },
       error: (err) => {

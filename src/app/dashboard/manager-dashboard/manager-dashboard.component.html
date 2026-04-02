@@ -68,7 +68,7 @@
       </div>
 
       <div class="flex-1 flex items-center justify-between gap-2 px-4">
-        <div *ngFor="let stage of funnelStages(); let i = index" class="flex-1 relative group">
+        <div routerLink="/applications" *ngFor="let stage of funnelStages(); let i = index" class="flex-1 relative group">
           <div
             class="text-center p-4 rounded-2xl transition-all duration-300 hover:shadow-lg border border-transparent hover:border-white"
             [style.background]="stage.bgColor"
@@ -184,10 +184,71 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <!-- Interview Calendar -->
-    <div class="lg:col-span-8">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 h-full">
+    <div class="lg:col-span-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200">
         <h3 class="font-bold text-slate-800 text-lg mb-4">Interview Calendar</h3>
         <app-interview-calendar></app-interview-calendar>
+      </div>
+    </div>
+
+    <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+      <h3 class="font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="p-2 rounded-lg bg-pink-50 text-pink-600">
+          <i class="bi bi-calendar2-check"></i>
+        </div>
+        Recent Interviews
+      </h3>
+      <div class="flex-1 space-y-4 overflow-y-auto max-h-[550px] custom-scrollbar pr-2">
+        <div
+          *ngFor="let interview of recentInterviews()"
+          class="p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all group cursor-default"
+        >
+          <div class="flex items-start justify-between mb-2">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-pink-100 group-hover:text-pink-600 transition-colors"
+              >
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-gray-900 group-hover:text-pink-600 transition-colors">
+                  {{ interview.application?.candidate?.firstName }}
+                  {{ interview.application?.candidate?.lastName }}
+                </h4>
+                <p class="text-[10px] text-gray-500 font-medium tracking-tight">
+                  {{ interview.type }}
+                </p>
+              </div>
+            </div>
+            <span
+              [class]="
+                'text-[9px] font-bold px-2 py-0.5 rounded-full border ' +
+                (interview.status === 'SCHEDULED'
+                  ? 'bg-blue-50 text-blue-600 border-blue-100'
+                  : 'bg-gray-50 text-gray-500 border-gray-100')
+              "
+            >
+              {{ interview.status }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-[10px]">
+            <span class="text-gray-400 flex items-center gap-1.5 font-medium">
+              <i class="bi bi-calendar3"></i>
+              {{ interview.scheduledAt | date : 'MMM d, yyyy' }}
+            </span>
+            <span class="text-gray-400 flex items-center gap-1.5 font-medium">
+              <i class="bi bi-clock"></i>
+              {{ interview.scheduledAt | date : 'h:mm a' }}
+            </span>
+          </div>
+        </div>
+        <div
+          *ngIf="recentInterviews().length === 0"
+          class="flex flex-col items-center justify-center h-full py-10 opacity-30"
+        >
+          <i class="bi bi-calendar-x text-3xl mb-2"></i>
+          <p class="text-xs font-medium">No interviews scheduled</p>
+        </div>
       </div>
     </div>
 
@@ -262,6 +323,57 @@
                 Review Applications
               </h4>
               <p class="text-xs text-gray-500">Review pending applications</p>
+            </div>
+          </a>
+
+          <a
+            routerLink="/interviews"
+            class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+          >
+            <div
+              class="w-10 h-10 rounded-lg text-purple-600 bg-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-900 group-hover:text-purple-600">
+                Schedule Interviews
+              </h4>
+              <p class="text-xs text-gray-500">View interview statuses</p>
+            </div>
+          </a>
+
+          <a
+            routerLink="/projects"
+            class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+          >
+            <div
+              class="w-10 h-10 rounded-lg text-rose-600 bg-rose-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-900 group-hover:text-rose-600">
+                View Projects
+              </h4>
+              <p class="text-xs text-gray-500">View project statuses</p>
+            </div>
+          </a>
+
+          <a
+            routerLink="/candidates"
+            class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
+          >
+            <div
+              class="w-10 h-10 rounded-lg text-blue-600 bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform"
+            >
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-slate-900 group-hover:text-blue-600">
+                View Candidates
+              </h4>
+              <p class="text-xs text-gray-500">View candidate statuses</p>
             </div>
           </a>
         </div>

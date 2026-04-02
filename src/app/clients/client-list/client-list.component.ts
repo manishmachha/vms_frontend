@@ -26,8 +26,8 @@ export class ClientListComponent implements OnInit {
   clients = signal<Client[]>([]);
   projects = signal<Project[]>([]);
 
-  searchQuery = '';
-  industryFilter = '';
+  searchQuery = signal('');
+  industryFilter = signal('');
   activeMenuId: number | null = null;
 
   ngOnInit() {
@@ -47,10 +47,11 @@ export class ClientListComponent implements OnInit {
 
   filteredClients = computed(() => {
     let result = this.clients();
-    const query = this.searchQuery.toLowerCase();
+    const query = this.searchQuery().toLowerCase();
+    const filter = this.industryFilter();
 
-    if (this.industryFilter) {
-      result = result.filter((c) => c.industry === this.industryFilter);
+    if (filter) {
+      result = result.filter((c) => c.industry === filter);
     }
 
     if (query) {
@@ -109,5 +110,27 @@ export class ClientListComponent implements OnInit {
     if (confirm(`Are you sure you want to delete ${client.name}?`)) {
       this.clientService.deleteClient(client.id).subscribe(() => this.loadData());
     }
+  }
+
+  getStatusClass(status?: string): string {
+    switch (status?.toUpperCase()) {
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'LEAD':
+        return 'bg-amber-100 text-amber-700 border-amber-200';
+      case 'INACTIVE':
+        return 'bg-red-100 text-red-700 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  }
+
+  getIndustryClass(industry?: string): string {
+    const ind = industry?.toLowerCase() || '';
+    if (ind.includes('tech') || ind.includes('soft')) return 'bg-indigo-50 text-indigo-600';
+    if (ind.includes('health') || ind.includes('pharma')) return 'bg-rose-50 text-rose-600';
+    if (ind.includes('fin') || ind.includes('bank')) return 'bg-emerald-50 text-emerald-600';
+    if (ind.includes('retail') || ind.includes('e-comm')) return 'bg-amber-50 text-amber-600';
+    return 'bg-slate-50 text-slate-600';
   }
 }

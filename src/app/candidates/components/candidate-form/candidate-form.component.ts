@@ -24,11 +24,13 @@ export class CandidateFormComponent {
     email: ['', [Validators.required, Validators.email]],
     phone: [''],
     currentDesignation: [''],
+    currentCompany: [''],
     experienceYears: [0, [Validators.min(0)]],
     skills: [''], // Comma separated string for UI, array for API
     city: [''],
     summary: [''],
     linkedInUrl: [''],
+    portfolioUrl: [''],
   });
 
   isEditMode = signal(false);
@@ -54,10 +56,12 @@ export class CandidateFormComponent {
         email: c.email,
         phone: c.phone,
         currentDesignation: c.currentDesignation,
+        currentCompany: c.currentCompany,
         experienceYears: c.experienceYears,
         city: c.city,
         summary: c.summary,
         linkedInUrl: c.linkedInUrl,
+        portfolioUrl: c.portfolioUrl,
         skills: c.skills.join(', '),
       });
     });

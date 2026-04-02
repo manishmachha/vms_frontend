@@ -20,12 +20,13 @@
 
     <div class="mt-6 space-y-4" *ngIf="selectedInterviews().length > 0; else noInterviews">
       <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
-        {{ selectedDate | date: 'mediumDate' }}
+        {{ selectedDate | date: 'mediumDate' }} 
+        <span class="bg-indigo-50 text-indigo-700 border border-indigo-100 px-1.5 py-0.5 rounded-full">{{selectedInterviews().length}} Interviews</span>
       </h4>
-      <div class="space-y-3">
-        <div
+      <div class="space-y-3 max-h-[200px] overflow-y-scroll">
+        <div routerLink="/interviews/{{interview.id}}"
           *ngFor="let interview of selectedInterviews()"
-          class="group p-3 bg-gray-50/50 rounded-xl border border-gray-100 hover:border-indigo-100 transition-all"
+          class="group p-3 bg-gray-50/50 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-100 cursor-pointer transition-all"
         >
           <div class="flex justify-between items-start mb-1">
             <div>
