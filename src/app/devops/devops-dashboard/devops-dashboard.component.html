@@ -1,0 +1,92 @@
+<div class="p-6 bg-slate-900 min-h-screen text-slate-100">
+  <header class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+        DevOps Control Panel
+      </h1>
+      <p class="text-slate-400">Manage feature branch previews and infrastructure</p>
+    </div>
+    <div class="flex gap-4">
+      <button (click)="loadBranches()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-indigo-500/20">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Branch List -->
+    <div class="lg:col-span-1 bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-xl">
+      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+        <i class="bi bi-git text-emerald-400"></i> Git Branches
+      </h2>
+      <div *ngIf="loading" class="animate-pulse space-y-4">
+        <div class="h-12 bg-slate-700 rounded-lg"></div>
+        <div class="h-12 bg-slate-700 rounded-lg"></div>
+        <div class="h-12 bg-slate-700 rounded-lg"></div>
+      </div>
+      <ul class="space-y-2">
+        <li *ngFor="let branch of branches" 
+            (click)="selectBranch(branch)"
+            [class.border-indigo-500]="selectedBranch === branch"
+            class="group cursor-pointer p-4 rounded-xl border border-slate-700 hover:border-indigo-500/50 hover:bg-slate-700/50 transition-all">
+          <div class="flex justify-between items-center">
+            <span class="font-medium text-slate-200 group-hover:text-white">{{ branch }}</span>
+            <i class="bi bi-chevron-right text-slate-500 group-hover:text-indigo-400"></i>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Deployment Board -->
+    <div class="lg:col-span-2 space-y-8">
+      <div *ngIf="!selectedBranch" class="h-full flex flex-col items-center justify-center p-12 bg-slate-800/50 rounded-2xl border border-dashed border-slate-700 opacity-50">
+        <i class="bi bi-diagram-3 text-6xl mb-4 text-slate-600"></i>
+        <p class="text-xl">Select a branch to view deployment options</p>
+      </div>
+
+      <div *ngIf="selectedBranch" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl">
+          <div class="p-6 border-b border-slate-700 bg-slate-700/30 flex justify-between items-center">
+            <div>
+              <h3 class="text-2xl font-bold text-white">{{ selectedBranch }}</h3>
+              <p class="text-sm text-slate-400 font-mono">https://{{ selectedBranch | lowercase }}.solventek.com</p>
+            </div>
+            <div class="flex gap-2">
+              <button (click)="deploy(selectedBranch)" 
+                      [disabled]="deploying"
+                      class="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 px-6 py-2 rounded-lg font-semibold transition-all">
+                {{ deploying ? 'Deploying...' : 'Deploy Preview' }}
+              </button>
+              <button (click)="deleteBranch(selectedBranch)" 
+                      class="bg-rose-900/50 hover:bg-rose-600 text-rose-200 px-4 py-2 rounded-lg border border-rose-500/30 transition-all">
+                Undeploy
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <h4 class="text-lg font-semibold mb-4 text-slate-300 uppercase tracking-wider text-xs">Recent Commits</h4>
+            <div class="space-y-4">
+              <div *ngFor="let commit of commits" class="relative pl-8 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-0 before:w-0.5 before:bg-slate-700 last:before:hidden">
+                <div class="absolute left-0 top-1.5 w-6 h-6 rounded-full bg-slate-900 border-2 border-indigo-500 flex items-center justify-center">
+                  <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+                </div>
+                <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-700/50 hover:border-slate-600 transition-all">
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="font-bold text-indigo-400 font-mono text-sm uppercase">{{ commit.hash }}</span>
+                    <span class="text-xs text-slate-500">{{ commit.time * 1000 | date:'short' }}</span>
+                  </div>
+                  <p class="text-slate-200 mb-2 leading-relaxed">{{ commit.message }}</p>
+                  <div class="flex items-center gap-2 text-xs text-slate-400">
+                    <i class="bi bi-person-circle"></i>
+                    <span>{{ commit.author }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

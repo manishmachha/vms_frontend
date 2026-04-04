@@ -81,6 +81,10 @@ export const routes: Routes = [
           import('./profile/my-profile.component').then((m) => m.MyProfileComponent),
       },
       {
+        path: 'devops',
+        loadChildren: () => import('./devops/devops.routes').then((m) => m.DEVOPS_ROUTES),
+      },
+      {
         path: 'login',
         loadComponent: () =>
           import('./login/vms.login.component').then((m) => m.VMSLoginComponent),

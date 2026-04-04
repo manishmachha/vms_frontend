@@ -1,0 +1,64 @@
+<div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
+  <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-700/20">
+    <h3 class="text-xl font-bold flex items-center gap-3">
+      <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+      Active Node: EC2-Instance-VMS
+    </h3>
+    <span class="text-xs font-mono text-slate-500 uppercase tracking-widest">Single Node Cluster</span>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-slate-900/50 text-slate-400 text-xs uppercase tracking-widest">
+          <th class="px-6 py-4">Container ID</th>
+          <th class="px-6 py-4">Name</th>
+          <th class="px-6 py-4">Image</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-700/50">
+        <tr *ngFor="let container of containers" class="hover:bg-slate-700/30 transition-colors group">
+          <td class="px-6 py-4 font-mono text-xs text-indigo-400">{{ container.id.substring(0, 12) }}</td>
+          <td class="px-6 py-4">
+            <div class="font-semibold text-slate-200">{{ container.names[0].replace('/', '') }}</div>
+            <div class="text-[10px] text-slate-500">{{ container.command }}</div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="text-slate-400 text-sm italic">{{ container.image }}</span>
+          </td>
+          <td class="px-6 py-4">
+            <span [class]="'px-3 py-1 rounded-full text-xs font-bold border ' + getStatusColor(container.status)">
+              {{ container.status }}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button (click)="performAction(container.id, 'start')" 
+                      title="Start"
+                      class="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 transition-all">
+                <i class="bi bi-play-fill text-lg"></i>
+              </button>
+              <button (click)="performAction(container.id, 'stop')" 
+                      title="Stop"
+                      class="p-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/30 text-orange-400 transition-all">
+                <i class="bi bi-stop-fill text-lg"></i>
+              </button>
+              <button (click)="performAction(container.id, 'restart')" 
+                      title="Restart"
+                      class="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/30 text-blue-400 transition-all">
+                <i class="bi bi-arrow-repeat text-lg"></i>
+              </button>
+              <button (click)="performAction(container.id, 'remove')" 
+                      title="Kill & Remove"
+                      class="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/30 text-rose-400 transition-all">
+                <i class="bi bi-trash-fill text-lg"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
