@@ -1,17 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { LogViewerComponent } from '../log-viewer/log-viewer.component';
 import { DevOpsService } from '../../services/devops.service';
 
 @Component({
   selector: 'app-devops-dashboard',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule, LogViewerComponent],
   templateUrl: './devops-dashboard.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DevOpsDashboardComponent implements OnInit {
-  branches: string[] = [];
-  selectedBranch: string | null = null;
-  commits: any[] = [];
-  loading = false;
-  deploying = false;
+  // Signals for state management
+  branches = signal<string[]>([]);
+  selectedBranch = signal<string | null>(null);
+  commits = signal<any[]>([]);
+  loading = signal(false);
+  deploying = signal(false);
+  repoType = signal<'vms-backend' | 'vms-ui'>('vms-backend');
 
   constructor(private devOpsService: DevOpsService) {}
 
@@ -19,48 +26,55 @@ export class DevOpsDashboardComponent implements OnInit {
     this.loadBranches();
   }
 
+  setRepoType(type: 'vms-backend' | 'vms-ui'): void {
+    this.repoType.set(type);
+    this.selectedBranch.set(null);
+    this.commits.set([]);
+    this.loadBranches();
+  }
+
   loadBranches(): void {
-    this.loading = true;
-    this.devOpsService.getBranches().subscribe({
+    this.loading.set(true);
+    this.devOpsService.getBranches(this.repoType()).subscribe({
       next: (data) => {
-        this.branches = data;
-        this.loading = false;
+        this.branches.set(data);
+        this.loading.set(false);
       },
       error: (err) => {
-        console.error('Failed to load branches', err);
-        this.loading = false;
+        console.error(`Failed to load branches for ${this.repoType()}`, err);
+        this.loading.set(false);
       }
     });
   }
 
   selectBranch(branch: string): void {
-    this.selectedBranch = branch;
+    this.selectedBranch.set(branch);
     this.loadCommits(branch);
   }
 
   loadCommits(branch: string): void {
-    this.devOpsService.getCommits(branch).subscribe(data => {
-      this.commits = data;
+    this.devOpsService.getCommits(branch, this.repoType()).subscribe(data => {
+      this.commits.set(data);
     });
   }
 
   deploy(branch: string): void {
-    const imageTag = 'latest'; // Or from commit hash
-    this.deploying = true;
+    const imageTag = `feature-${branch.replace('feature/', '')}`;
+    this.deploying.set(true);
     this.devOpsService.deploy(branch, imageTag).subscribe({
       next: () => {
-        this.deploying = false;
-        alert('Deployment started for ' + branch);
+        this.deploying.set(false);
+        alert('Deployment triggered for environment: ' + branch);
       },
       error: (err) => {
-        this.deploying = false;
+        this.deploying.set(false);
         alert('Deployment failed: ' + err.message);
       }
     });
   }
 
   deleteBranch(branch: string): void {
-    if (confirm(`Are you sure you want to undeploy and delete preview for branch ${branch}?`)) {
+    if (confirm(`Are you sure you want to undeploy and delete ALL containers for branch ${branch}?`)) {
       this.devOpsService.undeploy(branch).subscribe({
         next: () => {
           alert('Undeployed ' + branch);

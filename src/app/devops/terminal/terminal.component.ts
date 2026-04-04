@@ -1,11 +1,14 @@
-import { Component, ElementRef, OnInit, OnDestroy, ViewChild, AfterViewInit, HostListener } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild, AfterViewInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { DevOpsService } from '../../services/devops.service';
 
 @Component({
   selector: 'app-terminal',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="h-full w-full bg-black p-4 rounded-xl border border-slate-700 shadow-2xl">
       <div class="flex items-center gap-2 mb-4 text-slate-400 text-xs font-mono uppercase tracking-widest border-b border-slate-800 pb-2">

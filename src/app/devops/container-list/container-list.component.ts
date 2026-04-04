@@ -1,15 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LogViewerComponent } from '../log-viewer/log-viewer.component';
 import { DevOpsService } from '../../services/devops.service';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-container-list',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, LogViewerComponent],
   templateUrl: './container-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContainerListComponent implements OnInit, OnDestroy {
-  containers: any[] = [];
-  loading = false;
+  // Signals for reactive container state
+  containers = signal<any[]>([]);
+  loading = signal(false);
   private pollSubscription?: Subscription;
 
   constructor(private devOpsService: DevOpsService) {}
@@ -25,15 +30,15 @@ export class ContainerListComponent implements OnInit, OnDestroy {
   }
 
   loadContainers(silent = false): void {
-    if (!silent) this.loading = true;
+    if (!silent) this.loading.set(true);
     this.devOpsService.getContainers().subscribe({
       next: (data) => {
-        this.containers = data;
-        this.loading = false;
+        this.containers.set(data);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('Failed to load containers', err);
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }

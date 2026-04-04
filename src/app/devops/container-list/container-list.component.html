@@ -19,7 +19,7 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-700/50">
-        <tr *ngFor="let container of containers" class="hover:bg-slate-700/30 transition-colors group">
+        <tr *ngFor="let container of containers()" class="hover:bg-slate-700/30 transition-colors group">
           <td class="px-6 py-4 font-mono text-xs text-indigo-400">{{ container.id.substring(0, 12) }}</td>
           <td class="px-6 py-4">
             <div class="font-semibold text-slate-200">{{ container.names[0].replace('/', '') }}</div>

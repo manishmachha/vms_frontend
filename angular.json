@@ -67,7 +67,8 @@
               "buildTarget": "vms_ui:build:production"
             },
             "development": {
-              "buildTarget": "vms_ui:build:development"
+              "buildTarget": "vms_ui:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

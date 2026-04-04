@@ -10,12 +10,12 @@ export class DevOpsService {
 
   constructor(private http: HttpClient) {}
 
-  getBranches(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/branches`);
+  getBranches(repoType: string = 'backend'): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/branches?repoType=${repoType}`);
   }
 
-  getCommits(branchName: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/branches/${branchName}/commits`);
+  getCommits(branchName: string, repoType: string = 'backend'): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/commits?branchName=${branchName}&repoType=${repoType}`);
   }
 
   getContainers(): Observable<any[]> {
