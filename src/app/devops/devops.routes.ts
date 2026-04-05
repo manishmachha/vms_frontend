@@ -10,7 +10,9 @@ export const DEVOPS_ROUTES: Routes = [
     children: [
       { path: 'containers', component: ContainerListComponent },
       { path: 'terminal', component: TerminalComponent },
-      { path: '', redirectTo: 'branches', pathMatch: 'full' }
+      { path: 'terminal/:containerId', component: TerminalComponent },
+      { path: 'host-terminal', component: TerminalComponent },
+      { path: '', redirectTo: 'containers', pathMatch: 'full' }
     ]
   }
 ];

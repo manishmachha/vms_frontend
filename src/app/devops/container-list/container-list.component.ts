@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { LogViewerComponent } from '../log-viewer/log-viewer.component';
 import { DevOpsService } from '../../services/devops.service';
 import { interval, Subscription } from 'rxjs';
@@ -7,7 +8,7 @@ import { interval, Subscription } from 'rxjs';
 @Component({
   selector: 'app-container-list',
   standalone: true,
-  imports: [CommonModule, LogViewerComponent],
+  imports: [CommonModule, LogViewerComponent, RouterModule],
   templateUrl: './container-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

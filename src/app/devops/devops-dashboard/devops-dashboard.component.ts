@@ -1,13 +1,13 @@
 import { Component, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { LogViewerComponent } from '../log-viewer/log-viewer.component';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { ContainerListComponent } from '../container-list/container-list.component';
 import { DevOpsService } from '../../services/devops.service';
 
 @Component({
   selector: 'app-devops-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, LogViewerComponent],
+  imports: [CommonModule, RouterModule, ContainerListComponent],
   templateUrl: './devops-dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -20,7 +20,10 @@ export class DevOpsDashboardComponent implements OnInit {
   deploying = signal(false);
   repoType = signal<'vms-backend' | 'vms-ui'>('vms-backend');
 
-  constructor(private devOpsService: DevOpsService) {}
+  constructor(
+    private devOpsService: DevOpsService,
+    public route: ActivatedRoute // Public for template access
+  ) {}
 
   ngOnInit(): void {
     this.loadBranches();

@@ -44,4 +44,9 @@ export class DevOpsService {
     const params = containerId ? `?containerId=${containerId}` : '';
     return `${protocol}//${window.location.host}/api/ws/terminal${params}`;
   }
+
+  getHostTerminalUrl(): string {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${protocol}//${window.location.host}/api/ws/host-terminal`;
+  }
 }
