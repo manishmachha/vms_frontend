@@ -12,7 +12,6 @@ export const DEVOPS_ROUTES: Routes = [
       { path: 'terminal', component: TerminalComponent },
       { path: 'terminal/:containerId', component: TerminalComponent },
       { path: 'host-terminal', component: TerminalComponent },
-      { path: '', redirectTo: 'containers', pathMatch: 'full' }
     ]
   }
 ];
