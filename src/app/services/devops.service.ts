@@ -31,7 +31,7 @@ export class DevOpsService {
   }
 
   undeploy(branchName: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/deploy/${branchName}`);
+    return this.http.delete<void>(`${this.apiUrl}/deploy?branchName=${branchName}`);
   }
 
   getLogStreamUrl(containerId: string): string {
