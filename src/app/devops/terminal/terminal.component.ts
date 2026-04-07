@@ -101,10 +101,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
     setTimeout(() => {
       this.fitAddon.fit();
       this.connectWebSocket();
-
-      const ro = new ResizeObserver(() => this.fitAddon.fit());
-      ro.observe(this.terminalContainer.nativeElement);
-    }, 100);
+    }, 150);
   }
 
   private connectWebSocket(): void {
