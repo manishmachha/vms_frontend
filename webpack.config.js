@@ -1,9 +1,8 @@
 const { shareAll, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack');
 
-module.exports = withModuleFederationPlugin({
+const config = withModuleFederationPlugin({
 
   name: 'vms',
-  publicPath: 'auto',
 
   exposes: {
     './routes': './src/app/app.routes.ts',
@@ -14,3 +13,8 @@ module.exports = withModuleFederationPlugin({
   },
 
 });
+
+// Set publicPath to 'auto' to ensure correct asset resolution through the proxy
+config.output.publicPath = 'auto';
+
+module.exports = config;
