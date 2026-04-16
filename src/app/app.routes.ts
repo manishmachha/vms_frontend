@@ -2,17 +2,10 @@ import { Routes } from '@angular/router';
 
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { VMSLoginComponent } from './login/vms.login.component';
-import { Home } from './public/home/home';
-import { PublicLayoutComponent } from './public/layout/main-layout/main-layout';
-import { PUBLIC_ROUTES } from './public/public.routes';
 
 export const routes: Routes = [
-  {
-    path: '',
-    component: PublicLayoutComponent,
-    children: PUBLIC_ROUTES,
-  },
-  { path: 'login', component: VMSLoginComponent },
+
+  { path: '', component: VMSLoginComponent },
   {
     path: '',
     component: MainLayoutComponent,
@@ -79,10 +72,6 @@ export const routes: Routes = [
         path: 'profile',
         loadComponent: () =>
           import('./profile/my-profile.component').then((m) => m.MyProfileComponent),
-      },
-      {
-        path: 'devops',
-        loadChildren: () => import('./devops/devops.routes').then((m) => m.DEVOPS_ROUTES),
       },
       {
         path: 'login',

@@ -3,14 +3,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
-import { FooterComponent } from '../public/layout/footer/footer';
-import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from '../public/layout/header/header';
 
 @Component({
   selector: 'app-vms-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, FooterComponent, RouterOutlet],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './vms.login.component.html',
   styleUrl: './vms.login.component.css',
 })

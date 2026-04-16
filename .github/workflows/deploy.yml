@@ -8,7 +8,7 @@ on:
 env:
   AWS_REGION: eu-north-1
   EC2_USER: ubuntu
-  DEPLOY_DIR: /home/ubuntu/solventek-vms
+  DEPLOY_DIR: /home/ubuntu/solventek-vms-ui
 
 jobs:
   build:
@@ -81,6 +81,8 @@ jobs:
           IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
         run: |
           ECR_PASSWORD=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})
+          ssh -o StrictHostKeyChecking=no ${EC2_USER}@${{ secrets.EC2_HOST }} "mkdir -p $DEPLOY_DIR"
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no" docker-compose.prod.yml ${EC2_USER}@${{ secrets.EC2_HOST }}:$DEPLOY_DIR/
           ssh -o StrictHostKeyChecking=no ${EC2_USER}@${{ secrets.EC2_HOST }} "
             export DOCKER_REGISTRY=$ECR_REGISTRY
             export IMAGE_TAG=$IMAGE_TAG
@@ -90,13 +92,14 @@ jobs:
             # Login to ECR
             echo \$DOCKER_PASSWORD | docker login \$DOCKER_REGISTRY -u \$DOCKER_USERNAME --password-stdin
             
+            # Create network if not exists
+            docker network create solventek-network || true
+            
             cd $DEPLOY_DIR
             
-            # Pull only frontend image
-            docker-compose -f docker-compose.prod.yml pull frontend
-            
-            # Recreate frontend container
-            docker-compose -f docker-compose.prod.yml up -d frontend
+            # Pull and Update
+            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml up -d
             
             # Cleanup old images
             docker image prune -f

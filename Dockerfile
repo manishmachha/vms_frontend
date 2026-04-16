@@ -26,7 +26,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built Angular app to nginx html directory
-COPY --from=build /app/dist/vms_ui/browser /usr/share/nginx/html
+COPY --from=build /app/dist/vms_ui /usr/share/nginx/html
 
 # Expose port
 EXPOSE 80

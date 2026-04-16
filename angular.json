@@ -15,10 +15,14 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "ngx-build-plus:browser",
           "options": {
-            "browser": "src/main.ts",
+            "outputPath": "dist/vms_ui",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": [],
             "tsConfig": "tsconfig.app.json",
+            "extraWebpackConfig": "webpack.config.js",
             "assets": [
               {
                 "glob": "**/*",
@@ -61,7 +65,11 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "ngx-build-plus:dev-server",
+          "options": {
+            "port": 4201,
+            "publicHost": "http://localhost:4201"
+          },
           "configurations": {
             "production": {
               "buildTarget": "vms_ui:build:production"

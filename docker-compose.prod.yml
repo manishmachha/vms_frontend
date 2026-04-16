@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: ${DOCKER_REGISTRY}/vms-frontend:${IMAGE_TAG:-latest}
+    container_name: vms-frontend
+    restart: always
+    expose:
+      - "80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:80/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    networks:
+      - solventek-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  solventek-network:
+    external: true
+    name: solventek-network
