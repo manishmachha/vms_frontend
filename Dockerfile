@@ -22,11 +22,34 @@ FROM nginx:alpine
 # Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
 # Copy built Angular app to nginx html directory
 COPY --from=build /app/dist/vms_ui /usr/share/nginx/html
+
+# Ensure proper permissions for the nginx user
+RUN chmod -R 755 /usr/share/nginx/html
+
+# A robust config for Angular MFE
+RUN echo "server { \
+    listen 80; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    \
+    # Explicitly include mime types \
+    include /etc/nginx/mime.types; \
+    types { \
+        application/javascript js; \
+        text/css css; \
+    } \
+    \
+    location / { \
+        try_files \$uri \$uri/ /index.html; \
+    } \
+    \
+    location /health { \
+        access_log off; \
+        return 200 'healthy\n'; \
+    } \
+}" > /etc/nginx/conf.d/default.conf
 
 # Expose port
 EXPOSE 80
