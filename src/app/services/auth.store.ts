@@ -121,9 +121,9 @@ export class AuthStore {
       user,
     }));
     // Update local storage user but keep tokens
-    const current = sessionStorage.getItem('user');
+    const current = sessionStorage.getItem('vms_user');
     if (current) {
-      sessionStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('vms_user', JSON.stringify(user));
     }
   }
 
@@ -152,17 +152,17 @@ export class AuthStore {
 
   // Storage Handling
   private saveToStorage(accessToken: string, refreshToken: string | null, user: User) {
-    sessionStorage.setItem('access_token', accessToken);
+    sessionStorage.setItem('vms_access_token', accessToken);
     if (refreshToken) {
-      sessionStorage.setItem('refresh_token', refreshToken);
+      sessionStorage.setItem('vms_refresh_token', refreshToken);
     }
-    sessionStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem('vms_user', JSON.stringify(user));
   }
 
   private loadFromStorage() {
-    const accessToken = sessionStorage.getItem('access_token');
-    const refreshToken = sessionStorage.getItem('refresh_token');
-    const userStr = sessionStorage.getItem('user');
+    const accessToken = sessionStorage.getItem('vms_access_token');
+    const refreshToken = sessionStorage.getItem('vms_refresh_token');
+    const userStr = sessionStorage.getItem('vms_user');
 
     if (accessToken && userStr) {
       try {
@@ -183,8 +183,8 @@ export class AuthStore {
   }
 
   private clearStorage() {
-    sessionStorage.removeItem('access_token');
-    sessionStorage.removeItem('refresh_token');
-    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('vms_access_token');
+    sessionStorage.removeItem('vms_refresh_token');
+    sessionStorage.removeItem('vms_user');
   }
 }
