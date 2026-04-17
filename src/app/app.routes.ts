@@ -2,14 +2,24 @@ import { Routes } from '@angular/router';
 
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { VMSLoginComponent } from './login/vms.login.component';
+import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './services/auth.interceptor';
+import { LoadingInterceptor } from './services/loading.interceptor';
 
 export const routes: Routes = [
-
-  { path: '', component: VMSLoginComponent },
   {
     path: '',
-    component: MainLayoutComponent,
+    providers: [
+      provideHttpClient(withInterceptorsFromDi()),
+      { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+      { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
+    ],
     children: [
+      { path: '', component: VMSLoginComponent },
+      {
+        path: '',
+        component: MainLayoutComponent,
+        children: [
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -79,6 +89,8 @@ export const routes: Routes = [
           import('./login/vms.login.component').then((m) => m.VMSLoginComponent),
       },
     ],
+  },
+  ]
   },
   { path: '**', redirectTo: '' },
 ];
