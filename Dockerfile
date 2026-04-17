@@ -27,7 +27,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy built Angular app to nginx html directory
 # Angular 21 with ngx-build-plus may output to dist/<project>/browser/ or dist/<project>/
-COPY --from=build /app/dist/vms_ui /tmp/angular-build
+COPY --from=build /app/dist/vms_frontend /tmp/angular-build
 
 RUN if [ -d "/tmp/angular-build/browser" ]; then \
       cp -r /tmp/angular-build/browser/* /usr/share/nginx/html/; \

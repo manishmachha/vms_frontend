@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "vms_ui": {
+    "vms_frontend": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -17,7 +17,7 @@
         "build": {
           "builder": "ngx-build-plus:browser",
           "options": {
-            "outputPath": "dist/vms_ui",
+            "outputPath": "dist/vms_frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [],
@@ -29,10 +29,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/material-theme.scss",
-              "src/styles.css"
-            ]
+            "styles": ["src/material-theme.scss", "src/styles.css"]
           },
           "configurations": {
             "production": {
@@ -73,10 +70,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "vms_ui:build:production"
+              "buildTarget": "vms_frontend:build:production"
             },
             "development": {
-              "buildTarget": "vms_ui:build:development",
+              "buildTarget": "vms_frontend:build:development",
               "proxyConfig": "proxy.conf.json"
             }
           },

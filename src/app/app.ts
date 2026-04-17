@@ -9,5 +9,5 @@ import { LoaderComponent } from './shared/components/loader/loader.component';
   styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('vms_ui');
+  protected readonly title = signal('vms_frontend');
 }
