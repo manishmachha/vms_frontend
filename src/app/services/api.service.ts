@@ -13,7 +13,9 @@ export const SKIP_LOADER = new HttpContextToken<boolean>(() => false);
  * - Unwraps ApiResponse<T> (extracts .data)
  * - Provides typed HTTP methods
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ApiService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
