@@ -6,13 +6,15 @@ import { AuthInterceptor } from './services/auth.interceptor';
 import { LoadingInterceptor } from './services/loading.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { RemoteEntryComponent } from './remote-entry.component';
+import { importProvidersFrom } from '@angular/core';
+import { MatDialogModule } from '@angular/material/dialog';
 
 export const routes: Routes = [
   {
     path: '',
     component: RemoteEntryComponent,
     providers: [
-      provideAnimationsAsync(),
+      importProvidersFrom(MatDialogModule),
       provideHttpClient(withInterceptorsFromDi()),
       { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
       { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },

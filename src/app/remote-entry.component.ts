@@ -11,4 +11,8 @@ import { LoaderComponent } from './shared/components/loader/loader.component';
     <router-outlet></router-outlet>
   `
 })
-export class RemoteEntryComponent {}
+export class RemoteEntryComponent {
+  constructor() {
+    console.log('VMS RemoteEntryComponent initialized');
+  }
+}
