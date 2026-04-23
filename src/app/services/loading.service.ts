@@ -1,8 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class LoadingService {
   private activeRequests = signal(0);
 

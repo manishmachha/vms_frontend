@@ -8,6 +8,9 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { RemoteEntryComponent } from './remote-entry.component';
 import { importProvidersFrom } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
+import { ApiService } from './services/api.service';
+import { LoadingService } from './services/loading.service';
+import { AuthStore } from './services/auth.store';
 
 export const routes: Routes = [
   {
@@ -18,6 +21,9 @@ export const routes: Routes = [
       provideHttpClient(withInterceptorsFromDi()),
       { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
       { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
+      ApiService,
+      LoadingService,
+      AuthStore,
     ],
     children: [
       { path: '', component: VMSLoginComponent },
