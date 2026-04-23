@@ -1,15 +1,18 @@
 import { Routes } from '@angular/router';
-
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { VMSLoginComponent } from './login/vms.login.component';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './services/auth.interceptor';
 import { LoadingInterceptor } from './services/loading.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { RemoteEntryComponent } from './remote-entry.component';
 
 export const routes: Routes = [
   {
     path: '',
+    component: RemoteEntryComponent,
     providers: [
+      provideAnimationsAsync(),
       provideHttpClient(withInterceptorsFromDi()),
       { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
       { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
