@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 import { BrandedResumeService } from '../../services/branded-resume.service';
 import { BrandedResume } from '../../models/branded-resume.model';
 import { HeaderService } from '../../../services/header.service';
@@ -20,6 +21,12 @@ export class ResumeDetailComponent implements OnInit {
   private headerService = inject(HeaderService);
   private snackBar = inject(MatSnackBar);
   private sanitizer = inject(DomSanitizer);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   resume = signal<BrandedResume | null>(null);
   versions = signal<BrandedResume[]>([]);

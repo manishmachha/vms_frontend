@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 import { FormsModule } from '@angular/forms';
 import { BrandedResumeService } from '../../services/branded-resume.service';
 import { BrandedResume } from '../../models/branded-resume.model';
@@ -18,6 +19,12 @@ export class ResumeListComponent implements OnInit {
   private brandedResumeService = inject(BrandedResumeService);
   private headerService = inject(HeaderService);
   private snackBar = inject(MatSnackBar);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   resumes = signal<BrandedResume[]>([]);
   searchQuery = signal('');

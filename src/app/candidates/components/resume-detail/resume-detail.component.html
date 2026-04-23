@@ -47,7 +47,7 @@
           <button class="btn-secondary-brand" (click)="regenerate()">
             <i class="bi bi-arrow-clockwise"></i> Regenerate
           </button>
-          <a class="btn-outline" [routerLink]="['/candidates', resume()!.candidate?.id]">
+          <a class="btn-outline" [routerLink]="resolvePath('/candidates/' + resume()!.candidate?.id)">
             <i class="bi bi-person"></i> View Candidate
           </a>
         </div>

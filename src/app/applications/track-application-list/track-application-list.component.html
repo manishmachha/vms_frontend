@@ -71,7 +71,7 @@
           *ngFor="let app of dataSource.connect() | async"
           class="card-modern bg-white p-5 flex flex-col gap-5 relative group hover:border-indigo-100 transition-all border border-gray-100 shadow-sm"
           [ngClass]="hasNotification(app.id) ? 'ring-2 ring-red-100/50 border-red-200' : ''"
-          [routerLink]="['/applications', app.id]"
+          [routerLink]="resolvePath('/applications/' + app.id)"
         >
           <!-- Notification Indicator -->
           <div *ngIf="hasNotification(app.id)" class="absolute top-4 right-4 z-10">

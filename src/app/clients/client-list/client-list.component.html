@@ -205,7 +205,7 @@
 
         <div class="pt-6 border-t border-gray-100">
           <a
-            [routerLink]="['/clients', client.id]"
+            [routerLink]="resolvePath('/clients/' + client.id)"
             class="flex items-center justify-center w-full py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all"
           >
             View Details

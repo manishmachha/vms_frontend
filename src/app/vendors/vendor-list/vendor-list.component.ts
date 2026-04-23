@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrganizationService } from '../../services/organization.service';
@@ -19,6 +20,12 @@ export class VendorListComponent implements OnInit {
   organizationService = inject(OrganizationService);
   headerService = inject(HeaderService);
   notificationService = inject(NotificationService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   vendors = signal<Vendor[]>([]);
   unreadVendorIds = new Set<number>();

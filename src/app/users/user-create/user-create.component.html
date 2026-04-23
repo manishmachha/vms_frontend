@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="flex items-center gap-4 mb-8">
-      <a routerLink="/users" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm">
+      <a [routerLink]="resolvePath('/users')" class="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-500 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm">
         <i class="bi bi-arrow-left text-xl"></i>
       </a>
       <div>
@@ -150,7 +150,7 @@
         <!-- Form Actions -->
         <div class="mt-12 pt-8 border-t border-gray-100 flex items-center justify-end gap-4">
           <a
-            routerLink="/organization/users"
+            [routerLink]="resolvePath('/organization/users')"
             class="px-8 py-3.5 text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors"
           >
             Cancel

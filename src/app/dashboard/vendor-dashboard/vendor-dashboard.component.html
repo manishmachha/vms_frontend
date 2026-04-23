@@ -33,7 +33,7 @@
       style="animation-delay: 100ms;"
     >
       <!-- Published Jobs -->
-      <div routerLink="/jobs"
+      <div [routerLink]="resolvePath('/jobs')"
         class="stat-card hover:-translate-y-1 transition-transform duration-300 text-white"
         style="background: linear-gradient(to bottom right, #10b981, #059669)"
       >
@@ -51,7 +51,7 @@
       </div>
 
       <!-- My Candidates -->
-      <div routerLink="/candidates"
+      <div [routerLink]="resolvePath('/candidates')"
         class="stat-card hover:-translate-y-1 transition-transform duration-300 text-white"
         style="background: linear-gradient(to bottom right, #3b82f6, #2563eb)"
       >
@@ -69,7 +69,7 @@
       </div>
 
       <!-- Submitted -->
-      <div routerLink="/track-applications"
+      <div [routerLink]="resolvePath('/track-applications')"
         class="stat-card hover:-translate-y-1 transition-transform duration-300 text-white"
         style="background: linear-gradient(to bottom right, #a855f7, #9333ea)"
       >
@@ -87,7 +87,7 @@
       </div>
 
       <!-- Shortlisted -->
-      <div routerLink="/track-applications"
+      <div [routerLink]="resolvePath('/track-applications')"
         class="stat-card hover:-translate-y-1 transition-transform duration-300 text-white"
         style="background: linear-gradient(to bottom right, #f59e0b, #d97706)"
       >
@@ -111,7 +111,7 @@
       style="animation-delay: 200ms;"
     >
       <a
-        routerLink="/jobs"
+        [routerLink]="resolvePath('/jobs')"
         class="card-modern p-6 flex items-center gap-5 group cursor-pointer hover:border-indigo-100 hover:shadow-md transition-all"
       >
         <div
@@ -136,7 +136,7 @@
       </a>
 
       <a
-        routerLink="/candidates"
+        [routerLink]="resolvePath('/candidates')"
         class="card-modern p-6 flex items-center gap-5 group cursor-pointer hover:border-emerald-100 hover:shadow-md transition-all"
       >
         <div
@@ -166,7 +166,7 @@
       >
         <h3 class="text-lg font-bold text-gray-900">Recent Applications</h3>
         <a
-          routerLink="/track-applications"
+          [routerLink]="resolvePath('/track-applications')"
           class="text-indigo-600 hover:text-indigo-800 text-sm font-medium hover:underline"
         >
           View All →
@@ -183,7 +183,7 @@
             <p class="font-medium text-gray-600">No applications yet</p>
             <p class="text-sm mt-1 mb-4">Start by applying candidates to open jobs</p>
             <a
-              routerLink="/jobs"
+              [routerLink]="resolvePath('/jobs')"
               class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl font-semibold hover:bg-indigo-100 transition-colors"
             >
               <i class="bi bi-search"></i> Browse Jobs
@@ -191,7 +191,7 @@
           </div>
 
           <div *ngIf="vendorRecentApps().length > 0" class="space-y-4">
-            <div routerLink="/applications/{{ app.id }}"
+            <div [routerLink]="resolvePath('/applications/' + app.id)"
               *ngFor="let app of vendorRecentApps()"
               class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors border border-transparent hover:border-gray-100 group"
             >

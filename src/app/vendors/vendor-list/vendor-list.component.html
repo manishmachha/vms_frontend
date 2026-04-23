@@ -3,7 +3,7 @@
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div></div>
     <div class="flex gap-3">
-      <a routerLink="/vendors/create" class="btn-primary px-4 py-2 rounded-xl">Create vendor</a>
+      <a [routerLink]="resolvePath('/vendors/create')" class="btn-primary px-4 py-2 rounded-xl">Create vendor</a>
       <span class="badge badge-success">{{ activeCount() }} Active</span>
       <span class="badge badge-warning">{{ inactiveCount() }} Inactive</span>
     </div>
@@ -41,7 +41,7 @@
       *ngFor="let vendor of filteredVendors(); let i = index"
       class="card-modern relative p-6 animate-fade-in-up cursor-pointer transition-all group"
       [style.animation-delay.ms]="i * 50"
-      [routerLink]="['/vendors', vendor.id]"
+      [routerLink]="resolvePath('/vendors/' + vendor.id)"
       [ngClass]="
         hasNotification(vendor.id)
           ? 'border-red-300 ring-2 ring-red-100 hover:shadow-red-100 hover:border-red-300'
@@ -110,7 +110,7 @@
         </button>
         <button
           (click)="$event.stopPropagation()"
-          [routerLink]="['/vendors', vendor.id]"
+          [routerLink]="resolvePath('/vendors/' + vendor.id)"
           class="flex-1 py-1.5 px-3 bg-indigo-50 text-indigo-600 text-sm font-medium rounded-lg hover:bg-indigo-100 transition-colors"
         >
           <i class="bi bi-eye mr-1"></i> Details

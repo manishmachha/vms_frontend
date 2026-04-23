@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { ClientService } from '../../services/client.service';
 import { Client } from '../../models/client.model';
 import { FormsModule } from '@angular/forms';
@@ -23,6 +24,12 @@ export class ClientListComponent implements OnInit {
   private projectService = inject(ProjectService);
   private dialog = inject(MatDialog);
   private headerService = inject(HeaderService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
   clients = signal<Client[]>([]);
   projects = signal<Project[]>([]);
 

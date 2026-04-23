@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { ProjectService } from '../../services/project.service';
 import { HeaderService } from '../../services/header.service';
 import { Project, ProjectAllocation, UserSummary } from '../../models/project.model';
@@ -41,6 +42,12 @@ export class ProjectDetailComponent implements OnInit {
   private dialog = inject(MatDialog);
   private dialogService = inject(DialogService);
   private timelineService = inject(TimelineService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   project = signal<Project | null>(null);
   timelineEvents = signal<TimelineEvent[]>([]);

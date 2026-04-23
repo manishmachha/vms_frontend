@@ -18,6 +18,11 @@ export class CandidateFormComponent {
   private candidateService = inject(CandidateService);
   private router = inject(Router);
   private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
   private route = inject(ActivatedRoute);
 
   form = this.fb.group({

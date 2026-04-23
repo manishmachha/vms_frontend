@@ -48,6 +48,11 @@ export class CandidateDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
   private candidateService = inject(CandidateService);
   private snackBar = inject(MatSnackBar);
   private brandedResumeService = inject(BrandedResumeService);

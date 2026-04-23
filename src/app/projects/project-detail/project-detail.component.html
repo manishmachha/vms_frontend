@@ -3,7 +3,7 @@
   <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
     <div>
       <a
-        routerLink="/projects"
+        [routerLink]="resolvePath('/projects')"
         class="text-indigo-600 hover:underline text-sm mb-2 flex items-center"
       >
         <i class="bi bi-arrow-left mr-1"></i> Back to Projects

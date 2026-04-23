@@ -4,7 +4,7 @@
     <div></div>
     <a
       *ngIf="!authStore.isEmployee()"
-      routerLink="/jobs/create"
+      [routerLink]="resolvePath('/jobs/create')"
       class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
     >
       <i class="bi bi-plus-lg mr-2"></i> Post New Job
@@ -83,7 +83,7 @@
               <h3
                 class="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors"
               >
-                <a [routerLink]="['/jobs', job.id]">{{ job.title }}</a>
+                <a [routerLink]="resolvePath('/jobs/' + job.id)">{{ job.title }}</a>
               </h3>
             </div>
           </div>
@@ -133,7 +133,7 @@
           class="px-6 py-4 bg-gray-50 border-t border-gray-100 mt-4 group-hover:bg-indigo-50 transition-colors flex justify-between items-center"
         >
           <a
-            [routerLink]="['/jobs', job.id]"
+            [routerLink]="resolvePath('/jobs/' + job.id)"
             class="text-xs text-gray-400 hover:text-indigo-600"
             >ID: {{ job.id }}</a
           >
@@ -147,7 +147,7 @@
               Apply
             </button>
             <a
-              [routerLink]="['/jobs', job.id]"
+              [routerLink]="resolvePath('/jobs/' + job.id)"
               class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Details <i class="bi bi-arrow-right ml-1"></i>
@@ -173,7 +173,7 @@
     <div class="mt-6">
       <a
         *ngIf="!authStore.isEmployee()"
-        routerLink="/jobs/create"
+        [routerLink]="resolvePath('/jobs/create')"
         class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
         <i class="bi bi-plus-lg mr-2"></i> Create Job

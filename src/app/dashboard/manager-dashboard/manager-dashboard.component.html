@@ -17,7 +17,7 @@
   <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 md:gap-4">
     <a
       *ngFor="let stat of stats()"
-      [routerLink]="stat.link"
+      [routerLink]="resolvePath(stat.link || '')"
       class="p-4 rounded-2xl group hover:-translate-y-1 transition-all duration-300 cursor-pointer text-white shadow-lg relative overflow-hidden"
       [style.background]="stat.bgStyle"
     >
@@ -68,7 +68,7 @@
       </div>
 
       <div class="flex-1 flex items-center justify-between gap-2 px-4">
-        <div routerLink="/applications" *ngFor="let stage of funnelStages(); let i = index" class="flex-1 relative group">
+        <div [routerLink]="resolvePath('/applications')" *ngFor="let stage of funnelStages(); let i = index" class="flex-1 relative group">
           <div
             class="text-center p-4 rounded-2xl transition-all duration-300 hover:shadow-lg border border-transparent hover:border-white"
             [style.background]="stage.bgColor"
@@ -259,7 +259,7 @@
 
         <div class="grid grid-cols-1 gap-4">
           <a
-            routerLink="/jobs/create"
+            [routerLink]="resolvePath('/jobs/create')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
             <div
@@ -276,7 +276,7 @@
           </a>
 
           <a
-            routerLink="/users/"
+            [routerLink]="resolvePath('/users/')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
             <div
@@ -293,7 +293,7 @@
           </a>
 
           <a
-            routerLink="/vendors"
+            [routerLink]="resolvePath('/vendors')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
             <div
@@ -310,7 +310,7 @@
           </a>
 
           <a
-            routerLink="/applications"
+            [routerLink]="resolvePath('/applications')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
             <div
@@ -327,7 +327,7 @@
           </a>
 
           <a
-            routerLink="/interviews"
+            [routerLink]="resolvePath('/interviews')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
             <div
@@ -344,7 +344,7 @@
           </a>
 
           <a
-            routerLink="/projects"
+            [routerLink]="resolvePath('/projects')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
             <div
@@ -361,7 +361,7 @@
           </a>
 
           <a
-            routerLink="/candidates"
+            [routerLink]="resolvePath('/candidates')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
             <div

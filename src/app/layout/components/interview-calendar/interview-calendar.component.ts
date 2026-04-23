@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { InterviewService } from '../../../services/interview.service';
 import { Interview } from '../../../models/interview.model';
 import { RouterLink } from "@angular/router";
+import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
 @Component({
   selector: 'app-interview-calendar',
@@ -19,6 +20,12 @@ import { RouterLink } from "@angular/router";
 export class InterviewCalendarComponent implements OnInit {
   interviewService = inject(InterviewService);
   cdr = inject(ChangeDetectorRef);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
   interviews = signal<Interview[]>([]);
   selectedDate = new Date();
   selectedInterviews = signal<Interview[]>([]);

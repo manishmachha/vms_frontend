@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/auth.model';
@@ -21,6 +22,12 @@ export class UserListComponent implements OnInit {
   private headerService = inject(HeaderService);
   private snackBar = inject(MatSnackBar);
   public authStore = inject(AuthStore);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   users = signal<User[]>([]);
   filteredUsers = signal<User[]>([]);

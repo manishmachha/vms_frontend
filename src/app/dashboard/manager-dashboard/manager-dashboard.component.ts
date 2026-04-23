@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
@@ -58,6 +59,12 @@ export class ManagerDashboardComponent implements OnInit {
   projectService = inject(ProjectService);
   interviewService = inject(InterviewService);
   candidateService = inject(CandidateService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   stats = signal<StatCard[]>([
     {

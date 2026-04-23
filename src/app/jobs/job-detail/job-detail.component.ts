@@ -42,6 +42,11 @@ export class JobDetailComponent implements OnInit {
   route = inject(ActivatedRoute);
   router = inject(Router);
   private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
   jobService = inject(JobService);
   authStore = inject(AuthStore);
   fb = inject(FormBuilder);

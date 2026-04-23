@@ -24,7 +24,7 @@
         <span class="bg-indigo-50 text-indigo-700 border border-indigo-100 px-1.5 py-0.5 rounded-full">{{selectedInterviews().length}} Interviews</span>
       </h4>
       <div class="space-y-3 max-h-[200px] overflow-y-scroll">
-        <div routerLink="/interviews/{{interview.id}}"
+        <div [routerLink]="resolvePath('/interviews/' + interview.id)"
           *ngFor="let interview of selectedInterviews()"
           class="group p-3 bg-gray-50/50 rounded-xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-100 cursor-pointer transition-all"
         >

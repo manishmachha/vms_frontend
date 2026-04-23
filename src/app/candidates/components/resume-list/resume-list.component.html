@@ -73,7 +73,7 @@
         <button class="btn-download" (click)="downloadResume(resume)">
           <i class="bi bi-download"></i> Download
         </button>
-        <a class="btn-view" [routerLink]="['/candidates/resumes', resume.id]">
+        <a class="btn-view" [routerLink]="resolvePath('/candidates/resumes/' + resume.id)">
           <i class="bi bi-eye"></i> View
         </a>
         } @if (resume.status === 'FAILED') {

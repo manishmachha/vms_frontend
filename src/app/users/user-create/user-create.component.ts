@@ -41,6 +41,11 @@ export class UserCreateComponent implements OnInit {
   private mfeNav = inject(MfeNavigationService);
   private route = inject(ActivatedRoute);
 
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
+
   isEditMode = signal(false);
   userId = signal<number | null>(null);
 

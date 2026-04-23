@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { InterviewService } from '../../services/interview.service';
 import { Interview } from '../../models/interview.model';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,7 +24,13 @@ export class InterviewDetailComponent implements OnInit {
   private headerService = inject(HeaderService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private mfeNav = inject(MfeNavigationService);
   interview = signal<Interview | null>(null);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   ngOnInit() {
     this.headerService.setTitle(

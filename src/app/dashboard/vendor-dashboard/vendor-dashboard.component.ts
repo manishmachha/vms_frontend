@@ -1,10 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 
 import { DashboardService } from '../../services/dashboard.service';
 import { forkJoin, Observable, of } from 'rxjs';
-import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { ChartConfiguration, ChartData } from 'chart.js';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { JobApplication } from '../../models/application.model';
@@ -28,7 +29,7 @@ interface StatCard {
 @Component({
   selector: 'app-vendor-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, BaseChartDirective, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './vendor-dashboard.component.html',
   styleUrls: ['./vendor-dashboard.component.css'],
@@ -45,6 +46,12 @@ export class VendorDashboardComponent implements OnInit {
   auditLogService = inject(AuditLogService);
   projectService = inject(ProjectService);
   dashboardService = inject(DashboardService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   // --- Solventek State ---
   solventekStats = signal<StatCard[]>([

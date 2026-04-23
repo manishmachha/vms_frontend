@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { FormsModule } from '@angular/forms';
 import { InterviewService } from '../../services/interview.service';
 import { Interview } from '../../models/interview.model';
@@ -22,6 +23,12 @@ export class InterviewListComponent implements OnInit {
   public authStore = inject(AuthStore);
   private dialog = inject(MatDialog);
   private headerService = inject(HeaderService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
   searchQuery = '';
   activeTab = signal('upcoming');
   interviews = signal<Interview[]>([]);

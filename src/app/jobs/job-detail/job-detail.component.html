@@ -5,7 +5,7 @@
   <div class="mx-auto space-y-6">
     <!-- Back Button -->
     <a
-      routerLink="/jobs"
+      [routerLink]="resolvePath('/jobs')"
       class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium"
     >
       <i class="bi bi-arrow-left"></i>
@@ -238,7 +238,7 @@
                 <div
                   *ngFor="let app of group[1]"
                   class="p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all bg-white flex justify-between items-center cursor-pointer"
-                  [routerLink]="['/applications', app.id]"
+                  [routerLink]="resolvePath('/applications/' + app.id)"
                 >
                   <div class="flex items-center gap-3">
                     <div
@@ -324,7 +324,7 @@
 
             <button
               *ngIf="canManage()"
-              [routerLink]="['/jobs', 'edit', job()?.id]"
+              [routerLink]="resolvePath('/jobs/edit/' + job()?.id)"
               class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all shadow-xs"
             >
               <i class="bi bi-pencil mr-2"></i> Edit Job

@@ -35,6 +35,11 @@ export class VendorCreateComponent {
   private router = inject(Router);
   private mfeNav = inject(MfeNavigationService);
 
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
+
   vendorForm: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],

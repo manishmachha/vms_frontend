@@ -21,7 +21,7 @@
         <i class="bi bi-arrow-clockwise text-xl"></i>
       </button>
       <a
-        routerLink="/users/create"
+        [routerLink]="resolvePath('/users/create')"
         class="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 transition-all"
       >
         <i class="bi bi-person-plus-fill"></i>
@@ -99,7 +99,7 @@
           <td class="px-6 py-4 text-right">
             <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <a
-                [routerLink]="['/users/edit', user.id]"
+                [routerLink]="resolvePath('/users/edit/' + user.id)"
                 class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
                 title="Edit User"
               >

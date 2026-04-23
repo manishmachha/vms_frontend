@@ -19,6 +19,11 @@ export class JobCreateComponent implements OnInit {
   private mfeNav = inject(MfeNavigationService);
   route = inject(ActivatedRoute);
 
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
+
   isEditing = signal(false);
   jobId = signal<string | null>(null);
 

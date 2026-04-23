@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,6 +47,12 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   private appService = inject(ApplicationService);
   private headerService = inject(HeaderService);
   private notificationService = inject(NotificationService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   // View Children
   @ViewChild(MatPaginator) paginator!: MatPaginator;

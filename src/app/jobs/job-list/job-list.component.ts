@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { JobService } from '../../services/job.service';
 import { Job } from '../../models/job.model';
 import { HeaderService } from '../../services/header.service';
@@ -24,6 +25,12 @@ export class JobListComponent implements OnInit {
   dialog = inject(MatDialog);
   authStore = inject(AuthStore);
   private notificationService = inject(NotificationService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   jobs = signal<Job[]>([]);
   filteredJobs = signal<Job[]>([]);
