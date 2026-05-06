@@ -56,7 +56,7 @@ export class UserCreateComponent implements OnInit {
     phone: [''],
     type: ['SOLVENTEK', [Validators.required]],
     role: ['', [Validators.required]],
-    organizationId: [null]
+    organizationId: [null, [Validators.required]]
   });
 
   vendors: Vendor[] = [];
@@ -109,18 +109,20 @@ export class UserCreateComponent implements OnInit {
     this.orgService.getAllOrganizations().subscribe(orgs => {
       this.organizations = orgs;
       this.vendors = orgs.filter(o => o.orgType === 'VENDOR');
+      
+      const type = this.userForm.get('type')?.value;
+      if (type === 'SOLVENTEK') {
+        const solventekOrg = this.organizations.find(o => o.name.toLowerCase().includes('solventek'));
+        if (solventekOrg && !this.userForm.get('organizationId')?.value) {
+          this.userForm.get('organizationId')?.setValue(solventekOrg.id);
+        }
+      }
     });
   }
 
   setupTypeListener() {
     const typeControl = this.userForm.get('type');
     const orgControl = this.userForm.get('organizationId');
-
-    // Setup initial validators based on default value
-    if (typeControl?.value === 'VENDOR') {
-      orgControl?.setValidators([Validators.required]);
-      orgControl?.updateValueAndValidity();
-    }
 
     typeControl?.valueChanges.subscribe(type => {
       const roleControl = this.userForm.get('role');
@@ -129,16 +131,16 @@ export class UserCreateComponent implements OnInit {
         roleControl?.setValue('VENDOR');
         roleControl?.disable();
         
-        orgControl?.setValidators([Validators.required]);
+        orgControl?.setValue(null);
       } else {
         roleControl?.enable();
         if (roleControl?.value === 'VENDOR') {
           roleControl?.setValue('');
         }
         
-        orgControl?.clearValidators();
-        if (orgControl?.value) {
-          orgControl?.setValue(null);
+        const solventekOrg = this.organizations.find(o => o.name.toLowerCase().includes('solventek'));
+        if (solventekOrg) {
+          orgControl?.setValue(solventekOrg.id);
         }
       }
       orgControl?.updateValueAndValidity();
