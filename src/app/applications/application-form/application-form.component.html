@@ -60,9 +60,9 @@
   <!-- Form Content -->
   <div class="flex-1 overflow-y-auto px-6 py-10">
     <form [formGroup]="form" (ngSubmit)="submit()">
-      <!-- Vendor Candidate Selection -->
+      <!-- Candidate Selection -->
       <div
-        *ngIf="currentStep() === 0 && isVendor() && candidates().length > 0"
+        *ngIf="currentStep() === 0 && candidates().length > 0"
         class="mb-8 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 animate-fade-in-up"
       >
         <label class="block text-sm font-medium text-indigo-900 mb-2"
