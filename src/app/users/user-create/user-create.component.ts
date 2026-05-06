@@ -138,7 +138,7 @@ export class UserCreateComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.snackBar.open(`User ${this.isEditMode() ? 'updated' : 'created'} successfully`, 'Close', { duration: 3000 });
-        this.mfeNav.navigate('/organization/users');
+        this.mfeNav.navigate('/users');
       },
       error: (err) => {
         console.error(`Error ${this.isEditMode() ? 'updating' : 'creating'} user:`, err);

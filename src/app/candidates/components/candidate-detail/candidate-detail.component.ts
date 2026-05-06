@@ -8,8 +8,6 @@ import { Candidate, CandidateExperience } from '../../models/candidate.model'; /
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthStore } from '../../../services/auth.store';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { JobApplication } from '../../../models/application.model';
 import { Interview } from '../../../models/interview.model';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,7 +30,6 @@ import { MfeNavigationService } from '../../../services/mfe-navigation.service';
     CommonModule,
     RouterModule,
     MatDialogModule,
-    BaseChartDirective,
     OrganizationLogoComponent,
     ClientSubmissionsComponent,
     HubDashboardBannerComponent,
@@ -205,153 +202,6 @@ export class CandidateDetailComponent implements OnInit {
       }
     });
   }
-
-  // Analysis Signal
-  analysis = computed(() => {
-    try {
-      const json = this.candidate()?.aiAnalysisJson;
-      return json ? JSON.parse(json) : null;
-    } catch (e) {
-      console.error('Failed to parse analysis JSON', e);
-      return null;
-    }
-  });
-
-  // Radar Chart
-  public radarChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      r: {
-        min: 0,
-        max: 100,
-        ticks: { display: false },
-        grid: { color: 'rgba(0, 0, 0, 0.05)' },
-        pointLabels: { font: { size: 12, family: "'Inter', sans-serif" } },
-      },
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: true },
-    },
-  };
-
-  public radarChartLabels: string[] = [
-    'Overall Risk',
-    'Consistency',
-    'Timeline Risk',
-    'Skill Inflation',
-    'Credibility',
-    'AI Content',
-    'Job Match',
-    'Skill Match',
-  ];
-
-  // Risk Definitions
-  riskDefinitions = [
-    {
-      title: 'Overall Risk',
-      icon: 'warning',
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
-      description:
-        'Aggregate score reflecting total potential issues. Higher means more risk factors detected.',
-    },
-    {
-      title: 'Consistency',
-      icon: 'verified',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      description:
-        'Alignments between resume facts and professional norms. High consistency indicates a well-structured resume.',
-    },
-    {
-      title: 'Skill Inflation',
-      icon: 'trending_up',
-      color: 'text-amber-600',
-      bgColor: 'bg-amber-50',
-      description:
-        'Potential overstatement of skills, such as listing many tools without supporting project evidence.',
-    },
-    {
-      title: 'Timeline Risk',
-      icon: 'history',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      description:
-        'Anomalies in work history like unexplained gaps, overlaps, or impossible durations.',
-    },
-    {
-      title: 'Project Credibility',
-      icon: 'engineering',
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-50',
-      description:
-        'Assessment of project descriptions for technical depth and authenticity vs. generic templates.',
-    },
-    {
-      title: 'AI Content',
-      icon: 'psychology',
-      color: 'text-rose-600',
-      bgColor: 'bg-rose-50',
-      description:
-        'Probability that the resume was heavily generated or optimized using AI tools.',
-    },
-    {
-      title: 'Job Match',
-      icon: 'center_focus_strong',
-      color: 'text-teal-600',
-      bgColor: 'bg-teal-50',
-      description:
-        'Overall alignment between the candidate profile and the specific job description.',
-    },
-    {
-      title: 'Skill Match',
-      icon: 'code',
-      color: 'text-cyan-600',
-      bgColor: 'bg-cyan-50',
-      description:
-        'Direct overlap between the required skills for the job and the candidates experience.',
-    },
-  ];
-
-  public radarChartData = computed<ChartData<'radar'>>(() => {
-    const analysis = this.analysis();
-    if (!analysis) {
-      return {
-        labels: this.radarChartLabels,
-        datasets: [{ data: [0, 0, 0, 0, 0], label: 'Score Analysis' }],
-      };
-    }
-
-    return {
-      labels: this.radarChartLabels,
-      datasets: [
-        {
-          data: [
-            analysis.overallRiskScore || 0,
-            analysis.overallConsistencyScore || 0,
-            analysis.timelineRiskScore || 0,
-            analysis.skillInflationRiskScore || 0,
-            analysis.projectCredibilityRiskScore || 0,
-            analysis.aiContentScore || 0,
-            analysis.jobMatchScore || 0,
-            analysis.skillMatchScore || 0,
-          ],
-          label: 'Score Analysis',
-          borderColor: '#4f46e5',
-          backgroundColor: 'rgba(79, 70, 229, 0.2)',
-          pointBackgroundColor: '#4f46e5',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#4f46e5',
-          fill: true,
-        },
-      ],
-    };
-  });
-
-  public radarChartType: ChartType = 'radar';
 
   // Removed manual updateChart() as computed handles it properly now.
 
