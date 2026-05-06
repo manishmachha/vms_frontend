@@ -56,7 +56,7 @@ export class UserCreateComponent implements OnInit {
     phone: [''],
     type: ['SOLVENTEK', [Validators.required]],
     role: ['', [Validators.required]],
-    organizationId: [null, [Validators.required]]
+    organizationId: [null]
   });
 
   vendors: Vendor[] = [];
@@ -113,16 +113,35 @@ export class UserCreateComponent implements OnInit {
   }
 
   setupTypeListener() {
-    this.userForm.get('type')?.valueChanges.subscribe(type => {
+    const typeControl = this.userForm.get('type');
+    const orgControl = this.userForm.get('organizationId');
+
+    // Setup initial validators based on default value
+    if (typeControl?.value === 'VENDOR') {
+      orgControl?.setValidators([Validators.required]);
+      orgControl?.updateValueAndValidity();
+    }
+
+    typeControl?.valueChanges.subscribe(type => {
       const roleControl = this.userForm.get('role');
       
       if (type === 'VENDOR') {
         roleControl?.setValue('VENDOR');
         roleControl?.disable();
+        
+        orgControl?.setValidators([Validators.required]);
       } else {
         roleControl?.enable();
-        roleControl?.setValue('');
+        if (roleControl?.value === 'VENDOR') {
+          roleControl?.setValue('');
+        }
+        
+        orgControl?.clearValidators();
+        if (orgControl?.value) {
+          orgControl?.setValue(null);
+        }
       }
+      orgControl?.updateValueAndValidity();
     });
   }
 

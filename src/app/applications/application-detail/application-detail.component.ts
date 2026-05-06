@@ -6,10 +6,14 @@ import {
   computed,
   effect,
   ChangeDetectionStrategy,
+  ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartData, ChartType, Chart, RadialLinearScale, RadarController, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
+
+Chart.register(RadialLinearScale, RadarController, PointElement, LineElement, Filler, Tooltip, Legend);
+
 import { FormsModule, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -76,6 +80,8 @@ export class ApplicationDetailComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
   private timelineService = inject(TimelineService);
+
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   // Permission Signal
   // Permission Signals
@@ -305,6 +311,8 @@ export class ApplicationDetailComponent implements OnInit {
             },
           ],
         };
+        this.cdr.markForCheck();
+        setTimeout(() => this.chart?.update(), 0);
       }
     });
   }
