@@ -65,7 +65,11 @@ export class JobListComponent implements OnInit {
   }
 
   loadJobs(page: number = 0) {
-    this.jobService.getJobs(page).subscribe((data) => {
+    const jobObservable = this.authStore.orgType() === 'VENDOR' 
+      ? this.jobService.getPublishedJobs(page) 
+      : this.jobService.getJobs(page);
+
+    jobObservable.subscribe((data) => {
       this.jobs.set(data.content);
       this.totalElements = data.totalElements;
       this.totalPages = data.totalPages;
