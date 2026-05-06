@@ -62,14 +62,13 @@ export class ApplicationFormComponent implements OnInit {
 
   ngOnInit() {
     this.isVendor.set(this.authStore.userRole() === 'VENDOR');
-    if (this.isVendor()) {
-      this.loadCandidates();
+    
+    this.loadCandidates();
 
-      // Listen to changes
-      this.candidateIdControl.valueChanges.subscribe((id) => {
-        this.onCandidateSelected(id);
-      });
-    }
+    // Listen to changes
+    this.candidateIdControl.valueChanges.subscribe((id) => {
+      this.onCandidateSelected(id);
+    });
   }
 
   loadCandidates() {
