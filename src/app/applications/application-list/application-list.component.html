@@ -15,26 +15,16 @@
         <!-- Search Input -->
         <div class="md:col-span-4 relative group">
           <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <mat-icon class="text-gray-400 group-focus-within:text-indigo-500 transition-colors"
-              >search</mat-icon
-            >
+            <mat-icon class="text-gray-400 group-focus-within:text-indigo-500 transition-colors">search</mat-icon>
           </div>
-          <input
-            type="text"
-            [(ngModel)]="filterValues.searchTerm"
-            (ngModelChange)="applyFilter()"
-            placeholder="Search candidates, Request ID..."
-            class="input-modern pl-11! py-2.5! bg-white shadow-sm"
-          />
+          <input type="text" [(ngModel)]="filterValues.searchTerm" (ngModelChange)="applyFilter()"
+            placeholder="Search candidates, Request ID..." class="input-modern pl-11! py-2.5! bg-white shadow-sm" />
         </div>
 
         <!-- Status Filter -->
         <div class="md:col-span-3 relative group">
-          <select
-            [(ngModel)]="filterValues.status"
-            (ngModelChange)="applyFilter()"
-            class="input-modern py-2.5! px-3! bg-white shadow-sm w-full appearance-none pr-10!"
-          >
+          <select [(ngModel)]="filterValues.status" (ngModelChange)="applyFilter()"
+            class="input-modern py-2.5! px-3! bg-white shadow-sm w-full appearance-none pr-10!">
             <option value="">All Statuses</option>
             <option value="APPLIED">Applied</option>
             <option value="SHORTLISTED">Shortlisted</option>
@@ -53,33 +43,19 @@
 
         <!-- Risk Filter -->
         <div class="md:col-span-2 flex items-center gap-2">
-          <input
-            type="number"
-            [(ngModel)]="filterValues.maxRisk"
-            (ngModelChange)="applyFilter()"
-            placeholder="Max Risk"
-            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm text-xs"
-          />
+          <input type="number" [(ngModel)]="filterValues.maxRisk" (ngModelChange)="applyFilter()" placeholder="Max Risk"
+            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm text-xs" />
         </div>
 
         <!-- Match Filter -->
         <div class="md:col-span-2 flex items-center gap-2">
-          <input
-            type="number"
-            [(ngModel)]="filterValues.minMatch"
-            (ngModelChange)="applyFilter()"
-            placeholder="Min Match"
-            class="input-modern py-2.5! px-3! text-center bg-white shadow-sm text-xs"
-          />
+          <input type="number" [(ngModel)]="filterValues.minMatch" (ngModelChange)="applyFilter()"
+            placeholder="Min Match" class="input-modern py-2.5! px-3! text-center bg-white shadow-sm text-xs" />
         </div>
 
         <!-- Reset -->
         <div class="md:col-span-1 flex justify-end">
-          <button
-            mat-icon-button
-            color="warn"
-            matTooltip="Reset Filters"
-            (click)="
+          <button mat-icon-button color="warn" matTooltip="Reset Filters" (click)="
               filterValues = {
                 searchTerm: '',
                 minRisk: null,
@@ -89,9 +65,7 @@
                 status: ''
               };
               applyFilter()
-            "
-            class="bg-red-50 hover:bg-red-100 text-red-600 rounded-full! transition-colors"
-          >
+            " class="bg-red-50 hover:bg-red-100 text-red-600 rounded-full! transition-colors">
             <mat-icon>filter_list_off</mat-icon>
           </button>
         </div>
@@ -99,110 +73,142 @@
     </div>
 
     <!-- CARD GRID VIEW (ALL SCREENS) -->
-    <div class="bg-gray-50/50 p-6 min-h-[400px]">
+    <div class="bg-gray-50/50 p-6 min-h-100">
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <div
-          *ngFor="let app of dataSource.data"
-          class="card-modern p-5 flex flex-col gap-5 relative group hover:border-indigo-200 transition-all cursor-pointer"
-          [ngClass]="hasNotification(app.id) ? 'ring-2 ring-red-200 border-red-300 bg-red-50/10' : 'bg-white hover:shadow-lg'"
-          (click)="viewDetails(app)"
-        >
-          <!-- ... rest of card content remains the same ... -->
-          <!-- Header: Candidate & Match -->
-          <div class="flex justify-between items-start">
-            <div class="flex items-center gap-4">
-              <div class="h-14 w-14 rounded-2xl bg-linear-to-br from-indigo-50 to-violet-50 text-indigo-600 flex items-center justify-center font-bold text-xl shrink-0 shadow-sm border border-indigo-100 group-hover:rotate-3 transition-transform">
-                {{ app.candidate.firstName.charAt(0) }}{{ app.candidate.lastName.charAt(0) }}
-              </div>
-              <div class="min-w-0">
-                <h3 class="font-bold text-gray-900 text-lg leading-tight truncate group-hover:text-indigo-600 transition-colors">
-                  {{ app.candidate.firstName }} {{ app.candidate.lastName }}
-                </h3>
-                <p class="text-sm text-gray-500 font-medium truncate mt-1 flex items-center gap-1.5">
-                   <mat-icon class="text-[14px] w-[14px] h-[14px]! opacity-60">business</mat-icon>
-                   {{ app.candidate.currentCompany || 'N/A' }}
-                </p>
-              </div>
-            </div>
-            
-            <!-- Match Badge -->
-            <div *ngIf="app.latestAnalysis" class="flex flex-col items-end">
-              <span class="text-[10px] font-bold text-teal-600 uppercase tracking-widest mb-1">Match</span>
-              <span class="text-lg font-black text-teal-700 leading-none">{{ app.latestAnalysis.jobMatchScore }}%</span>
-            </div>
-          </div>
+        <div *ngFor="let app of dataSource.data"
+  class="relative flex flex-col p-6 rounded-[28px] transition-all duration-500 ease-out cursor-pointer group bg-white border border-gray-100 hover:border-transparent hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.15)] hover:-translate-y-1.5"
+  [ngClass]="hasNotification(app.id) ? 'ring-2 ring-rose-400 ring-offset-2 ring-offset-white' : ''"
+  (click)="viewDetails(app)">
 
-          <!-- Job Info -->
-          <div class="p-4 rounded-xl bg-gray-50 border border-gray-100 group-hover:bg-indigo-50/30 group-hover:border-indigo-100 transition-colors">
-            <div class="flex items-start gap-3">
-              <app-organization-logo
-                [org]="app.job.organization"
-                size="sm"
-                [rounded]="true"
-                class="mt-0.5 shadow-xs border border-white"
-              ></app-organization-logo>
-              <div class="flex flex-col min-w-0">
-                <span class="text-sm font-bold text-gray-900 leading-tight truncate">{{ app.job.title }}</span>
-                <div class="flex items-center gap-2 mt-0.5">
-                  <span class="text-xs text-gray-500 font-medium">{{ app.job.organization?.name }}</span>
-                  <span *ngIf="app.job.requestId" class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 uppercase tracking-tighter">
-                    {{ app.job.requestId }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+  <!-- Absolute Notification Dot -->
+  <div *ngIf="hasNotification(app.id)" class="absolute top-5 right-5 w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
 
-          <!-- Stats & Scores -->
-          <div class="space-y-4">
-             <div class="flex items-center justify-between">
-                <span [class]="getStatusClasses(app.status)" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-xs border">
-                  {{ app.status.replace('_', ' ') }}
-                </span>
-                <div class="flex items-center gap-1.5 text-xs font-bold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-lg">
-                  <mat-icon class="text-[16px] w-[16px] h-[16px]!">work_outline</mat-icon>
-                  {{ app.job.experience || 0 }} Yrs
-                </div>
-             </div>
+  <!-- Section 1: Candidate & Premium Match Score -->
+  <div class="flex justify-between items-center gap-4 mb-6">
+    <div class="flex items-center gap-4 min-w-0">
+      <!-- Rich Avatar with Ring Depth -->
+      <div class="h-14 w-14 rounded-full bg-linear-to-br from-indigo-500 via-purple-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xl shrink-0 shadow-lg shadow-indigo-200/50 border-2 border-white ring-4 ring-indigo-50 group-hover:rotate-6 transition-transform duration-500">
+        {{ app.candidate.firstName.charAt(0) }}{{ app.candidate.lastName.charAt(0) }}
+      </div>
 
-             <!-- Risk Bar -->
-             <div *ngIf="app.latestAnalysis; else noAnalysisCard">
-               <div class="flex justify-between items-center mb-1.5 px-0.5">
-                  <span class="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Analysis Risk</span>
-                  <span class="text-xs font-bold" [ngClass]="getRiskColorClass(app.latestAnalysis.overallRiskScore)">
-                    {{ app.latestAnalysis.overallRiskScore }}%
-                  </span>
-               </div>
-               <div class="h-2 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
-                 <div
-                   class="h-full rounded-full transition-all duration-700 ease-out"
-                   [style.width.%]="app.latestAnalysis.overallRiskScore"
-                   [ngClass]="getRiskColorClass(app.latestAnalysis.overallRiskScore, true)"
-                 ></div>
-               </div>
-             </div>
-          </div>
+      <!-- Candidate Info -->
+      <div class="min-w-0">
+        <h3 class="font-extrabold text-gray-900 text-[18px] tracking-tight leading-tight truncate group-hover:text-indigo-600 transition-colors">
+          {{ app.candidate.firstName }} {{ app.candidate.lastName }}
+        </h3>
+        <p class="text-[13px] text-gray-500 font-medium truncate mt-0.5 flex items-center gap-1.5">
+          <!-- FIX: Added shrink-0 and perfectly synced dimensions -->
+          <mat-icon class="!text-[16px] !w-[16px] !h-[16px] shrink-0 text-gray-400 flex items-center justify-center">business</mat-icon>
+          {{ app.candidate.currentCompany || 'N/A' }}
+        </p>
+      </div>
+    </div>
 
-          <!-- Footer: Date -->
-          <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-1">
-             <span class="text-xs text-gray-400 font-medium">Applied {{ app.createdAt | date:'mediumDate' }}</span>
-             <div class="flex items-center gap-1 text-indigo-600 font-bold text-xs group-hover:translate-x-1 transition-transform">
-                View Details
-                <mat-icon class="text-[16px] w-[16px] h-[16px]!">chevron_right</mat-icon>
-             </div>
-          </div>
+    <!-- Hero Match Score (Gradient Typography) -->
+    <div *ngIf="app.latestAnalysis" class="shrink-0 flex flex-col items-end pl-2">
+      <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Match</span>
+      <span class="text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-br from-teal-400 to-emerald-600">
+        {{ app.latestAnalysis.jobMatchScore }}%
+      </span>
+    </div>
+  </div>
 
-          <ng-template #noAnalysisCard>
-            <div class="flex items-center justify-center gap-3 p-4 bg-gray-50 rounded-xl text-gray-400 border border-dashed border-gray-200">
-              <mat-icon class="text-gray-300">analytics</mat-icon>
-              <span class="text-xs font-bold uppercase tracking-wider">Analysis Pending</span>
-            </div>
-          </ng-template>
+  <!-- Section 2: Compact Job Pill -->
+  <div class="flex items-center gap-3 bg-gray-50/80 hover:bg-indigo-50/50 transition-colors rounded-2xl p-2.5 pr-4 border border-gray-100/80 w-fit max-w-full">
+    <app-organization-logo 
+      [org]="app.job.organization" 
+      size="sm" 
+      [rounded]="true"
+      class="shrink-0 shadow-sm border border-white rounded-xl bg-white">
+    </app-organization-logo>
+    <div class="flex flex-col min-w-0">
+      <span class="text-[13px] font-bold text-gray-800 leading-tight truncate">{{ app.job.title }}</span>
+      <div class="flex items-center gap-1.5 mt-0.5">
+        <span class="text-[11px] text-gray-500 font-medium truncate">{{ app.job.organization?.name }}</span>
+        <span class="w-1 h-1 shrink-0 rounded-full bg-gray-300"></span>
+        <span *ngIf="app.job.requestId" class="shrink-0 text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
+          #{{ app.job.requestId }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Tags & Risk -->
+  <div class="flex flex-col gap-6 mt-6 grow">
+    
+    <!-- Minimalist Pill Tags -->
+    <div class="flex flex-wrap items-center gap-1">
+      <!-- Status Pill with Dot -->
+      <span [class]="getStatusClasses(app.status)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white border shadow-xs">
+        <span class="w-1.5 h-1.5 shrink-0 rounded-full bg-current"></span>
+        {{ app.status.replace('_', ' ') }}
+      </span>
+      
+      <!-- Source Pill -->
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-indigo-700 bg-indigo-50/80 border border-indigo-100 shadow-xs">
+        <!-- FIX: Added shrink-0 -->
+        <mat-icon class="!text-[16px] !w-[16px] !h-[16px] shrink-0 text-indigo-500 flex items-center justify-center">share</mat-icon>
+        {{ app.source || 'VMS'}}
+      </span>
+      
+      <!-- Experience Pill -->
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold text-gray-600 bg-white border border-gray-200 shadow-xs">
+        <!-- FIX: Added shrink-0 -->
+        <mat-icon class="!text-[16px] !w-[16px] !h-[16px] shrink-0 text-gray-500 flex items-center justify-center">schedule</mat-icon>
+        {{ app.job.experience || 0 }} Yrs
+      </span>
+    </div>
+
+    <!-- Refined Risk Bar -->
+    <div *ngIf="app.latestAnalysis; else noAnalysisCard" class="mt-auto">
+      <div class="flex justify-between items-end mb-2 px-0.5">
+        <span class="text-[10px] uppercase text-gray-400 font-bold tracking-widest flex items-center gap-1.5">
+          <!-- FIX: Added shrink-0 -->
+          <mat-icon class="!text-[14px] !w-[14px] !h-[14px] shrink-0 flex items-center justify-center">analytics</mat-icon> Risk Score
+        </span>
+        <span class="text-[14px] font-black leading-none" [ngClass]="getRiskColorClass(app.latestAnalysis.overallRiskScore)">
+          {{ app.latestAnalysis.overallRiskScore }}%
+        </span>
+      </div>
+      <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
+        <div class="h-full rounded-full transition-all duration-1000 ease-out relative"
+          [style.width.%]="app.latestAnalysis.overallRiskScore"
+          [ngClass]="getRiskColorClass(app.latestAnalysis.overallRiskScore, true)">
+          <div class="absolute inset-0 bg-linear-to-r from-transparent to-white/20"></div>
         </div>
       </div>
-      
+    </div>
+  </div>
+
+  <!-- Section 4: Footer -->
+  <div class="flex items-center justify-between pt-5 mt-5 border-t border-gray-100/60 border-dashed">
+    <span class="text-[12px] text-gray-400 font-semibold flex items-center gap-1.5">
+      <!-- FIX: Added shrink-0 -->
+      <mat-icon class="!text-[16px] !w-[16px] !h-[16px] shrink-0 flex items-center justify-center">event</mat-icon>
+      Applied {{ app.createdAt | date:'MMM d, y' }}
+    </span>
+    <div class="flex items-center gap-1 text-indigo-600 font-bold text-[13px] group-hover:text-indigo-700 transition-colors bg-indigo-50/0 group-hover:bg-indigo-50 px-3 py-1 rounded-full">
+      Review
+      <!-- FIX: Added shrink-0 -->
+      <mat-icon class="!text-[18px] !w-[18px] !h-[18px] shrink-0 flex items-center justify-center group-hover:translate-x-1 transition-transform">arrow_forward</mat-icon>
+    </div>
+  </div>
+
+  <!-- Pending Analysis Template -->
+  <ng-template #noAnalysisCard>
+    <div class="mt-auto flex items-center justify-center gap-2 p-4 bg-gray-50/80 rounded-2xl text-gray-400 border border-dashed border-gray-200">
+      <!-- FIX: Added shrink-0 -->
+      <mat-icon class="!text-[20px] !w-[20px] !h-[20px] shrink-0 flex items-center justify-center text-gray-300">hourglass_empty</mat-icon>
+      <span class="text-[11px] font-bold uppercase tracking-widest">Analysis Pending</span>
+    </div>
+  </ng-template>
+
+</div>
+      </div>
+
       <!-- Empty State -->
-      <div *ngIf="dataSource.data.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
+      <div *ngIf="dataSource.data.length === 0"
+        class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
         <div class="p-4 rounded-full bg-gray-50 text-gray-300 mb-4">
           <mat-icon class="text-4xl text-gray-200">file_copy</mat-icon>
         </div>
@@ -222,14 +228,9 @@
       </div>
     </div>
 
-    <mat-paginator
-      [length]="totalElements"
-      [pageSize]="9"
-      [pageSizeOptions]="[9, 18, 27, 45]"
-      (page)="onPageChange($event)"
-      aria-label="Select page of applications"
-      class="border-t border-gray-100"
-    ></mat-paginator>
+    <mat-paginator [length]="totalElements" [pageSize]="9" [pageSizeOptions]="[9, 18, 27, 45]"
+      (page)="onPageChange($event)" aria-label="Select page of applications"
+      class="border-t border-gray-100"></mat-paginator>
   </div>
 
   <ng-template #noAnalysis>

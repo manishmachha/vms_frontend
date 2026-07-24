@@ -48,7 +48,7 @@
               "outputHashing": "all",
               "extraWebpackConfig": "webpack.config.js"
             },
-            "development": {
+            "dev": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
@@ -72,12 +72,12 @@
             "production": {
               "buildTarget": "vms_frontend:build:production"
             },
-            "development": {
-              "buildTarget": "vms_frontend:build:development",
+            "dev": {
+              "buildTarget": "vms_frontend:build:dev",
               "proxyConfig": "proxy.conf.json"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "dev"
         },
         "test": {
           "builder": "@angular/build:unit-test"

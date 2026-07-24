@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService, Notification } from '../services/notification.service';
@@ -22,6 +23,7 @@ export class NotificationsComponent implements OnInit {
   private headerService = inject(HeaderService);
   private router = inject(Router);
   private mfeNav = inject(MfeNavigationService);
+  private destroyRef = inject(DestroyRef);
 
   notifications = signal<Notification[]>([]);
   unreadCount = signal(0);
@@ -45,6 +47,14 @@ export class NotificationsComponent implements OnInit {
     );
     this.loadNotifications();
     this.loadUnreadCount();
+
+    // Subscribe to live updates
+    this.notificationService.notificationStream
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadNotifications();
+        this.loadUnreadCount();
+      });
   }
 
   loadNotifications() {

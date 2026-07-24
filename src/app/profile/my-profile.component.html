@@ -1,10 +1,11 @@
-<div class="max-w-4xl mx-auto space-y-8 p-4 md:p-8 animate-fade-in pb-10">
+<div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 lg:space-y-8 animate-fade-in pb-12">
+  
   <!-- Profile Header Card -->
   <div class="relative bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
     <!-- Gradient Banner -->
-    <div class="h-36 bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 relative">
+    <div class="h-44 bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 relative">
       <div
-        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48L3N2Zz4=')] opacity-50"
+        class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48L3N2Zz4=')] opacity-30"
       ></div>
     </div>
 
@@ -13,12 +14,12 @@
       <div class="flex flex-col md:flex-row items-start md:items-end gap-6">
         <!-- Avatar -->
         <div
-          class="w-28 h-28 rounded-2xl bg-white shadow-xl border-4 border-white flex items-center justify-center overflow-hidden"
+          class="w-32 h-32 rounded-3xl bg-white shadow-xl border-4 border-white flex items-center justify-center overflow-hidden shrink-0"
         >
           <div
-            class="w-full h-full rounded-xl bg-linear-to-br from-indigo-400 to-purple-500 flex items-center justify-center"
+            class="w-full h-full rounded-2xl bg-linear-to-br from-indigo-50 to-purple-500 flex items-center justify-center shadow-inner"
           >
-            <span class="text-4xl font-black text-white">
+            <span class="text-5xl font-black text-indigo-600 tracking-wide">
               {{ getInitials() }}
             </span>
           </div>
@@ -26,10 +27,10 @@
 
         <!-- User Info -->
         <div class="flex-1 min-w-0 pt-2">
-          <h1 class="text-2xl md:text-3xl font-bold text-gray-900">
+          <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
             {{ profile()?.firstName }} {{ profile()?.lastName }}
           </h1>
-          <div class="flex flex-wrap items-center gap-3 mt-2">
+          <div class="flex flex-wrap items-center gap-3 mt-3">
             <span
               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
               [ngClass]="getRoleBadgeClass()"
@@ -63,73 +64,16 @@
     </div>
   </div>
 
-  <!-- Content Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Left: Personal Information (Read-Only) -->
-    <div class="lg:col-span-1 space-y-6">
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h3
-          class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-5 flex items-center gap-2"
-        >
-          <i class="bi bi-info-circle text-indigo-500"></i>
-          Account Details
-        </h3>
-        <div class="space-y-5">
-          <div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Email</p>
-            <p class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-envelope text-indigo-400"></i>
-              {{ profile()?.email }}
-            </p>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Phone</p>
-            <p class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-phone text-emerald-400"></i>
-              {{ profile()?.phone || 'Not provided' }}
-            </p>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-              User ID
-            </p>
-            <p class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-hash text-amber-400"></i>
-              #{{ profile()?.id }}
-            </p>
-          </div>
-          <div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-              Member Since
-            </p>
-            <p class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-calendar3 text-purple-400"></i>
-              {{ profile()?.createdAt | date : 'mediumDate' }}
-            </p>
-          </div>
-          <div *ngIf="profile()?.updatedAt">
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-              Last Updated
-            </p>
-            <p class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-clock-history text-rose-400"></i>
-              {{ profile()?.updatedAt | date : 'medium' }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: Edit Profile + Change Password -->
-    <div class="lg:col-span-2 space-y-8">
-      <!-- Edit Personal Details -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3
-            class="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2"
-          >
-            <i class="bi bi-pencil-square text-indigo-500"></i>
-            Edit Profile
+  <!-- 2-Column Equal-Height Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+    
+    <!-- Left: Personal Profile -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col justify-between h-full">
+      <div class="space-y-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <div class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><i class="bi bi-person-fill"></i></div>
+            Personal Details
           </h3>
           <span
             *ngIf="profileSaved()"
@@ -139,7 +83,8 @@
           </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Edit Form -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
               >First Name</label
@@ -147,7 +92,7 @@
             <input
               type="text"
               [(ngModel)]="editForm.firstName"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm font-medium text-gray-900 bg-gray-50 focus:bg-white"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm font-semibold text-gray-900 bg-gray-50/50 focus:bg-white"
               placeholder="First Name"
             />
           </div>
@@ -158,58 +103,104 @@
             <input
               type="text"
               [(ngModel)]="editForm.lastName"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm font-medium text-gray-900 bg-gray-50 focus:bg-white"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm font-semibold text-gray-900 bg-gray-50/50 focus:bg-white"
               placeholder="Last Name"
             />
           </div>
-          <div class="md:col-span-2">
+          <div class="sm:col-span-2">
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
               >Phone Number</label
             >
             <input
               type="tel"
               [(ngModel)]="editForm.phone"
-              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm font-medium text-gray-900 bg-gray-50 focus:bg-white"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm font-semibold text-gray-900 bg-gray-50/50 focus:bg-white"
               placeholder="Phone Number"
             />
           </div>
         </div>
 
-        <div class="flex items-center gap-3 mt-6">
+        <div class="flex items-center gap-3 pt-2">
           <button
             (click)="saveProfile()"
-            class="px-6 py-2.5 bg-indigo-600 text-white font-semibold text-sm rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-sm shadow-indigo-200"
+            class="px-6 py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-sm shadow-indigo-200 cursor-pointer"
           >
             <i class="bi bi-check2"></i>
             Save Changes
           </button>
           <button
             (click)="resetForm()"
-            class="px-6 py-2.5 bg-gray-100 text-gray-600 font-semibold text-sm rounded-xl hover:bg-gray-200 transition-colors"
+            class="px-6 py-2.5 bg-gray-100 text-gray-600 font-bold text-sm rounded-xl hover:bg-gray-200 transition-colors cursor-pointer"
           >
             Reset
           </button>
         </div>
 
-        <p *ngIf="profileError()" class="mt-3 text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+        <p *ngIf="profileError()" class="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-3">
           <i class="bi bi-exclamation-triangle mr-1"></i> {{ profileError() }}
         </p>
-      </div>
 
-      <!-- Change Password -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h3
-            class="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2"
-          >
-            <i class="bi bi-lock text-rose-500"></i>
-            Change Password
+        <!-- Divider -->
+        <div class="border-t border-gray-100 pt-6">
+          <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Account Metadata</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex items-center gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100">
+              <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 border border-indigo-100/50">
+                <i class="bi bi-hash"></i>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">User ID</p>
+                <p class="text-sm font-semibold text-gray-900 truncate">#{{ profile()?.id }}</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100">
+              <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 border border-blue-100/50">
+                <i class="bi bi-envelope"></i>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email Address</p>
+                <p class="text-sm font-semibold text-gray-900 truncate" [title]="profile()?.email">{{ profile()?.email }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100" *ngIf="profile()?.organizationName">
+              <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 border border-emerald-100/50">
+                <i class="bi bi-building"></i>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Organization</p>
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ profile()?.organizationName }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100">
+              <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center shrink-0 border border-purple-100/50">
+                <i class="bi bi-calendar3"></i>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Member Since</p>
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ profile()?.createdAt | date : 'mediumDate' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Change Password -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col justify-between h-full">
+      <div class="space-y-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <div class="p-1.5 bg-rose-50 text-rose-600 rounded-lg"><i class="bi bi-lock-fill"></i></div>
+            Security Settings
           </h3>
           <span
             *ngIf="passwordSaved()"
             class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full animate-fade-in"
           >
-            <i class="bi bi-check-circle mr-1"></i> Password changed!
+            <i class="bi bi-check-circle mr-1"></i> Changed!
           </span>
         </div>
 
@@ -222,7 +213,7 @@
               <input
                 [type]="showCurrentPassword ? 'text' : 'password'"
                 [(ngModel)]="passwordForm.currentPassword"
-                class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all text-sm font-medium text-gray-900 bg-gray-50 focus:bg-white"
+                class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all text-sm font-semibold text-gray-900 bg-gray-50/50 focus:bg-white"
                 placeholder="Enter current password"
               />
               <button
@@ -233,51 +224,51 @@
               </button>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
-                >New Password</label
+
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
+              >New Password</label
+            >
+            <div class="relative">
+              <input
+                [type]="showNewPassword ? 'text' : 'password'"
+                [(ngModel)]="passwordForm.newPassword"
+                class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all text-sm font-semibold text-gray-900 bg-gray-50/50 focus:bg-white"
+                placeholder="Enter new password"
+              />
+              <button
+                (click)="showNewPassword = !showNewPassword"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-              <div class="relative">
-                <input
-                  [type]="showNewPassword ? 'text' : 'password'"
-                  [(ngModel)]="passwordForm.newPassword"
-                  class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all text-sm font-medium text-gray-900 bg-gray-50 focus:bg-white"
-                  placeholder="Enter new password"
-                />
-                <button
-                  (click)="showNewPassword = !showNewPassword"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <i class="bi" [ngClass]="showNewPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
-                </button>
-              </div>
+                <i class="bi" [ngClass]="showNewPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </button>
             </div>
-            <div>
-              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
-                >Confirm Password</label
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2"
+              >Confirm Password</label
+            >
+            <div class="relative">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                [(ngModel)]="passwordForm.confirmPassword"
+                class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all text-sm font-semibold text-gray-900 bg-gray-50/50 focus:bg-white"
+                placeholder="Confirm new password"
+              />
+              <button
+                (click)="showConfirmPassword = !showConfirmPassword"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-              <div class="relative">
-                <input
-                  [type]="showConfirmPassword ? 'text' : 'password'"
-                  [(ngModel)]="passwordForm.confirmPassword"
-                  class="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none transition-all text-sm font-medium text-gray-900 bg-gray-50 focus:bg-white"
-                  placeholder="Confirm new password"
-                />
-                <button
-                  (click)="showConfirmPassword = !showConfirmPassword"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
-                </button>
-              </div>
+                <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </button>
             </div>
           </div>
 
           <!-- Password strength indicator -->
-          <div *ngIf="passwordForm.newPassword" class="space-y-2">
+          <div *ngIf="passwordForm.newPassword" class="space-y-2 pt-1">
             <div class="flex items-center gap-2">
-              <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   class="h-full rounded-full transition-all duration-300"
                   [style.width]="getPasswordStrength().width"
@@ -285,7 +276,7 @@
                 ></div>
               </div>
               <span
-                class="text-[10px] font-bold uppercase tracking-wider"
+                class="text-[10px] font-extrabold uppercase tracking-wider"
                 [ngClass]="getPasswordStrength().textColor"
               >
                 {{ getPasswordStrength().label }}
@@ -294,20 +285,22 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-3 mt-6">
+        <div class="flex items-center gap-3 pt-4">
           <button
             (click)="changePassword()"
-            class="px-6 py-2.5 bg-rose-600 text-white font-semibold text-sm rounded-xl hover:bg-rose-700 transition-colors flex items-center gap-2 shadow-sm shadow-rose-200"
+            class="px-6 py-2.5 bg-rose-600 text-white font-bold text-sm rounded-xl hover:bg-rose-700 transition-colors flex items-center gap-2 shadow-sm shadow-rose-200 cursor-pointer"
           >
-            <i class="bi bi-lock"></i>
+            <i class="bi bi-shield-lock"></i>
             Change Password
           </button>
         </div>
 
-        <p *ngIf="passwordError()" class="mt-3 text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+        <p *ngIf="passwordError()" class="text-sm text-red-600 bg-red-50 px-4 py-2 rounded-lg mt-3">
           <i class="bi bi-exclamation-triangle mr-1"></i> {{ passwordError() }}
         </p>
       </div>
     </div>
+
   </div>
+
 </div>

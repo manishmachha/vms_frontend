@@ -1,12 +1,14 @@
 <div
   *ngIf="job()"
-  class="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30 py-8 px-4"
+  class="min-h-screen bg-linear-to-br from-slate-50 via-white to-indigo-50/30 py-8 px-4 sm:px-6 lg:px-8"
 >
-  <div class="mx-auto space-y-6">
+  <!-- Added max-w-7xl and w-full to prevent ultra-wide screen gaps -->
+  <div class="max-w-7xl w-full mx-auto space-y-6 md:space-y-8">
+    
     <!-- Back Button -->
     <a
       [routerLink]="resolvePath('/jobs')"
-      class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium"
+      class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium w-fit"
     >
       <i class="bi bi-arrow-left"></i>
       Back to Jobs
@@ -15,11 +17,11 @@
     <!-- Top Header Card -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       <div class="bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-700 px-6 py-8 md:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div class="text-white">
-            <div class="flex items-center gap-3 mb-3">
+            <div class="flex flex-wrap items-center gap-3 mb-3">
               <div
-                class="px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white backdrop-blur-sm flex items-center gap-2"
+                class="px-3 py-1.5 rounded-full text-xs font-medium bg-white/20 text-white backdrop-blur-sm flex items-center gap-2"
               >
                 <app-organization-logo
                   [org]="job()?.organization"
@@ -33,21 +35,21 @@
               </span>
             </div>
             <h1 class="text-3xl md:text-4xl font-bold tracking-tight">{{ job()?.title }}</h1>
-            <div class="mt-3 flex flex-wrap items-center gap-4 text-white/80 text-sm">
-              <span class="flex items-center gap-1">
+            <div class="mt-4 flex flex-wrap items-center gap-4 text-white/80 text-sm">
+              <span class="flex items-center gap-1.5">
                 <i class="bi bi-briefcase"></i>
                 {{ formatEmploymentType(job()?.employmentType) }}
               </span>
-              <span class="flex items-center gap-1">
+              <span class="flex items-center gap-1.5">
                 <i class="bi bi-calendar3"></i> Posted
                 {{ job()?.createdAt | date: 'mediumDate' }}
               </span>
-              <span *ngIf="job()?.experience" class="flex items-center gap-1">
+              <span *ngIf="job()?.experience" class="flex items-center gap-1.5">
                 <i class="bi bi-clock-history"></i> {{ job()?.experience }}
               </span>
             </div>
           </div>
-          <div class="flex flex-col items-end gap-2">
+          <div class="flex flex-col items-end shrink-0">
             <span
               class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wide"
               [ngClass]="getStatusBadgeClass(job()!.status)"
@@ -61,44 +63,48 @@
 
       <!-- Quick Stats Bar -->
       <div
-        class="px-6 py-4 md:px-8 bg-gray-50/50 border-t border-gray-100 flex flex-wrap items-center gap-6"
+        class="px-6 py-4 md:px-8 bg-gray-50/50 border-t border-gray-100 flex flex-wrap items-center justify-between gap-6"
       >
-        <div
-          *ngIf="job()?.billRate && authStore.userRole() !== 'VENDOR'"
-          class="flex items-center gap-2"
-        >
-          <div class="p-2 bg-green-100 rounded-lg">
-            <i class="bi bi-currency-dollar text-green-600"></i>
+        <div class="flex flex-wrap items-center gap-8">
+          <div
+            *ngIf="job()?.billRate && authStore.userRole() !== 'VENDOR'"
+            class="flex items-center gap-3"
+          >
+            <div class="p-2.5 bg-green-100 rounded-lg">
+              <i class="bi bi-currency-dollar text-green-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 font-medium">Bill Rate</p>
+              <p class="font-bold text-gray-900">{{ job()?.billRate | currency }}/hr</p>
+            </div>
           </div>
-          <div>
-            <p class="text-xs text-gray-500">Bill Rate</p>
-            <p class="font-bold text-gray-900">{{ job()?.billRate | currency }}/hr</p>
+          
+          <div *ngIf="job()?.payRate" class="flex items-center gap-3">
+            <div class="p-2.5 bg-blue-100 rounded-lg">
+              <i class="bi bi-wallet2 text-blue-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 font-medium">Pay Rate</p>
+              <p class="font-bold text-gray-900">{{ job()?.payRate | currency }}/hr</p>
+            </div>
           </div>
-        </div>
-        <div *ngIf="job()?.payRate" class="flex items-center gap-2">
-          <div class="p-2 bg-blue-100 rounded-lg">
-            <i class="bi bi-wallet2 text-blue-600"></i>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500">Pay Rate</p>
-            <p class="font-bold text-gray-900">{{ job()?.payRate | currency }}/hr</p>
-          </div>
-        </div>
-        <div *ngIf="job()?.skills" class="flex items-center gap-2">
-          <div class="p-2 bg-purple-100 rounded-lg">
-            <i class="bi bi-lightning-charge text-purple-600"></i>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500">Skills</p>
-            <p class="font-medium text-gray-900 text-sm">{{ getSkillCount() }} required</p>
+          
+          <div *ngIf="job()?.skills" class="flex items-center gap-3">
+            <div class="p-2.5 bg-purple-100 rounded-lg">
+              <i class="bi bi-lightning-charge text-purple-600"></i>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 font-medium">Skills</p>
+              <p class="font-medium text-gray-900 text-sm">{{ getSkillCount() }} required</p>
+            </div>
           </div>
         </div>
 
-        <div class="ml-auto">
+        <div class="ml-auto w-full sm:w-auto mt-4 sm:mt-0">
           <button
             *ngIf="job()?.status === 'PUBLISHED' && authStore.orgType() !== 'SOLVENTEK'"
             (click)="openApplyDialog(job()!)"
-            class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-xl text-white bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            class="w-full sm:w-auto inline-flex justify-center items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-xl text-white bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Apply Now
             <i class="bi bi-arrow-right ml-2"></i>
@@ -107,9 +113,11 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Grid: items-start prevents awkward vertical stretching of the right column cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+      
       <!-- Main Content (Tabbed) -->
-      <div class="lg:col-span-2">
+      <div class="lg:col-span-2 w-full">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
           <mat-tab-group
             animationDuration="300ms"
@@ -126,235 +134,181 @@
                 </div>
               </ng-template>
               <div class="p-6 space-y-6 bg-gray-50/30 overflow-y-auto h-full">
-        <!-- Description Card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-file-text text-indigo-500"></i>
-              Job Description
-            </h3>
-          </div>
-          <div class="p-6">
-            <div
-              class="prose prose-sm max-w-none text-gray-600 leading-relaxed whitespace-pre-line"
-            >
-              {{ job()?.description }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Requirements Card -->
-        <div
-          *ngIf="job()?.requirements"
-          class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-        >
-          <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-list-check text-emerald-500"></i>
-              Requirements
-            </h3>
-          </div>
-          <div class="p-6">
-            <div
-              class="prose prose-sm max-w-none text-gray-600 leading-relaxed whitespace-pre-line"
-            >
-              {{ job()?.requirements }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Roles & Responsibilities Card -->
-        <div
-          *ngIf="job()?.rolesAndResponsibilities"
-          class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-        >
-          <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-person-badge text-amber-500"></i>
-              Roles & Responsibilities
-            </h3>
-          </div>
-          <div class="p-6">
-            <div
-              class="prose prose-sm max-w-none text-gray-600 leading-relaxed whitespace-pre-line"
-            >
-              {{ job()?.rolesAndResponsibilities }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Skills Card -->
-        <div
-          *ngIf="job()?.skills"
-          class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-        >
-          <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-stars text-purple-500"></i>
-              Required Skills
-            </h3>
-          </div>
-          <div class="p-6">
-            <div class="flex flex-wrap gap-2">
-              <span
-                *ngFor="let skill of job()?.skills?.split(',')"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-linear-to-r from-indigo-50 to-purple-50 text-indigo-700 border border-indigo-100"
-              >
-                {{ skill.trim() }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Candidates Grouped by Vendor -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div
-            class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100 flex justify-between items-center"
-          >
-            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <i class="bi bi-people text-blue-500"></i>
-              Applied Candidates (Vendor-wise)
-            </h3>
-          </div>
-          <div class="p-6 space-y-6">
-            <div
-              *ngIf="groupedApplications().length === 0"
-              class="text-center py-8 bg-gray-50 rounded-xl"
-            >
-              <i class="bi bi-person-x text-gray-400 text-3xl mb-2"></i>
-              <p class="text-gray-500">No candidates applied yet.</p>
-            </div>
-
-            <div *ngFor="let group of groupedApplications()" class="space-y-3">
-              <div class="flex items-center gap-2 pb-2 border-b border-gray-100">
-                <span
-                  class="p-1 px-3 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider"
-                >
-                  {{ group[0] }}
-                </span>
-                <span class="text-xs text-gray-400">{{ group[1].length }} Candidates</span>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div
-                  *ngFor="let app of group[1]"
-                  class="p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-sm transition-all bg-white flex justify-between items-center cursor-pointer"
-                  [routerLink]="resolvePath('/applications/' + app.id)"
-                >
-                  <div class="flex items-center gap-3">
-                    <div
-                      class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold"
-                    >
-                      {{ app.candidate.firstName[0] }}{{ app.candidate.lastName[0] }}
-                    </div>
-                    <div>
-                      <h4 class="text-sm font-semibold text-gray-900">
-                        {{ app.candidate.firstName }} {{ app.candidate.lastName }}
-                      </h4>
-                      <p class="text-xs text-gray-500">{{ app.status | titlecase }}</p>
+                
+                <!-- Description Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i class="bi bi-file-text text-indigo-500"></i>
+                      Job Description
+                    </h3>
+                  </div>
+                  <div class="p-6">
+                    <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed whitespace-pre-line">
+                      {{ job()?.description }}
                     </div>
                   </div>
-                  <i class="bi bi-chevron-right text-gray-300"></i>
                 </div>
+
+                <!-- Requirements Card -->
+                <div *ngIf="job()?.requirements" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i class="bi bi-list-check text-emerald-500"></i>
+                      Requirements
+                    </h3>
+                  </div>
+                  <div class="p-6">
+                    <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed whitespace-pre-line">
+                      {{ job()?.requirements }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Roles & Responsibilities Card -->
+                <div *ngIf="job()?.rolesAndResponsibilities" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i class="bi bi-person-badge text-amber-500"></i>
+                      Roles & Responsibilities
+                    </h3>
+                  </div>
+                  <div class="p-6">
+                    <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed whitespace-pre-line">
+                      {{ job()?.rolesAndResponsibilities }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Skills Card -->
+                <div *ngIf="job()?.skills" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i class="bi bi-stars text-purple-500"></i>
+                      Required Skills
+                    </h3>
+                  </div>
+                  <div class="p-6">
+                    <div class="flex flex-wrap gap-2.5">
+                      <span
+                        *ngFor="let skill of job()?.skills?.split(',')"
+                        class="inline-flex items-center px-3.5 py-1.5 rounded-lg text-sm font-medium bg-linear-to-r from-indigo-50 to-purple-50 text-indigo-700 border border-indigo-100"
+                      >
+                        {{ skill.trim() }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Candidates Grouped by Vendor -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i class="bi bi-people text-blue-500"></i>
+                      Applied Candidates (Vendor-wise)
+                    </h3>
+                  </div>
+                  <div class="p-6 space-y-6">
+                    <div *ngIf="groupedApplications().length === 0" class="text-center py-10 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+                      <i class="bi bi-person-x text-gray-400 text-4xl mb-3"></i>
+                      <p class="text-gray-500 font-medium">No candidates applied yet.</p>
+                    </div>
+
+                    <div *ngFor="let group of groupedApplications()" class="space-y-4">
+                      <div class="flex items-center gap-3 pb-2 border-b border-gray-100">
+                        <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider">
+                          {{ group[0] }}
+                        </span>
+                        <span class="text-xs font-medium text-gray-400">{{ group[1].length }} Candidates</span>
+                      </div>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div
+                          *ngFor="let app of group[1]"
+                          class="p-4 rounded-xl border border-gray-100 hover:border-indigo-300 hover:shadow-md transition-all duration-200 bg-white flex justify-between items-center cursor-pointer group"
+                          [routerLink]="resolvePath('/applications/' + app.id)"
+                        >
+                          <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold border border-indigo-100">
+                              {{ app.candidate.firstName[0] }}{{ app.candidate.lastName[0] }}
+                            </div>
+                            <div>
+                              <h4 class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                {{ app.candidate.firstName }} {{ app.candidate.lastName }}
+                              </h4>
+                              <p class="text-xs text-gray-500 font-medium">{{ app.status | titlecase }}</p>
+                            </div>
+                          </div>
+                          <i class="bi bi-chevron-right text-gray-300 group-hover:text-indigo-500 transition-colors"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
-            </div>
-          </div>
+            </mat-tab>
+
+            <!-- Activity Log Tab -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <div class="flex items-center gap-2 px-2">
+                  <mat-icon class="text-blue-500">history</mat-icon>
+                  <span class="font-bold">Activity Log</span>
+                </div>
+              </ng-template>
+              <div class="p-6 bg-gray-50/30 overflow-y-auto h-full">
+                <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <mat-icon class="text-blue-500">timeline</mat-icon>
+                  Job Lifecycle Audit
+                </h3>
+                <app-timeline [events]="timelineEvents()" entityType="JOB" [entityId]="job()!.id"></app-timeline>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
         </div>
       </div>
-    </mat-tab>
 
-          <!-- Activity Log Tab -->
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <div class="flex items-center gap-2 px-2">
-                <mat-icon class="text-blue-500">history</mat-icon>
-                <span class="font-bold">Activity Log</span>
-              </div>
-            </ng-template>
-            <div class="p-6 bg-gray-50/30 overflow-y-auto h-full">
-              <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <mat-icon class="text-blue-500">timeline</mat-icon>
-                Job Lifecycle Audit
-              </h3>
-              <app-timeline [events]="timelineEvents()" entityType="JOB" [entityId]="job()!.id"></app-timeline>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
-      </div>
-    </div>
-
-      <!-- Right Column: Actions and Info -->
-      <div class="space-y-6">
+      <!-- Right Column: Actions and Info (Sticky behavior prevents whitespace on long scrolls) -->
+      <div class="flex flex-col gap-6 lg:sticky lg:top-8">
+        
         <!-- Actions Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
             <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Actions</h3>
           </div>
           <div class="p-6 flex flex-col gap-3">
-            <button
-              *ngIf="canVerify()"
-              (click)="verify()"
-              class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-lg shadow-indigo-200"
-            >
+            <button *ngIf="canVerify()" (click)="verify()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-white bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 transition-all shadow-md hover:shadow-lg shadow-indigo-200">
               <i class="bi bi-check-circle mr-2"></i> Verify Job
             </button>
 
-            <button
-              *ngIf="canEnrich()"
-              (click)="openEnrichForm()"
-              class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg shadow-purple-200"
-            >
+            <button *ngIf="canEnrich()" (click)="openEnrichForm()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-white bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg shadow-purple-200">
               <i class="bi bi-magic mr-2"></i> Enrich Job
             </button>
 
-            <button
-              *ngIf="canFinalVerify()"
-              (click)="onFinalVerify()"
-              class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg shadow-emerald-200"
-            >
+            <button *ngIf="canFinalVerify()" (click)="onFinalVerify()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-white bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-md hover:shadow-lg shadow-emerald-200">
               <i class="bi bi-cash-coin mr-2"></i> Final Verify & Rates
             </button>
 
-            <button
-              *ngIf="canPublish()"
-              (click)="publish()"
-              class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-200"
-            >
+            <button *ngIf="canPublish()" (click)="publish()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-white bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg shadow-blue-200">
               <i class="bi bi-globe mr-2"></i> Publish Job
             </button>
 
-            <button
-              *ngIf="canManage()"
-              [routerLink]="resolvePath('/jobs/edit/' + job()?.id)"
-              class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all shadow-xs"
-            >
+            <button *ngIf="canManage()" [routerLink]="resolvePath('/jobs/edit/' + job()?.id)" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-xs">
               <i class="bi bi-pencil mr-2"></i> Edit Job
             </button>
 
-            <button
-              *ngIf="canManage()"
-              (click)="onUpdateStatus()"
-              class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-all shadow-xs"
-            >
+            <button *ngIf="canManage()" (click)="onUpdateStatus()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-xs">
               <i class="bi bi-arrow-repeat mr-2"></i> Update Status
             </button>
 
-            <button
-              *ngIf="canPerformCriticalAction()"
-              (click)="deleteJob()"
-              class="w-full inline-flex justify-center items-center px-4 py-3 text-sm font-medium rounded-xl text-red-600 bg-red-50 border border-red-100 hover:bg-red-100 transition-all shadow-xs"
-            >
+            <button *ngIf="canPerformCriticalAction()" (click)="deleteJob()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-red-600 bg-red-50 border border-red-100 hover:bg-red-100 transition-all shadow-xs">
               <i class="bi bi-trash mr-2"></i> Delete Job
             </button>
 
-            <div
-              *ngIf="
-                !canVerify() && !canEnrich() && !canFinalVerify() && !canPublish() && !canManage()
-              "
-              class="text-center py-4"
-            >
-              <div class="p-3 bg-gray-50 rounded-xl">
+            <div *ngIf="!canVerify() && !canEnrich() && !canFinalVerify() && !canPublish() && !canManage()" class="text-center py-4">
+              <div class="p-4 bg-gray-50 border border-gray-100 border-dashed rounded-xl">
                 <i class="bi bi-info-circle text-gray-400 text-xl mb-2"></i>
-                <p class="text-sm text-gray-500">No actions available at this stage</p>
+                <p class="text-sm text-gray-500 font-medium">No actions available at this stage</p>
               </div>
             </div>
           </div>
@@ -367,41 +321,38 @@
           </div>
           <div class="p-6">
             <dl class="space-y-4">
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center pb-3 border-b border-gray-50">
                 <dt class="text-sm text-gray-500">Job ID</dt>
-                <dd class="text-sm font-mono text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                <dd class="text-sm font-mono font-medium text-gray-700 bg-gray-100 px-2 py-0.5 rounded">
                   {{ job()?.id }}
                 </dd>
               </div>
-              <div *ngIf="job()?.requestId" class="flex justify-between items-center">
+              <div *ngIf="job()?.requestId" class="flex justify-between items-center pb-3 border-b border-gray-50">
                 <dt class="text-sm text-gray-500">Request ID</dt>
-                <dd class="text-sm font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-1 rounded">
+                <dd class="text-sm font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">
                   {{ job()?.requestId }}
                 </dd>
               </div>
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center pb-3 border-b border-gray-50">
                 <dt class="text-sm text-gray-500">Employment Type</dt>
                 <dd class="text-sm font-medium text-gray-900">
                   {{ formatEmploymentType(job()?.employmentType) }}
                 </dd>
               </div>
-              <div *ngIf="job()?.experience" class="flex justify-between items-center">
+              <div *ngIf="job()?.experience" class="flex justify-between items-center pb-3 border-b border-gray-50">
                 <dt class="text-sm text-gray-500">Experience</dt>
                 <dd class="text-sm font-medium text-gray-900">{{ job()?.experience }}</dd>
               </div>
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center pb-3 border-b border-gray-50">
                 <dt class="text-sm text-gray-500">Created</dt>
                 <dd class="text-sm font-medium text-gray-900">
-                  {{ job()?.createdAt | date: 'medium' }}
+                  {{ job()?.createdAt | date: 'mediumDate' }}
                 </dd>
               </div>
-              <div
-                *ngIf="job()?.updatedAt !== job()?.createdAt"
-                class="flex justify-between items-center"
-              >
+              <div *ngIf="job()?.updatedAt !== job()?.createdAt" class="flex justify-between items-center">
                 <dt class="text-sm text-gray-500">Last Updated</dt>
                 <dd class="text-sm font-medium text-gray-900">
-                  {{ job()?.updatedAt | date: 'medium' }}
+                  {{ job()?.updatedAt | date: 'mediumDate' }}
                 </dd>
               </div>
             </dl>
@@ -410,39 +361,33 @@
 
         <!-- Compensation Card (Visible for Admins) -->
         <div
-          *ngIf="
-            (job()?.billRate || job()?.payRate) &&
-            (authStore.userRole() === 'SUPER_ADMIN' || authStore.userRole() === 'MANAGER')
-          "
+          *ngIf="(job()?.billRate || job()?.payRate) && (authStore.userRole() === 'SUPER_ADMIN' || authStore.userRole() === 'MANAGER')"
           class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
         >
           <div class="px-6 py-4 bg-linear-to-r from-green-50 to-white border-b border-green-100">
-            <h3
-              class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2"
-            >
-              <i class="bi bi-currency-dollar text-green-600"></i>
+            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2">
+              <i class="bi bi-currency-dollar text-green-600 text-lg leading-none"></i>
               Compensation
             </h3>
           </div>
           <div class="p-6">
             <dl class="space-y-4">
-              <div
-                *ngIf="job()?.billRate && authStore.userRole() !== 'VENDOR'"
-                class="flex justify-between items-center"
-              >
-                <dt class="text-sm text-gray-500">Bill Rate</dt>
+              <div *ngIf="job()?.billRate && authStore.userRole() !== 'VENDOR'" class="flex justify-between items-center">
+                <dt class="text-sm text-gray-500 font-medium">Bill Rate</dt>
                 <dd class="text-lg font-bold text-green-600">
                   {{ job()?.billRate | currency }}/hr
                 </dd>
               </div>
               <div *ngIf="job()?.payRate" class="flex justify-between items-center">
-                <dt class="text-sm text-gray-500">Pay Rate</dt>
-                <dd class="text-lg font-bold text-blue-600">{{ job()?.payRate | currency }}/hr</dd>
+                <dt class="text-sm text-gray-500 font-medium">Pay Rate</dt>
+                <dd class="text-lg font-bold text-blue-600">
+                  {{ job()?.payRate | currency }}/hr
+                </dd>
               </div>
-              <div *ngIf="job()?.billRate && job()?.payRate" class="pt-3 border-t border-gray-100">
+              <div *ngIf="job()?.billRate && job()?.payRate" class="pt-4 mt-2 border-t border-gray-100 border-dashed">
                 <div class="flex justify-between items-center">
-                  <dt class="text-sm text-gray-500">Margin</dt>
-                  <dd class="text-lg font-bold text-amber-600">
+                  <dt class="text-sm text-gray-500 font-medium">Margin</dt>
+                  <dd class="text-lg font-bold text-amber-500 bg-amber-50 px-3 py-1 rounded-lg border border-amber-100">
                     {{ job()!.billRate! - job()!.payRate! | currency }}/hr
                   </dd>
                 </div>
@@ -453,6 +398,5 @@
 
       </div>
     </div>
-
   </div>
 </div>

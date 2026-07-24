@@ -1,11 +1,13 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpParams, HttpHeaders } from '@angular/common/http';
-import { interval } from 'rxjs';
+import { Injectable, inject, signal, NgZone } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Page } from '../models/page.model';
 import { ApiResponse } from '../models/auth.model';
 import { environment } from '../../environments/environment';
 import { ApiService } from './api.service';
+import { AuthStore } from './auth.store';
+import { Client, IMessage } from '@stomp/stompjs';
 
 export interface Notification {
   id: number;
@@ -31,20 +33,57 @@ export interface NotificationCounts {
 })
 export class NotificationService {
   private apiService = inject(ApiService);
+  private authStore = inject(AuthStore);
+  private zone = inject(NgZone);
   private baseUrl = `/notifications`;
+  
+  private stompClient: Client | null = null;
+  readonly notificationStream = new Subject<Notification>();
 
   // Centralized signal for notification counts
   readonly notificationCounts = signal<NotificationCounts | null>(null);
 
   constructor() {
-    this.startPolling();
+    this.connectWebSocket();
   }
 
-  private startPolling() {
-    this.refreshCounts();
-    interval(5000).subscribe(() => {
-      this.refreshCounts();
+  private connectWebSocket() {
+    const token = this.authStore.accessToken();
+    if (!token) return;
+
+    // Use environment apiUrl to build WS url, fallback to standard localhost
+    let wsUrl = (environment.apiUrl || 'http://localhost:8080/api').replace(/^http/, 'ws') + '/ws';
+    
+    this.stompClient = new Client({
+      brokerURL: wsUrl,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
     });
+
+    this.stompClient.onConnect = (frame) => {
+      console.log('Connected to Real-time Notifications');
+      this.zone.run(() => {
+        this.refreshCounts();
+      });
+      
+      this.stompClient?.subscribe('/user/queue/notifications', (message: IMessage) => {
+        console.log('[WebSocket] Received message:', message.body);
+        if (message.body) {
+          const notification: Notification = JSON.parse(message.body);
+          this.zone.run(() => {
+            console.log('[WebSocket] Processing notification:', notification);
+            this.notificationStream.next(notification);
+            this.refreshCounts();
+          });
+        }
+      });
+    };
+
+    this.stompClient.activate();
   }
 
   refreshCounts() {

@@ -10,7 +10,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { interval, switchMap } from 'rxjs';
 import { Notification, NotificationService } from '../../../services/notification.service';
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
@@ -35,8 +34,8 @@ export class NotificationDropdownComponent implements OnInit {
   ngOnInit() {
     this.loadUnreadCount();
 
-    // Poll every 10 seconds
-    interval(5000)
+    // Subscribe to real-time notification stream instead of polling
+    this.notificationService.notificationStream
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.loadUnreadCount();

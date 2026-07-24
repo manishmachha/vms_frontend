@@ -40,6 +40,7 @@ export interface JobApplication {
   currentCompany?: string;
   createdAt?: string;
   updatedAt?: string;
+  source?: string;
 }
 
 export type ApplicationStatus =
