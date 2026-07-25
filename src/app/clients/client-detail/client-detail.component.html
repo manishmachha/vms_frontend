@@ -1,13 +1,4 @@
 <div class="space-y-6 py-6 animate-fade-in" *ngIf="client() as c">
-  <!-- Breadcrumb & Back -->
-  <div>
-    <a
-      [routerLink]="resolvePath('/clients')"
-      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center mb-4 transition-colors"
-    >
-      <i class="bi bi-arrow-left mr-1"></i> Back to Clients
-    </a>
-  </div>
 
   <!-- Dashboard Banner -->
   <app-hub-dashboard-banner [stats]="dashboardStats()?.stats || []"></app-hub-dashboard-banner>
