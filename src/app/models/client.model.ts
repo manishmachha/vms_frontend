@@ -12,7 +12,7 @@ export interface Client {
   contactPerson?: string;
   industry?: string;
   description?: string;
-  status?: string;
+  status?: 'ACTIVE' | 'LEAD' | 'INACTIVE';
   createdAt?: string;
   updatedAt?: string;
 }

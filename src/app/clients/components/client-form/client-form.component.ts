@@ -36,6 +36,7 @@ export class ClientFormComponent {
       website: [data?.website || ''],
       address: [data?.address || ''],
       description: [data?.description || ''],
+      status: [data?.status || 'ACTIVE'],
     });
   }
 

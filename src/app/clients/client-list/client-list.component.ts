@@ -35,7 +35,8 @@ export class ClientListComponent implements OnInit {
 
   searchQuery = signal('');
   industryFilter = signal('');
-  statusFilter = signal('');
+  statusFilter = signal<Client['status'] | ''>('');
+  availableStatuses: NonNullable<Client['status']>[] = ['ACTIVE', 'LEAD', 'INACTIVE'];
   activeMenuId: number | null = null;
 
   ngOnInit() {
