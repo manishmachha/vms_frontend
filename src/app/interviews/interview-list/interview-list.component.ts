@@ -52,7 +52,7 @@ export class InterviewListComponent implements OnInit {
     return `${base}${path.startsWith('/') ? path : '/' + path}`;
   }
   searchQuery = '';
-  activeTab = signal('upcoming');
+  activeTab = signal('all');
   interviews = signal<Interview[]>([]);
   filteredInterviews = signal<Interview[]>([]);
   
