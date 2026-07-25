@@ -26,6 +26,9 @@ export class CandidateListComponent implements OnInit {
   candidates = signal<Candidate[]>([]);
   filteredCandidates = signal<Candidate[]>([]);
   searchQuery = signal('');
+  filterType = signal<'ALL' | 'MINE'>('ALL');
+  totalCandidates = signal<number>(0);
+  candidatesCreatedByYou = signal<number>(0);
   unreadCandidateIds = new Set<string>();
 
   ngOnInit() {
@@ -60,6 +63,10 @@ export class CandidateListComponent implements OnInit {
         });
 
         this.candidates.set(sorted);
+        this.totalCandidates.set(sorted.length);
+        this.candidatesCreatedByYou.set(
+          sorted.filter((c) => String(c.createdBy?.id) === String(this.authStore.user()?.id)).length
+        );
         this.filterCandidates();
       },
       error: (err) => {
@@ -73,16 +80,29 @@ export class CandidateListComponent implements OnInit {
     this.filterCandidates();
   }
 
+  setFilterType(type: 'ALL' | 'MINE') {
+    this.filterType.set(type);
+    this.filterCandidates();
+  }
+
   filterCandidates() {
     const q = this.searchQuery().toLowerCase();
+    const type = this.filterType();
+    const currentUserId = String(this.authStore.user()?.id);
+
     this.filteredCandidates.set(
-      this.candidates().filter(
-        (c) =>
+      this.candidates().filter((c) => {
+        const matchesSearch =
           c.firstName.toLowerCase().includes(q) ||
           c.lastName.toLowerCase().includes(q) ||
           c.email.toLowerCase().includes(q) ||
-          c.skills.some((s) => s.toLowerCase().includes(q)),
-      ),
+          c.skills.some((s) => s.toLowerCase().includes(q));
+
+        const matchesFilter =
+          type === 'ALL' ? true : String(c.createdBy?.id) === currentUserId;
+
+        return matchesSearch && matchesFilter;
+      })
     );
   }
 }

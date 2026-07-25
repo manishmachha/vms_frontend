@@ -3,7 +3,16 @@ export interface StatItem {
     count: number;
     icon: string;
     route: string;
-    items?: { id: number; name: string }[];
+    items?: StatDetail[];
+}
+
+export interface StatDetail {
+    id: number;
+    name: string;
+    subtitle?: string;
+    date?: string;
+    status?: string;
+    badgeColor?: string;
 }
 
 export interface DashboardStatsResponse {

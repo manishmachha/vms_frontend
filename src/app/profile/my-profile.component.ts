@@ -5,11 +5,14 @@ import { UserService } from '../services/user.service';
 import { AuthStore } from '../services/auth.store';
 import { HeaderService } from '../services/header.service';
 import { User } from '../models/auth.model';
+import { DashboardStatsResponse } from '../models/dashboard-stats.model';
+import { MfeNavigationService } from '../services/mfe-navigation.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-my-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './my-profile.component.html',
   styleUrls: ['./my-profile.component.css'],
 })
@@ -17,8 +20,15 @@ export class MyProfileComponent implements OnInit {
   private userService = inject(UserService);
   private authStore = inject(AuthStore);
   private headerService = inject(HeaderService);
+  private mfeNav = inject(MfeNavigationService);
+
+  resolvePath(path: string): string {
+    const base = this.mfeNav.basePath;
+    return `${base}${path.startsWith('/') ? path : '/' + path}`;
+  }
 
   profile = signal<User | null>(null);
+  stats = signal<DashboardStatsResponse | null>(null);
 
   // Edit profile form
   editForm = { firstName: '', lastName: '', phone: '' };
@@ -49,6 +59,9 @@ export class MyProfileComponent implements OnInit {
           lastName: user.lastName || '',
           phone: user.phone || '',
         };
+        if (user.id) {
+          this.loadStats(user.id);
+        }
       },
       error: (err) => {
         console.error('Failed to load profile', err);
@@ -63,6 +76,19 @@ export class MyProfileComponent implements OnInit {
           };
         }
       },
+    });
+  }
+
+  loadStats(userId: number | string) {
+    (this.userService as any).getUserStats(userId).subscribe({
+      next: (response: any) => {
+        if (response && response.stats) {
+          this.stats.set(response);
+        }
+      },
+      error: (err: any) => {
+        console.error('Failed to load stats', err);
+      }
     });
   }
 

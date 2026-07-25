@@ -32,6 +32,12 @@
                 at {{ candidate()!.currentCompany }}
               </span>
             </p>
+            <div class="mt-2 flex items-center" *ngIf="candidate()!.createdBy">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">
+                <i class="bi bi-person-fill text-gray-500"></i>
+                Added by {{ candidate()!.createdBy?.firstName }} {{ candidate()!.createdBy?.lastName }}
+              </span>
+            </div>
           </div>
 
           <!-- Actions (Desktop) -->

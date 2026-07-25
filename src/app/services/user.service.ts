@@ -18,6 +18,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { DashboardStatsResponse } from '../models/dashboard-stats.model';
 import { ApiResponse } from '../models/auth.model';
 
 @Injectable({
@@ -40,6 +41,10 @@ export class UserService {
 
   getUsersByOrganization(orgId: string | number) {
     return this.api.get<User[]>(`/v1/users/organization/${orgId}`);
+  }
+
+  getUserStats(userId: string | number) {
+    return this.api.get<DashboardStatsResponse>(`/v1/users/${userId}/stats`);
   }
 
   createUser(data: CreateEmployeeRequest) {

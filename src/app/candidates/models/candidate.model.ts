@@ -28,6 +28,12 @@ export interface Candidate {
     city?: string;
     country?: string;
   };
+  createdBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

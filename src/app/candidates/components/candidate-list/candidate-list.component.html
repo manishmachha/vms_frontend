@@ -1,30 +1,32 @@
 <div class="p-6 space-y-6">
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-    <div></div>
-    <a
-      *ngIf="!authStore.isEmployee()"
-      routerLink="new"
-      class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-    >
-      <svg
-        class="-ml-1 mr-2 h-5 w-5"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-          clip-rule="evenodd"
-        />
-      </svg>
-      Add Candidate
-    </a>
+
+  <!-- Dashboard Stats Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-500">Total Candidates</p>
+        <p class="text-2xl font-bold text-gray-900">{{ totalCandidates() }}</p>
+      </div>
+      <div class="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+        <i class="bi bi-people-fill text-lg"></i>
+      </div>
+    </div>
+    <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-500">Created By You</p>
+        <p class="text-2xl font-bold text-gray-900">{{ candidatesCreatedByYou() }}</p>
+      </div>
+      <div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+        <i class="bi bi-person-check-fill text-lg"></i>
+      </div>
+    </div>
   </div>
 
-  <!-- Search & Filter -->
-  <div class="relative">
+  <!-- Search, Filter & Add Candidate -->
+<div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
+
+  <!-- Search -->
+  <div class="relative flex-1">
     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
       <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
         <path
@@ -34,14 +36,51 @@
         />
       </svg>
     </div>
+
     <input
       type="text"
       [ngModel]="searchQuery()"
       (ngModelChange)="onSearch($event)"
-      class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
       placeholder="Search candidates by name, email, or skills..."
     />
   </div>
+
+  <!-- Filter -->
+  <div class="flex bg-gray-100 p-1 rounded-md shrink-0">
+    <button
+      (click)="setFilterType('ALL')"
+      [class.bg-white]="filterType() === 'ALL'"
+      [class.shadow]="filterType() === 'ALL'"
+      [class.text-gray-900]="filterType() === 'ALL'"
+      [class.text-gray-500]="filterType() !== 'ALL'"
+      class="px-4 py-1.5 text-sm font-medium rounded transition-colors cursor-pointer"
+    >
+      All Candidates
+    </button>
+
+    <button
+      (click)="setFilterType('MINE')"
+      [class.bg-white]="filterType() === 'MINE'"
+      [class.shadow]="filterType() === 'MINE'"
+      [class.text-gray-900]="filterType() === 'MINE'"
+      [class.text-gray-500]="filterType() !== 'MINE'"
+      class="px-4 py-1.5 text-sm font-medium rounded transition-colors cursor-pointer"
+    >
+      Created by Me
+    </button>
+  </div>
+
+  <!-- Add Candidate -->
+  <a
+    *ngIf="!authStore.isEmployee()"
+    routerLink="new"
+    class="lg:ml-auto inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap"
+  >
+    + Add New Candidate
+  </a>
+
+</div>
 
   <!-- Empty State -->
   <div *ngIf="filteredCandidates().length === 0" class="text-center py-12">
@@ -143,6 +182,14 @@
               />
             </svg>
             <span class="truncate">{{ candidate.email }}</span>
+          </div>
+          
+          <!-- Created By Badge -->
+          <div class="mt-2 flex items-center" *ngIf="candidate.createdBy">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+              <i class="bi bi-person-fill text-gray-400"></i>
+              Created by {{ candidate.createdBy.firstName }} {{ candidate.createdBy.lastName }}
+            </span>
           </div>
         </div>
         <div class="shrink-0" *ngIf="candidate.organization">

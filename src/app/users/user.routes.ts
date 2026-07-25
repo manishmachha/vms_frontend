@@ -15,6 +15,11 @@ export const USER_ROUTES: Routes = [
           import('./user-create/user-create.component').then((m) => m.UserCreateComponent),
       },
       {
+        path: ':id',
+        loadComponent: () =>
+          import('./user-detail/user-detail.component').then((m) => m.UserDetailComponent),
+      },
+      {
         path: 'edit/:id',
         loadComponent: () =>
           import('./user-create/user-create.component').then((m) => m.UserCreateComponent),
