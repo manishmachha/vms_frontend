@@ -275,7 +275,7 @@
             </div>
           </a>
 
-          <a
+          <a *ngIf="authStore.userRole() != 'TALENT_ACQUISITION'"
             [routerLink]="resolvePath('/users/')"
             class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
           >
