@@ -38,6 +38,8 @@ export class JobListComponent implements OnInit {
 
   searchQuery = '';
   statusFilter = '';
+  employmentTypeFilter = '';
+  availableEmploymentTypes = signal<string[]>([]);
 
   currentPage = 0;
   totalPages = 0;
@@ -74,6 +76,10 @@ export class JobListComponent implements OnInit {
       this.totalElements = data.totalElements;
       this.totalPages = data.totalPages;
       this.currentPage = data.number; // Assuming standard spring pageable
+      
+      const empTypes = new Set(data.content.map((j: Job) => j.employmentType).filter((t) => !!t));
+      this.availableEmploymentTypes.set(Array.from(empTypes) as string[]);
+
       this.applyFilters();
     });
   }
@@ -100,6 +106,10 @@ export class JobListComponent implements OnInit {
 
     if (this.statusFilter) {
       result = result.filter((j) => j.status === this.statusFilter);
+    }
+
+    if (this.employmentTypeFilter) {
+      result = result.filter((j) => j.employmentType === this.employmentTypeFilter);
     }
 
     // Sort: notified jobs first, then by createdAt desc

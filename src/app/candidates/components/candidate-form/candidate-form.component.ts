@@ -40,9 +40,8 @@ export class CandidateFormComponent {
     portfolioUrl: [''],
   });
 
-  isEditMode = signal(false);
+  isEditMode = signal(true);
   candidateId = signal<string | null>(null);
-  uploadError = signal<string | null>(null);
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
@@ -74,29 +73,6 @@ export class CandidateFormComponent {
     });
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.uploadAndParse(input.files[0]);
-    }
-  }
-
-  uploadAndParse(file: File) {
-    this.uploadError.set(null);
-
-    this.candidateService.uploadResume(file).subscribe({
-      next: (candidate: Candidate) => {
-        // Since backend saves validation is bypassed or auto-filled.
-        // We can redirect to edit mode for this new candidate to allow user verification.
-        this.mfeNav.navigate('/candidates');
-      },
-      error: (err) => {
-        console.error('Upload failed', err);
-        this.uploadError.set('Failed to upload/parse resume. Please try manual entry.');
-      },
-    });
-  }
-
   onSubmit() {
     if (this.form.invalid) return;
 
@@ -113,20 +89,10 @@ export class CandidateFormComponent {
       experienceYears: Number(formVal.experienceYears),
     } as any;
 
-    if (this.isEditMode() && this.candidateId()) {
+    if (this.candidateId()) {
       this.candidateService.updateCandidate(this.candidateId()!, payload).subscribe({
         next: () => {
           this.mfeNav.navigate('/candidates');
-        },
-      });
-    } else {
-      this.candidateService.createManual(payload).subscribe({
-        next: (candidate) => {
-          this.mfeNav.navigate('/candidates');
-        },
-        error: (err) => {
-          console.error('Manual creation failed', err);
-          this.uploadError.set('Failed to create candidate manually.');
         },
       });
     }

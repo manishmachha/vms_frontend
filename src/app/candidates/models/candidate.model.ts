@@ -14,6 +14,7 @@ export interface Candidate {
   portfolioUrl?: string;
   resumeFilePath?: string;
   resumeOriginalFileName?: string;
+  source?: string;
   isArchived: boolean;
   experienceDetailsJson?: string;
   educationDetailsJson?: string;

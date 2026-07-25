@@ -35,6 +35,7 @@ export class ClientListComponent implements OnInit {
 
   searchQuery = signal('');
   industryFilter = signal('');
+  statusFilter = signal('');
   activeMenuId: number | null = null;
 
   ngOnInit() {
@@ -56,9 +57,14 @@ export class ClientListComponent implements OnInit {
     let result = this.clients();
     const query = this.searchQuery().toLowerCase();
     const filter = this.industryFilter();
+    const status = this.statusFilter();
 
     if (filter) {
       result = result.filter((c) => c.industry === filter);
+    }
+
+    if (status) {
+      result = result.filter((c) => c.status === status);
     }
 
     if (query) {

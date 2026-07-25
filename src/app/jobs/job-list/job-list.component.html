@@ -44,6 +44,15 @@
         <option value="PAUSED">Paused</option>
         <option value="CLOSED">Closed</option>
       </select>
+
+      <select
+        [(ngModel)]="employmentTypeFilter"
+        (change)="applyFilters()"
+        class="block w-full md:w-48 pl-3 pr-10 py-3 text-base border-gray-200 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-xl bg-gray-50"
+      >
+        <option value="">All Employment Types</option>
+        <option *ngFor="let emp of availableEmploymentTypes()" [value]="emp">{{ emp | titlecase }}</option>
+      </select>
     </div>
   </div>
 

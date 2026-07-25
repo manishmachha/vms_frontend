@@ -50,6 +50,7 @@ export class ProjectListComponent implements OnInit {
 
   searchQuery = '';
   statusFilter = '';
+  clientFilter = '';
   statuses: ('ACTIVE' | 'COMPLETED' | 'ON_HOLD' | 'PLANNED')[] = [
     'ACTIVE',
     'PLANNED',
@@ -99,6 +100,10 @@ export class ProjectListComponent implements OnInit {
 
     if (this.statusFilter) {
       result = result.filter((p) => p.status === this.statusFilter);
+    }
+
+    if (this.clientFilter) {
+      result = result.filter((p) => p.client && p.client.id.toString() === this.clientFilter);
     }
 
     if (this.searchQuery.trim()) {

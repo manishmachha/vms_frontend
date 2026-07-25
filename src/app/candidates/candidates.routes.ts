@@ -7,7 +7,6 @@ import { ResumeDetailComponent } from './components/resume-detail/resume-detail.
 
 export const CANDIDATE_ROUTES: Routes = [
   { path: '', component: CandidateListComponent },
-  { path: 'new', component: CandidateFormComponent },
   { path: 'resumes', component: ResumeListComponent },
   { path: 'resumes/:id', component: ResumeDetailComponent },
   { path: 'edit/:id', component: CandidateFormComponent },

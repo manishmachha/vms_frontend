@@ -46,39 +46,37 @@
     />
   </div>
 
-  <!-- Filter -->
-  <div class="flex bg-gray-100 p-1 rounded-md shrink-0">
-    <button
-      (click)="setFilterType('ALL')"
-      [class.bg-white]="filterType() === 'ALL'"
-      [class.shadow]="filterType() === 'ALL'"
-      [class.text-gray-900]="filterType() === 'ALL'"
-      [class.text-gray-500]="filterType() !== 'ALL'"
-      class="px-4 py-1.5 text-sm font-medium rounded transition-colors cursor-pointer"
+  <!-- Filters -->
+  <div class="flex flex-col sm:flex-row gap-3 shrink-0">
+    <!-- Ownership Filter -->
+    <select
+      [ngModel]="filterType()"
+      (ngModelChange)="setFilterType($event)"
+      class="block w-full sm:w-auto pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md shadow-sm bg-white"
     >
-      All Candidates
-    </button>
+      <option value="ALL">All Candidates</option>
+      <option value="MINE">Created by Me</option>
+    </select>
 
-    <button
-      (click)="setFilterType('MINE')"
-      [class.bg-white]="filterType() === 'MINE'"
-      [class.shadow]="filterType() === 'MINE'"
-      [class.text-gray-900]="filterType() === 'MINE'"
-      [class.text-gray-500]="filterType() !== 'MINE'"
-      class="px-4 py-1.5 text-sm font-medium rounded transition-colors cursor-pointer"
+    <!-- Source Filter -->
+    <select
+      [ngModel]="sourceFilter()"
+      (ngModelChange)="setSourceFilter($event)"
+      class="block w-full sm:w-auto pl-3 pr-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md shadow-sm bg-white"
     >
-      Created by Me
-    </button>
+      <option value="ALL">All Sources</option>
+      <option *ngFor="let source of availableSources()" [value]="source">{{ source }}</option>
+    </select>
   </div>
 
   <!-- Add Candidate -->
-  <a
+  <button
     *ngIf="!authStore.isEmployee()"
-    routerLink="new"
-    class="lg:ml-auto inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap"
+    (click)="openUploadDialog()"
+    class="lg:ml-auto inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-colors whitespace-nowrap cursor-pointer"
   >
     + Add New Candidate
-  </a>
+  </button>
 
 </div>
 
@@ -102,9 +100,9 @@
       Get started by creating a new candidate or uploading a resume.
     </p>
     <div class="mt-6" *ngIf="!authStore.isEmployee()">
-      <a
-        routerLink="new"
-        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      <button
+        (click)="openUploadDialog()"
+        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
       >
         <svg
           class="-ml-1 mr-2 h-5 w-5"
@@ -119,7 +117,7 @@
           />
         </svg>
         Add Candidate
-      </a>
+      </button>
     </div>
   </div>
 
@@ -184,11 +182,15 @@
             <span class="truncate">{{ candidate.email }}</span>
           </div>
           
-          <!-- Created By Badge -->
-          <div class="mt-2 flex items-center" *ngIf="candidate.createdBy">
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+          <!-- Badges -->
+          <div class="mt-2 flex flex-wrap gap-2 items-center">
+            <span *ngIf="candidate.createdBy" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
               <i class="bi bi-person-fill text-gray-400"></i>
               Created by {{ candidate.createdBy.firstName }} {{ candidate.createdBy.lastName }}
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+              <i class="bi bi-funnel-fill text-indigo-400"></i>
+              Source: {{ candidate.source || 'vms'}}
             </span>
           </div>
         </div>

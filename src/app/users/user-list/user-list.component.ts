@@ -32,6 +32,9 @@ export class UserListComponent implements OnInit {
   users = signal<User[]>([]);
   filteredUsers = signal<User[]>([]);
   searchQuery = signal('');
+  statusFilter = signal('');
+  roleFilter = signal('');
+  availableRoles = signal<string[]>([]);
 
   ngOnInit() {
     this.headerService.setTitle(
@@ -46,6 +49,8 @@ export class UserListComponent implements OnInit {
     this.userService.getUsers().subscribe({
       next: (data) => {
         this.users.set(data);
+        const roles = new Set(data.map(u => u.role).filter(r => !!r));
+        this.availableRoles.set(Array.from(roles) as string[]);
         this.filterUsers();
       },
       error: (err) => {
@@ -62,14 +67,23 @@ export class UserListComponent implements OnInit {
 
   filterUsers() {
     const q = this.searchQuery().toLowerCase();
+    const statusF = this.statusFilter();
+    const roleF = this.roleFilter();
+
     this.filteredUsers.set(
-      this.users().filter(
-        (u) =>
+      this.users().filter((u) => {
+        const matchesSearch = 
+          !q ||
           u.firstName?.toLowerCase().includes(q) ||
           u.lastName?.toLowerCase().includes(q) ||
           u.email?.toLowerCase().includes(q) ||
-          u.role?.toLowerCase().includes(q)
-      )
+          u.role?.toLowerCase().includes(q);
+        
+        const matchesStatus = !statusF || (statusF === 'ACTIVE' ? u.status : !u.status);
+        const matchesRole = !roleF || u.role === roleF;
+
+        return matchesSearch && matchesStatus && matchesRole;
+      })
     );
   }
 

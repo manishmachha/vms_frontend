@@ -13,6 +13,27 @@
     </div>
 
     <div class="flex items-center gap-3">
+      <select
+        [ngModel]="roleFilter()"
+        (ngModelChange)="roleFilter.set($event); filterUsers()"
+        class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+      >
+        <option value="">All Roles</option>
+        <option *ngFor="let role of availableRoles()" [value]="role">{{ formatRole(role) }}</option>
+      </select>
+      
+      <select
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); filterUsers()"
+        class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+      >
+        <option value="">All Statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+      </select>
+    </div>
+
+    <div class="flex items-center gap-3">
       <button
         (click)="loadUsers()"
         class="p-2.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"

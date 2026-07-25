@@ -7,13 +7,15 @@ import { Candidate } from '../../models/candidate.model';
 import { HeaderService } from '../../../services/header.service';
 import { AuthStore } from '../../../services/auth.store';
 import { NotificationService } from '../../../services/notification.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { CandidateUploadDialogComponent } from '../candidate-upload-dialog/candidate-upload-dialog.component';
 
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
 
 @Component({
   selector: 'app-candidate-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, OrganizationLogoComponent],
+  imports: [CommonModule, RouterModule, FormsModule, OrganizationLogoComponent, MatDialogModule],
   templateUrl: './candidate-list.component.html',
   styleUrls: ['./candidate-list.component.css'],
 })
@@ -22,11 +24,14 @@ export class CandidateListComponent implements OnInit {
   private headerService = inject(HeaderService);
   public authStore = inject(AuthStore);
   private notificationService = inject(NotificationService);
+  private dialog = inject(MatDialog);
 
   candidates = signal<Candidate[]>([]);
   filteredCandidates = signal<Candidate[]>([]);
   searchQuery = signal('');
   filterType = signal<'ALL' | 'MINE'>('ALL');
+  sourceFilter = signal<string>('ALL');
+  availableSources = signal<string[]>([]);
   totalCandidates = signal<number>(0);
   candidatesCreatedByYou = signal<number>(0);
   unreadCandidateIds = new Set<string>();
@@ -67,6 +72,10 @@ export class CandidateListComponent implements OnInit {
         this.candidatesCreatedByYou.set(
           sorted.filter((c) => String(c.createdBy?.id) === String(this.authStore.user()?.id)).length
         );
+
+        const sources = new Set(sorted.map(c => c.source).filter(s => !!s));
+        this.availableSources.set(Array.from(sources) as string[]);
+
         this.filterCandidates();
       },
       error: (err) => {
@@ -82,6 +91,11 @@ export class CandidateListComponent implements OnInit {
 
   setFilterType(type: 'ALL' | 'MINE') {
     this.filterType.set(type);
+    this.filterCandidates();
+  }
+
+  setSourceFilter(source: string) {
+    this.sourceFilter.set(source);
     this.filterCandidates();
   }
 
@@ -101,8 +115,26 @@ export class CandidateListComponent implements OnInit {
         const matchesFilter =
           type === 'ALL' ? true : String(c.createdBy?.id) === currentUserId;
 
-        return matchesSearch && matchesFilter;
+        const sourceF = this.sourceFilter();
+        const matchesSource = sourceF === 'ALL' ? true : c.source === sourceF;
+
+        return matchesSearch && matchesFilter && matchesSource;
       })
     );
+  }
+
+  openUploadDialog() {
+    const dialogRef = this.dialog.open(CandidateUploadDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      panelClass: 'rounded-xl'
+    });
+
+    dialogRef.afterClosed().subscribe((result: Candidate | undefined) => {
+      if (result) {
+        // Upload successful, reload candidate list
+        this.loadCandidates();
+      }
+    });
   }
 }
