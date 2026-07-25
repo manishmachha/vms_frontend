@@ -18,19 +18,23 @@ export class LoadingInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    // Check if the request should skip the loader
+    console.log('[LoadingInterceptor] Intercepting request:', req.url);
     const skipLoader = req.context.get(SKIP_LOADER);
 
     if (skipLoader) {
+      console.log('[LoadingInterceptor] Skipping loader for:', req.url);
       return next.handle(req);
     }
 
-    // Show loader
+    console.log('[LoadingInterceptor] Showing loader for:', req.url);
     this.loadingService.show();
 
     return next.handle(req).pipe(
       finalize(() => {
-        this.loadingService.hide();
+        console.log('[LoadingInterceptor] Hiding loader for:', req.url);
+        setTimeout(() => {
+          this.loadingService.hide();
+        }, 500);
       }),
     );
   }

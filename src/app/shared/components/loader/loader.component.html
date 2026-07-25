@@ -1,6 +1,16 @@
 <div *ngIf="loadingService.isLoading()" class="loader-overlay">
   <div class="loader-container">
-    <div class="spinner"></div>
-    <div class="loader-text">Loading...</div>
+    <div class="spinner-wrapper">
+      <div class="spinner-outer"></div>
+      <div class="spinner-inner"></div>
+      <div class="spinner-center"></div>
+      <div class="spinner-icon-pulse">
+        <i class="bi bi-cpu text-indigo-500"></i>
+      </div>
+    </div>
+    <div class="loader-text-wrapper">
+      <div class="loader-title">Fetching Data</div>
+      <div class="loader-subtitle">Please wait while we sync...</div>
+    </div>
   </div>
 </div>

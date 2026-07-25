@@ -11,6 +11,21 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from './services/api.service';
 import { LoadingService } from './services/loading.service';
 import { AuthStore } from './services/auth.store';
+import { ProjectService } from './services/project.service';
+import { OrganizationService } from './services/organization.service';
+import { TimelineService } from './services/timeline.service';
+import { ClientSubmissionService } from './services/client-submission.service';
+import { AuthService } from './services/auth.service';
+import { DashboardService } from './services/dashboard.service';
+import { AuditLogService } from './services/audit-log.service';
+import { NotificationService } from './services/notification.service';
+import { ApplicationService } from './services/application.service';
+import { UserService } from './services/user.service';
+import { BrandedResumeService } from './services/branded-resume.service';
+import { JobService } from './services/job.service';
+import { ClientService } from './services/client.service';
+import { InterviewService } from './services/interview.service';
+import { CandidateService } from './services/candidate.service';
 
 export const routes: Routes = [
   {
@@ -24,6 +39,21 @@ export const routes: Routes = [
       ApiService,
       LoadingService,
       AuthStore,
+      ProjectService,
+      OrganizationService,
+      TimelineService,
+      ClientSubmissionService,
+      AuthService,
+      DashboardService,
+      AuditLogService,
+      NotificationService,
+      ApplicationService,
+      UserService,
+      BrandedResumeService,
+      JobService,
+      ClientService,
+      InterviewService,
+      CandidateService,
     ],
     children: [
       { path: '', component: VMSLoginComponent },
