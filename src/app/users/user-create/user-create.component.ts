@@ -106,9 +106,10 @@ export class UserCreateComponent implements OnInit {
   }
 
   loadInitialData() {
-    this.orgService.getAllOrganizations().subscribe(orgs => {
+    this.orgService.getAllOrganizations(0, 500).subscribe(page => {
+      const orgs = page.content || [];
       this.organizations = orgs;
-      this.vendors = orgs.filter(o => o.orgType === 'VENDOR');
+      this.vendors = orgs.filter((o: any) => o.orgType === 'VENDOR');
       
       const type = this.userForm.get('type')?.value;
       if (type === 'SOLVENTEK') {

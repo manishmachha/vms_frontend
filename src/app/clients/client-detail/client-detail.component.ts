@@ -64,7 +64,8 @@ export class ClientDetailComponent implements OnInit {
   }
 
   loadProjects(clientId: string | number) {
-    this.projectService.getProjects().subscribe((projects: Project[]) => {
+    this.projectService.getProjects(0, 100).subscribe((page) => {
+      const projects = page.content || [];
       const id = Number(clientId);
       const filtered = projects.filter((p) => p.client?.id === id);
       this.clientProjects.set(filtered);

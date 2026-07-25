@@ -9,13 +9,25 @@ import { HeaderService } from '../../services/header.service';
 import { AuthStore } from '../../services/auth.store';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatSnackBarModule, OrganizationLogoComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    MatSnackBarModule,
+    OrganizationLogoComponent,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+  ],
   templateUrl: './user-list.component.html',
-  styleUrl: './user-list.component.css'
+  styleUrl: './user-list.component.css',
 })
 export class UserListComponent implements OnInit {
   private userService = inject(UserService);
@@ -24,67 +36,95 @@ export class UserListComponent implements OnInit {
   public authStore = inject(AuthStore);
   private mfeNav = inject(MfeNavigationService);
 
+  viewMode = signal<'table' | 'grid'>('grid');
+  dataSource = new MatTableDataSource<User>([]);
+  displayedColumns: string[] = ['user', 'contact', 'role', 'organization', 'status', 'actions'];
+
+  totalElements = signal(0);
+  pageSize = signal(10);
+  pageIndex = signal(0);
+  sortField = signal('');
+  sortOrder = signal('');
+
+  searchQuery = signal('');
+  statusFilter = signal('');
+  roleFilter = signal('');
+  availableRoles = signal<string[]>([
+    'SUPER_ADMIN',
+    'MANAGER',
+    'TALENT_ACQUISITION',
+    'VENDOR',
+    'EMPLOYEE',
+    'CLIENT',
+  ]);
+
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
     return `${base}${path.startsWith('/') ? path : '/' + path}`;
   }
 
-  users = signal<User[]>([]);
-  filteredUsers = signal<User[]>([]);
-  searchQuery = signal('');
-  statusFilter = signal('');
-  roleFilter = signal('');
-  availableRoles = signal<string[]>([]);
-
   ngOnInit() {
     this.headerService.setTitle(
       'User Management',
       'Manage system users and their roles',
-      'bi bi-person-badge-fill'
+      'bi bi-person-badge-fill',
     );
     this.loadUsers();
   }
 
   loadUsers() {
-    this.userService.getUsers().subscribe({
-      next: (data) => {
-        this.users.set(data);
-        const roles = new Set(data.map(u => u.role).filter(r => !!r));
-        this.availableRoles.set(Array.from(roles) as string[]);
-        this.filterUsers();
-      },
-      error: (err) => {
-        console.error('Failed to load users', err);
-        this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
-      }
-    });
+    let sortStr: string | undefined = undefined;
+    if (this.sortField() && this.sortOrder()) {
+      sortStr = `${this.sortField()},${this.sortOrder()}`;
+    }
+    this.userService
+      .getUsers(
+        this.pageIndex(),
+        this.pageSize(),
+        this.searchQuery(),
+        this.roleFilter(),
+        this.statusFilter(),
+        sortStr,
+      )
+      .subscribe({
+        next: (pageData) => {
+          this.dataSource.data = pageData.content;
+          this.totalElements.set(pageData.totalElements);
+        },
+        error: (err) => {
+          console.error('Failed to load users', err);
+          this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
+        },
+      });
   }
 
   onSearch(query: string) {
     this.searchQuery.set(query);
-    this.filterUsers();
+    this.pageIndex.set(0);
+    this.loadUsers();
   }
 
-  filterUsers() {
-    const q = this.searchQuery().toLowerCase();
-    const statusF = this.statusFilter();
-    const roleF = this.roleFilter();
+  onFilterChange() {
+    this.pageIndex.set(0);
+    this.loadUsers();
+  }
 
-    this.filteredUsers.set(
-      this.users().filter((u) => {
-        const matchesSearch = 
-          !q ||
-          u.firstName?.toLowerCase().includes(q) ||
-          u.lastName?.toLowerCase().includes(q) ||
-          u.email?.toLowerCase().includes(q) ||
-          u.role?.toLowerCase().includes(q);
-        
-        const matchesStatus = !statusF || (statusF === 'ACTIVE' ? u.status : !u.status);
-        const matchesRole = !roleF || u.role === roleF;
+  onPageChange(event: PageEvent) {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadUsers();
+  }
 
-        return matchesSearch && matchesStatus && matchesRole;
-      })
-    );
+  onSortChange(event: Sort) {
+    if (!event.active || !event.direction) {
+      this.sortField.set('');
+      this.sortOrder.set('');
+    } else {
+      this.sortField.set(event.active);
+      this.sortOrder.set(event.direction);
+    }
+    this.pageIndex.set(0);
+    this.loadUsers();
   }
 
   deleteUser(user: User) {
@@ -100,12 +140,16 @@ export class UserListComponent implements OnInit {
       error: (err) => {
         console.error('Failed to delete user', err);
         this.snackBar.open('Error deleting user', 'Close', { duration: 3000 });
-      }
+      },
     });
   }
 
   formatRole(role: string | undefined): string {
     if (!role) return '';
     return role.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  }
+
+  toggleView(mode: 'table' | 'grid') {
+    this.viewMode.set(mode);
   }
 }

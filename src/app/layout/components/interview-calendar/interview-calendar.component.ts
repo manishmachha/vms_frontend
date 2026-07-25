@@ -38,13 +38,13 @@ export class InterviewCalendarComponent implements OnInit {
   }
 
   loadInterviews() {
-    this.interviewService.getAllInterviews().subscribe((res) => {
-      const data = res || [];
+    this.interviewService.getAllInterviews(0, 500).subscribe((res) => {
+      const data = res.content || [];
       this.interviews.set(data);
 
       // Build a Set of date strings for O(1) lookup
       this.interviewDateSet.clear();
-      data.forEach((i) => {
+      data.forEach((i: any) => {
         if (i.scheduledAt) {
           const date = new Date(i.scheduledAt);
           this.interviewDateSet.add(this.formatDate(date));

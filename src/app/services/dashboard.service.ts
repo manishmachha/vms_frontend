@@ -27,6 +27,7 @@ export interface DashboardStats {
   orgDistribution: ChartData[];
   recruitmentPipeline: ChartData[];
   recentActivity: RecentActivity[];
+  recentInterviews: import('../models/interview.model').Interview[];
   totalActiveJobs: number;
   totalEmployees: number;
   totalApplications: number;
@@ -38,7 +39,7 @@ export interface DashboardStats {
 })
 export class DashboardService {
   private apiService = inject(ApiService);
-  private apiUrl = '/admin/dashboard/stats';
+  private apiUrl = '/v1/admin/dashboard/stats';
 
   getStats(): Observable<DashboardStats> {
     return this.apiService.get<DashboardStats>(this.apiUrl);

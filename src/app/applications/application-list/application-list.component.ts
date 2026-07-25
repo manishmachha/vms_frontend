@@ -78,41 +78,6 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
     );
     this.loadUnreadAppIds();
     this.loadApplications();
-
-    this.dataSource.filterPredicate = (data: JobApplication, filter: string): boolean => {
-      // 1. Text Search
-      const search = this.filterValues.searchTerm.toLowerCase();
-      const name = ((data.candidate?.firstName || '') + ' ' + (data.candidate?.lastName || '')).toLowerCase();
-      const matchesSearch =
-        !search ||
-        name.includes(search) ||
-        (data.candidate?.email?.toLowerCase().includes(search) ?? false) ||
-        (data.candidate?.currentCompany?.toLowerCase().includes(search) ?? false) ||
-        (data.job?.requestId?.toLowerCase().includes(search) ?? false) ||
-        (data.job?.title?.toLowerCase().includes(search) ?? false) ||
-        data.status.toLowerCase().includes(search);
-
-      // 2. Risk & Consistency Filters
-      const analysis = (data as any)['latestAnalysis'];
-
-      if (this.filterValues.minRisk != null) {
-        if (!analysis || (analysis.overallRiskScore ?? 0) < this.filterValues.minRisk) return false;
-      }
-      if (this.filterValues.maxRisk != null) {
-        if (!analysis || (analysis.overallRiskScore ?? 0) > this.filterValues.maxRisk) return false;
-      }
-
-      if (this.filterValues.minMatch != null) {
-        if (!analysis || (analysis.jobMatchScore ?? 0) < this.filterValues.minMatch)
-          return false;
-      }
-      if (this.filterValues.maxMatch != null) {
-        if (!analysis || (analysis.jobMatchScore ?? 0) > this.filterValues.maxMatch)
-          return false;
-      }
-
-      return matchesSearch;
-    };
   }
 
   loadUnreadAppIds() {

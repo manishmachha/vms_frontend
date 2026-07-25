@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
@@ -11,11 +11,23 @@ import { Project } from '../../models/project.model';
 import { ClientFormComponent } from '../components/client-form/client-form.component';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { HeaderService } from '../../services/header.service';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-client-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatDialogModule, OrganizationLogoComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    FormsModule,
+    MatDialogModule,
+    OrganizationLogoComponent,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+  ],
   templateUrl: './client-list.component.html',
   styleUrls: ['./client-list.component.css'],
 })
@@ -25,6 +37,16 @@ export class ClientListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private headerService = inject(HeaderService);
   private mfeNav = inject(MfeNavigationService);
+
+  viewMode = signal<'table' | 'grid'>('grid');
+  dataSource = new MatTableDataSource<Client>([]);
+  displayedColumns: string[] = ['client', 'industry', 'location', 'projects', 'status', 'actions'];
+
+  totalElements = signal(0);
+  pageSize = signal(12);
+  pageIndex = signal(0);
+  sortField = signal('');
+  sortOrder = signal('');
 
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
@@ -39,6 +61,12 @@ export class ClientListComponent implements OnInit {
   availableStatuses: NonNullable<Client['status']>[] = ['ACTIVE', 'LEAD', 'INACTIVE'];
   activeMenuId: number | null = null;
 
+  constructor() {
+    effect(() => {
+      this.dataSource.data = this.filteredClients();
+    });
+  }
+
   ngOnInit() {
     this.headerService.setTitle(
       'Clients',
@@ -50,35 +78,69 @@ export class ClientListComponent implements OnInit {
   }
 
   loadData() {
-    this.clientService.getAllClients().subscribe((data) => this.clients.set(data));
-    this.projectService.getProjects().subscribe((data) => this.projects.set(data));
+    let sortStr: string | undefined = undefined;
+    if (this.sortField() && this.sortOrder()) {
+      sortStr = `${this.sortField()},${this.sortOrder()}`;
+    }
+    this.clientService
+      .getAllClients(
+        this.pageIndex(),
+        this.pageSize(),
+        this.searchQuery() || undefined,
+        sortStr,
+        this.statusFilter() || undefined,
+        this.industryFilter() || undefined
+      )
+      .subscribe((pageData) => {
+        this.clients.set(pageData.content || []);
+        this.totalElements.set(pageData.totalElements || 0);
+      });
+    if (this.projects().length === 0) {
+      this.projectService.getProjects(0, 100).subscribe((page) => this.projects.set(page.content || []));
+    }
   }
 
-  filteredClients = computed(() => {
-    let result = this.clients();
-    const query = this.searchQuery().toLowerCase();
-    const filter = this.industryFilter();
-    const status = this.statusFilter();
+  onSearchChange(query: string) {
+    this.searchQuery.set(query);
+    this.pageIndex.set(0);
+    this.loadData();
+  }
 
-    if (filter) {
-      result = result.filter((c) => c.industry === filter);
+  onIndustryFilterChange(val: string) {
+    this.industryFilter.set(val);
+    this.pageIndex.set(0);
+    this.loadData();
+  }
+
+  onStatusFilterChange(val: any) {
+    this.statusFilter.set(val);
+    this.pageIndex.set(0);
+    this.loadData();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadData();
+  }
+
+  onSortChange(event: Sort) {
+    if (!event.active || !event.direction) {
+      this.sortField.set('');
+      this.sortOrder.set('');
+    } else {
+      this.sortField.set(event.active);
+      this.sortOrder.set(event.direction);
     }
+    this.pageIndex.set(0);
+    this.loadData();
+  }
 
-    if (status) {
-      result = result.filter((c) => c.status === status);
-    }
+  toggleView(mode: 'table' | 'grid') {
+    this.viewMode.set(mode);
+  }
 
-    if (query) {
-      result = result.filter(
-        (c) =>
-          c.name.toLowerCase().includes(query) ||
-          c.city?.toLowerCase().includes(query) ||
-          c.industry?.toLowerCase().includes(query),
-      );
-    }
-
-    return result;
-  });
+  filteredClients = computed(() => this.clients());
 
   // Stats computed values
   activeProjectsCount = computed(

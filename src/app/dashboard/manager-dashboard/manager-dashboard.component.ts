@@ -197,6 +197,9 @@ export class ManagerDashboardComponent implements OnInit {
     }).subscribe({
       next: ({ candidates, jobs, applications, projects, interviews }) => {
         const apps = (applications as any)?.content || (Array.isArray(applications) ? applications : []);
+        const cList = (candidates as any)?.content || (Array.isArray(candidates) ? candidates : []);
+        const pList = (projects as any)?.content || (Array.isArray(projects) ? projects : []);
+        const iList = (interviews as any)?.content || (Array.isArray(interviews) ? interviews : []);
 
         // Funnel Processing
         const applied = apps.filter((a: any) => a.status === 'APPLIED').length;
@@ -216,10 +219,10 @@ export class ManagerDashboardComponent implements OnInit {
         // Update Stats
         this.stats.update((currentStats) => {
           const stats = [...currentStats];
-          stats[0].value = (candidates as any)?.length || 0;
+          stats[0].value = (candidates as any)?.totalElements ?? cList.length ?? 0;
           stats[1].value = (jobs as any)?.totalElements ?? (jobs as any)?.length ?? 0;
           stats[2].value = (applications as any)?.totalElements ?? (applications as any)?.length ?? 0;
-          stats[3].value = (projects as any)?.length || 0;
+          stats[3].value = (projects as any)?.totalElements ?? pList.length ?? 0;
           stats[4].value = interview || 0;
           stats[5].value = offer || 0;
           return stats;
@@ -248,12 +251,12 @@ export class ManagerDashboardComponent implements OnInit {
         this.processCharts(apps);
 
         // Process Recent Activity
-        this.processActivity(apps, interviews);
+        this.processActivity(apps, iList);
 
         // Process Recent Interviews
         this.recentInterviews.set(
-          (interviews as any[] || [])
-            .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
+          iList
+            .sort((a: any, b: any) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())
             .slice(0, 10)
         );
 

@@ -8,11 +8,22 @@ import { Vendor } from '../../models/organization.model';
 import { HeaderService } from '../../services/header.service';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { NotificationService } from '../../services/notification.service';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-vendor-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, OrganizationLogoComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    OrganizationLogoComponent,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+  ],
   templateUrl: './vendor-list.component.html',
   styleUrls: ['./vendor-list.component.css'],
 })
@@ -21,6 +32,16 @@ export class VendorListComponent implements OnInit {
   headerService = inject(HeaderService);
   notificationService = inject(NotificationService);
   private mfeNav = inject(MfeNavigationService);
+
+  viewMode = signal<'table' | 'grid'>('grid');
+  dataSource = new MatTableDataSource<Vendor>([]);
+  displayedColumns: string[] = ['vendor', 'orgType', 'registered', 'status', 'actions'];
+
+  totalElements = signal(0);
+  pageSize = signal(12);
+  pageIndex = signal(0);
+  sortField = signal('');
+  sortOrder = signal('');
 
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
@@ -58,34 +79,62 @@ export class VendorListComponent implements OnInit {
   }
 
   loadVendors() {
-    this.organizationService.getVendors().subscribe((data: Vendor[]) => {
-      // Sort: notified first
-      const sorted = [...data].sort((a, b) => {
-        const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
-        const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
-        return bHasNotif - aHasNotif;
+    let sortStr: string | undefined = undefined;
+    if (this.sortField() && this.sortOrder()) {
+      sortStr = `${this.sortField()},${this.sortOrder()}`;
+    }
+    const statusF = this.activeTab === 'all' ? 'ALL' : this.activeTab;
+    this.organizationService
+      .getVendors(this.pageIndex(), this.pageSize(), this.searchQuery, statusF, sortStr)
+      .subscribe((pageData) => {
+        const sorted = [...pageData.content].sort((a, b) => {
+          const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
+          const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
+          return bHasNotif - aHasNotif;
+        });
+        this.vendors.set(sorted);
+        this.dataSource.data = sorted;
+        this.totalElements.set(pageData.totalElements);
+        this.activeCount.set(sorted.filter((v) => v.status === 'ACTIVE').length);
+        this.inactiveCount.set(sorted.filter((v) => v.status === 'INACTIVE').length);
       });
-      this.vendors.set(sorted);
-      this.activeCount.set(data.filter((v) => v.status === 'ACTIVE').length);
-      this.inactiveCount.set(data.filter((v) => v.status === 'INACTIVE').length);
-    });
+  }
+
+  onTabChange(tabValue: string) {
+    this.activeTab = tabValue;
+    this.pageIndex.set(0);
+    this.loadVendors();
+  }
+
+  onSearchChange() {
+    this.pageIndex.set(0);
+    this.loadVendors();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadVendors();
+  }
+
+  onSortChange(event: Sort) {
+    if (!event.active || !event.direction) {
+      this.sortField.set('');
+      this.sortOrder.set('');
+    } else {
+      this.sortField.set(event.active);
+      this.sortOrder.set(event.direction);
+    }
+    this.pageIndex.set(0);
+    this.loadVendors();
+  }
+
+  toggleView(mode: 'table' | 'grid') {
+    this.viewMode.set(mode);
   }
 
   filteredVendors() {
-    let result = this.vendors();
-
-    // Filter by tab
-    if (this.activeTab !== 'all') {
-      result = result.filter((v) => v.status === this.activeTab);
-    }
-
-    // Filter by search
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      result = result.filter((v) => v.name.toLowerCase().includes(query));
-    }
-
-    return result;
+    return this.vendors();
   }
 
   getStatusBadgeClass(status?: string): string {

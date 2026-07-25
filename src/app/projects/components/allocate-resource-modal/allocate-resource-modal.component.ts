@@ -50,8 +50,8 @@ export class AllocateResourceModalComponent implements OnInit {
     if (this.data.candidates && this.data.candidates.length > 0) {
       this.candidates.set(this.data.candidates);
     } else {
-      this.candidateService.getCandidates().subscribe((candidates) => {
-        this.candidates.set(candidates);
+      this.candidateService.getCandidates(0, 500).subscribe((page) => {
+        this.candidates.set(page.content || []);
       });
     }
   }

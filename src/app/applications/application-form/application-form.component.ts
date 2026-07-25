@@ -72,8 +72,8 @@ export class ApplicationFormComponent implements OnInit {
   }
 
   loadCandidates() {
-    this.candidateService.getCandidates().subscribe({
-      next: (data) => this.candidates.set(data),
+    this.candidateService.getCandidates(0, 100).subscribe({
+      next: (page) => this.candidates.set(page.content || []),
       error: (err) => console.error('Failed to load candidates', err),
     });
   }

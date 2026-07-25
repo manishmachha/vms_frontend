@@ -1,6 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { Project, ProjectAllocation } from '../models/project.model';
+import { Observable } from 'rxjs';
+import { Page } from '../models/page.model';
+import { HttpParams } from '@angular/common/http';
 
 // ========== REQUEST TYPES ==========
 
@@ -48,8 +51,20 @@ export interface UpdateAllocationRequest {
 export class ProjectService {
   private api = inject(ApiService);
 
-  getProjects() {
-    return this.api.get<Project[]>('/projects');
+  getProjects(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    sort?: string,
+    status?: string,
+    clientId?: string | number
+  ): Observable<Page<Project>> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (search) params = params.set('search', search);
+    if (sort) params = params.set('sort', sort);
+    if (status) params = params.set('status', status);
+    if (clientId) params = params.set('clientId', clientId.toString());
+    return this.api.get<Page<Project>>('/projects', params);
   }
 
   getProject(id: number) {

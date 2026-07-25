@@ -235,7 +235,7 @@ export class VendorDashboardComponent implements OnInit {
       next: (results) => {
         const currentStats = this.solventekStats();
         currentStats[0].value = results.jobs.totalElements;
-        currentStats[1].value = results.candidates.length;
+        currentStats[1].value = results.candidates.totalElements ?? (results.candidates as any).length ?? 0;
         const apps = results.applications.content;
         currentStats[2].value = results.applications.totalElements;
         currentStats[3].value = apps.filter((a) => a.status === 'APPLIED').length;

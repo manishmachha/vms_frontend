@@ -11,11 +11,12 @@ import { ApplicationFormComponent } from '../../applications/application-form/ap
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { AuthStore } from '../../services/auth.store';
 import { NotificationService } from '../../services/notification.service';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-job-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatDialogModule, OrganizationLogoComponent],
+  imports: [CommonModule, RouterLink, FormsModule, MatDialogModule, OrganizationLogoComponent, MatPaginatorModule],
   templateUrl: './job-list.component.html',
   styleUrls: ['./job-list.component.css'],
 })
@@ -39,11 +40,13 @@ export class JobListComponent implements OnInit {
   searchQuery = '';
   statusFilter = '';
   employmentTypeFilter = '';
-  availableEmploymentTypes = signal<string[]>([]);
+  sortField = 'createdAt,desc';
+  availableEmploymentTypes = signal<string[]>(['FTE', 'C2H']);
 
   currentPage = 0;
   totalPages = 0;
   totalElements = 0;
+  pageSize = 12;
 
   ngOnInit() {
     this.headerService.setTitle(
@@ -68,19 +71,23 @@ export class JobListComponent implements OnInit {
 
   loadJobs(page: number = 0) {
     const jobObservable = this.authStore.orgType() === 'VENDOR' 
-      ? this.jobService.getPublishedJobs(page) 
-      : this.jobService.getJobs(page);
+      ? this.jobService.getPublishedJobs(page, this.pageSize, this.searchQuery || undefined, this.employmentTypeFilter || undefined, this.sortField) 
+      : this.jobService.getJobs(page, this.pageSize, this.searchQuery || undefined, this.statusFilter || undefined, this.employmentTypeFilter || undefined, this.sortField);
 
     jobObservable.subscribe((data) => {
-      this.jobs.set(data.content);
+      const jobsList = data.content || [];
+      const sorted = [...jobsList].sort((a, b) => {
+        const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
+        const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
+        if (bHasNotif !== aHasNotif) return bHasNotif - aHasNotif;
+        return 0;
+      });
+
+      this.jobs.set(sorted);
+      this.filteredJobs.set(sorted);
       this.totalElements = data.totalElements;
       this.totalPages = data.totalPages;
-      this.currentPage = data.number; // Assuming standard spring pageable
-      
-      const empTypes = new Set(data.content.map((j: Job) => j.employmentType).filter((t) => !!t));
-      this.availableEmploymentTypes.set(Array.from(empTypes) as string[]);
-
-      this.applyFilters();
+      this.currentPage = data.number;
     });
   }
 
@@ -90,37 +97,21 @@ export class JobListComponent implements OnInit {
     }
   }
 
+  onPageChange(event: PageEvent) {
+    this.pageSize = event.pageSize;
+    this.loadJobs(event.pageIndex);
+  }
+
+  private searchTimeout: any;
+  onSearchChange() {
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => {
+      this.loadJobs(0);
+    }, 300);
+  }
+
   applyFilters() {
-    let result = this.jobs();
-
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
-      result = result.filter(
-        (j) =>
-          j.title.toLowerCase().includes(q) ||
-          j.organization?.name.toLowerCase().includes(q) ||
-          (j.requestId && j.requestId.toLowerCase().includes(q)) ||
-          (j.location && j.location.toLowerCase().includes(q)),
-      );
-    }
-
-    if (this.statusFilter) {
-      result = result.filter((j) => j.status === this.statusFilter);
-    }
-
-    if (this.employmentTypeFilter) {
-      result = result.filter((j) => j.employmentType === this.employmentTypeFilter);
-    }
-
-    // Sort: notified jobs first, then by createdAt desc
-    result = [...result].sort((a, b) => {
-      const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
-      const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
-      if (bHasNotif !== aHasNotif) return bHasNotif - aHasNotif;
-      return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
-    });
-
-    this.filteredJobs.set(result);
+    this.loadJobs(0);
   }
 
   getStatusClass(status: string): string {

@@ -1,5 +1,32 @@
 <div class="space-y-6">
-  <!-- Header Removed -->
+  <!-- Search and Filter Toolbar -->
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row gap-4 items-center justify-between">
+    <div class="relative flex-1 w-full">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="bi bi-search text-gray-400"></i>
+      </div>
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (input)="onSearchOrFilter()"
+        placeholder="Search candidate or job title..."
+        class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+    </div>
+    <select
+      [(ngModel)]="statusFilter"
+      (change)="onSearchOrFilter()"
+      class="block w-full md:w-48 pl-3 pr-8 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    >
+      <option value="">All Statuses</option>
+      <option value="APPLIED">Applied</option>
+      <option value="SHORTLISTED">Shortlisted</option>
+      <option value="INTERVIEW_SCHEDULED">Interview Scheduled</option>
+      <option value="OFFERED">Offered</option>
+      <option value="ONBOARDED">Onboarded</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+  </div>
 
   <div class="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
     <ul role="list" class="divide-y divide-gray-200">
@@ -53,8 +80,17 @@
         </div>
       </li>
       <li *ngIf="applications().length === 0" class="px-4 py-12 text-center text-gray-500">
-        You haven't submitted any applications yet.
+        No applications found.
       </li>
     </ul>
+    <mat-paginator
+      [length]="totalElements"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage"
+      [pageSizeOptions]="[10, 20, 50]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      class="border-t border-gray-100"
+    ></mat-paginator>
   </div>
 </div>

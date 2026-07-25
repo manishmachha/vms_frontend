@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ManagerDashboardComponent } from './manager-dashboard/manager-dashboard.component';
 import { VendorDashboardComponent } from './vendor-dashboard/vendor-dashboard.component';
 import { AuthStore } from '../services/auth.store';
+import { SuperAdminDashboardComponent } from './super-admin-dashboard/super-admin-dashboard.component';
 
 @Component({
   selector: 'app-role-dashboard',
@@ -25,7 +26,7 @@ export class RoleDashboardComponent implements OnInit {
 
     switch (role) {
       case 'SUPER_ADMIN':
-        component = ManagerDashboardComponent;
+        component = SuperAdminDashboardComponent;
         break;
       case 'MANAGER':
       case 'TALENT_ACQUISITION':

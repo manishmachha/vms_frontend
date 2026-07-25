@@ -3,6 +3,8 @@ import { Observable } from 'rxjs';
 import { Client } from '../models/client.model';
 import { ApiService } from './api.service';
 import { DashboardStatsResponse } from '../models/dashboard-stats.model';
+import { Page } from '../models/page.model';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +13,20 @@ export class ClientService {
   private api = inject(ApiService);
   private readonly BASE_URL = '/clients';
 
-  getAllClients(): Observable<Client[]> {
-    return this.api.get<Client[]>(this.BASE_URL);
+  getAllClients(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    sort?: string,
+    status?: string,
+    industry?: string
+  ): Observable<Page<Client>> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (search) params = params.set('search', search);
+    if (sort) params = params.set('sort', sort);
+    if (status) params = params.set('status', status);
+    if (industry) params = params.set('industry', industry);
+    return this.api.get<Page<Client>>(this.BASE_URL, params);
   }
 
   getClientById(id: string | number): Observable<Client> {

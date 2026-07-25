@@ -55,11 +55,15 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   // View Children
+  // View Children
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   // State
   dataSource = new MatTableDataSource<JobApplication>([]);
   unreadAppIds = new Set<string>();
+  totalElements = 0;
+  pageSize = 9;
+  currentPage = 0;
 
   // Filters
   searchText = '';
@@ -87,7 +91,6 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
       'bi bi-cursor',
     );
     this.loadUnreadAppIds();
-    this.setupFilterPredicate();
     this.loadApplications();
   }
 
@@ -103,63 +106,46 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
   }
 
-  loadApplications() {
-    // Fetch a large page to simulate "All" for client-side ops
-    this.appService.getApplications(undefined, 0, 1000, 'OUTBOUND').subscribe({
-      next: (page) => {
-        // Sort: notified first
-        const sorted = [...page.content].sort((a, b) => {
-          const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
-          const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
-          return bHasNotif - aHasNotif;
-        });
-        this.dataSource.data = sorted;
+  loadApplications(pageIndex?: number, pageSize?: number) {
+    const p = pageIndex ?? this.paginator?.pageIndex ?? 0;
+    const s = pageSize ?? this.paginator?.pageSize ?? this.pageSize;
 
-        if (this.dataSource.paginator) {
-          this.dataSource.paginator.firstPage();
-        }
-      },
-      error: (error) => console.error(error),
-    });
+    this.appService
+      .getApplications(
+        undefined,
+        p,
+        s,
+        'OUTBOUND',
+        this.searchText || undefined,
+        (this.statusFilter || undefined) as any
+      )
+      .subscribe({
+        next: (page: any) => {
+          this.totalElements = page.totalElements || 0;
+          this.currentPage = page.number || p;
+          const sorted = [...(page.content || [])].sort((a, b) => {
+            const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
+            const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
+            return bHasNotif - aHasNotif;
+          });
+          this.dataSource.data = sorted;
+        },
+        error: (error) => console.error(error),
+      });
   }
 
-  setupFilterPredicate() {
-    this.dataSource.filterPredicate = (data: JobApplication, filter: string) => {
-      const searchTerms = JSON.parse(filter);
-      const text = searchTerms.text.toLowerCase();
-      const status = searchTerms.status;
-
-      // Check Status
-      const matchesStatus = status ? data.status === status : true;
-
-      // Check Text (Job Title, Company, Applicant Name/Email)
-      const matchesText =
-        !text ||
-        data.job.title.toLowerCase().includes(text) ||
-        (data.job.organization?.name || '').toLowerCase().includes(text) ||
-        (data.candidate?.firstName || '').toLowerCase().includes(text) ||
-        (data.candidate?.lastName || '').toLowerCase().includes(text) ||
-        (data.candidate?.email || '').toLowerCase().includes(text);
-
-      return matchesStatus && matchesText;
-    };
+  onPageChange(event: any) {
+    this.pageSize = event.pageSize;
+    this.loadApplications(event.pageIndex, event.pageSize);
   }
-
-  // setupSorting() was removed as it's no longer needed for the card view.
 
   applyFilter() {
-    const filterValue = JSON.stringify({
-      text: this.searchText,
-      status: this.statusFilter,
-    });
-    this.dataSource.filter = filterValue;
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
     }
+    this.loadApplications(0, this.pageSize);
   }
 
   clearFilters() {

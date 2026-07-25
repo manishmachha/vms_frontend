@@ -9,13 +9,24 @@ import { AuthStore } from '../../../services/auth.store';
 import { NotificationService } from '../../../services/notification.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CandidateUploadDialogComponent } from '../candidate-upload-dialog/candidate-upload-dialog.component';
-
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-candidate-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, OrganizationLogoComponent, MatDialogModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    OrganizationLogoComponent,
+    MatDialogModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+  ],
   templateUrl: './candidate-list.component.html',
   styleUrls: ['./candidate-list.component.css'],
 })
@@ -26,12 +37,22 @@ export class CandidateListComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private dialog = inject(MatDialog);
 
+  viewMode = signal<'table' | 'grid'>('grid');
+  dataSource = new MatTableDataSource<Candidate>([]);
+  displayedColumns: string[] = ['candidate', 'contact', 'experience', 'source', 'organization', 'actions'];
+
+  totalElements = signal(0);
+  pageSize = signal(12);
+  pageIndex = signal(0);
+  sortField = signal('');
+  sortOrder = signal('');
+
   candidates = signal<Candidate[]>([]);
   filteredCandidates = signal<Candidate[]>([]);
   searchQuery = signal('');
   filterType = signal<'ALL' | 'MINE'>('ALL');
   sourceFilter = signal<string>('ALL');
-  availableSources = signal<string[]>([]);
+  availableSources = signal<string[]>(['vms', 'LinkedIn', 'Referral']);
   totalCandidates = signal<number>(0);
   candidatesCreatedByYou = signal<number>(0);
   unreadCandidateIds = new Set<string>();
@@ -58,81 +79,105 @@ export class CandidateListComponent implements OnInit {
   }
 
   loadCandidates() {
-    this.candidateService.getCandidates().subscribe({
-      next: (data) => {
-        // Sort: notified candidates first
-        const sorted = [...data].sort((a, b) => {
-          const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
-          const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
-          return bHasNotif - aHasNotif;
-        });
+    let sortStr: string | undefined = undefined;
+    if (this.sortField() && this.sortOrder()) {
+      sortStr = `${this.sortField()},${this.sortOrder()}`;
+    }
+    this.candidateService
+      .getCandidates(
+        this.pageIndex(),
+        this.pageSize(),
+        this.searchQuery() || undefined,
+        sortStr,
+        this.filterType(),
+        this.sourceFilter()
+      )
+      .subscribe({
+        next: (pageData) => {
+          const sorted = [...(pageData.content || [])].sort((a, b) => {
+            const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
+            const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
+            return bHasNotif - aHasNotif;
+          });
 
-        this.candidates.set(sorted);
-        this.totalCandidates.set(sorted.length);
-        this.candidatesCreatedByYou.set(
-          sorted.filter((c) => String(c.createdBy?.id) === String(this.authStore.user()?.id)).length
-        );
+          this.candidates.set(sorted);
+          this.totalElements.set(pageData.totalElements || 0);
+          this.totalCandidates.set(pageData.totalElements || 0);
 
-        const sources = new Set(sorted.map(c => c.source).filter(s => !!s));
-        this.availableSources.set(Array.from(sources) as string[]);
+          const currentUserId = String(this.authStore.user()?.id);
+          this.candidatesCreatedByYou.set(
+            sorted.filter((c) => String(c.createdBy?.id) === currentUserId).length
+          );
 
-        this.filterCandidates();
-      },
-      error: (err) => {
-        console.error('Failed to load candidates', err);
-      },
-    });
+          const sources = new Set(sorted.map((c) => c.source).filter((s) => !!s));
+          this.availableSources.update((current) => {
+            const combined = new Set([...current, ...(Array.from(sources) as string[])]);
+            return Array.from(combined);
+          });
+
+          this.filterCandidates();
+        },
+        error: (err) => {
+          console.error('Failed to load candidates', err);
+        },
+      });
   }
 
   onSearch(query: string) {
     this.searchQuery.set(query);
-    this.filterCandidates();
+    this.pageIndex.set(0);
+    this.loadCandidates();
   }
 
   setFilterType(type: 'ALL' | 'MINE') {
     this.filterType.set(type);
-    this.filterCandidates();
+    this.pageIndex.set(0);
+    this.loadCandidates();
   }
 
   setSourceFilter(source: string) {
     this.sourceFilter.set(source);
-    this.filterCandidates();
+    this.pageIndex.set(0);
+    this.loadCandidates();
   }
 
   filterCandidates() {
-    const q = this.searchQuery().toLowerCase();
-    const type = this.filterType();
-    const currentUserId = String(this.authStore.user()?.id);
+    const sorted = this.candidates();
+    this.filteredCandidates.set(sorted);
+    this.dataSource.data = sorted;
+  }
 
-    this.filteredCandidates.set(
-      this.candidates().filter((c) => {
-        const matchesSearch =
-          c.firstName.toLowerCase().includes(q) ||
-          c.lastName.toLowerCase().includes(q) ||
-          c.email.toLowerCase().includes(q) ||
-          c.skills.some((s) => s.toLowerCase().includes(q));
+  onPageChange(event: PageEvent) {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadCandidates();
+  }
 
-        const matchesFilter =
-          type === 'ALL' ? true : String(c.createdBy?.id) === currentUserId;
+  onSortChange(event: Sort) {
+    if (!event.active || !event.direction) {
+      this.sortField.set('');
+      this.sortOrder.set('');
+    } else {
+      this.sortField.set(event.active);
+      this.sortOrder.set(event.direction);
+    }
+    this.pageIndex.set(0);
+    this.loadCandidates();
+  }
 
-        const sourceF = this.sourceFilter();
-        const matchesSource = sourceF === 'ALL' ? true : c.source === sourceF;
-
-        return matchesSearch && matchesFilter && matchesSource;
-      })
-    );
+  toggleView(mode: 'table' | 'grid') {
+    this.viewMode.set(mode);
   }
 
   openUploadDialog() {
     const dialogRef = this.dialog.open(CandidateUploadDialogComponent, {
       width: '500px',
       disableClose: true,
-      panelClass: 'rounded-xl'
+      panelClass: 'rounded-xl',
     });
 
     dialogRef.afterClosed().subscribe((result: Candidate | undefined) => {
       if (result) {
-        // Upload successful, reload candidate list
         this.loadCandidates();
       }
     });

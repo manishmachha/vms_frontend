@@ -19,8 +19,19 @@ export class JobService {
     return this.api.post<Job>('/jobs', job);
   }
 
-  getJobs(page: number = 0, size: number = 20) {
-    const params = new HttpParams().set('page', page).set('size', size);
+  getJobs(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    status?: string,
+    employmentType?: string,
+    sort?: string
+  ) {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (search) params = params.set('search', search);
+    if (status) params = params.set('status', status);
+    if (employmentType) params = params.set('employmentType', employmentType);
+    if (sort) params = params.set('sort', sort);
     return this.api.get<Page<Job>>('/jobs', params);
   }
 
@@ -56,8 +67,17 @@ export class JobService {
     return this.api.post<Job>(`/jobs/${id}/status`, { status, message });
   }
 
-  getPublishedJobs(page: number = 0, size: number = 20) {
-    const params = new HttpParams().set('page', page).set('size', size);
+  getPublishedJobs(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    employmentType?: string,
+    sort?: string
+  ) {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (search) params = params.set('search', search);
+    if (employmentType) params = params.set('employmentType', employmentType);
+    if (sort) params = params.set('sort', sort);
     return this.api.get<Page<Job>>('/jobs/published', params);
   }
 }

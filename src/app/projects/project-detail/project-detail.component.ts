@@ -143,14 +143,14 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   loadUsers() {
-    this.userService.getUsers(0, 100).subscribe((users: User[]) => {
-      this.users.set(users);
+    this.userService.getUsers(0, 500).subscribe((page) => {
+      this.users.set(page.content || []);
     });
   }
 
   loadCandidates() {
-    this.candidateService.getCandidates().subscribe((data: Candidate[]) => {
-      this.candidates.set(data);
+    this.candidateService.getCandidates(0, 500).subscribe((page) => {
+      this.candidates.set(page.content || []);
     });
   }
 

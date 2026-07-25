@@ -15,6 +15,10 @@ import { NotificationService } from '../../services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogService } from '../../services/dialog.service';
 import { AddProjectDialogComponent } from '../components/add-project-modal/add-project-dialog.component';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
+
 @Component({
   selector: 'app-project-list',
   standalone: true,
@@ -24,6 +28,9 @@ import { AddProjectDialogComponent } from '../components/add-project-modal/add-p
     FormsModule,
     OrganizationLogoComponent,
     UserAvatarComponent,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
   ],
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
@@ -37,6 +44,16 @@ export class ProjectListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private dialogService = inject(DialogService);
   private mfeNav = inject(MfeNavigationService);
+
+  viewMode = signal<'table' | 'grid'>('grid');
+  dataSource = new MatTableDataSource<Project>([]);
+  displayedColumns: string[] = ['name', 'client', 'dates', 'team', 'status', 'actions'];
+
+  totalElements = signal(0);
+  pageSize = signal(12);
+  pageIndex = signal(0);
+  sortField = signal('');
+  sortOrder = signal('');
 
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
@@ -84,46 +101,80 @@ export class ProjectListComponent implements OnInit {
   }
 
   loadProjects() {
-    this.projectService.getProjects().subscribe((data) => {
-      this.projects.set(data);
-    });
+    let sortStr: string | undefined = undefined;
+    if (this.sortField() && this.sortOrder()) {
+      sortStr = `${this.sortField()},${this.sortOrder()}`;
+    }
+    this.projectService
+      .getProjects(
+        this.pageIndex(),
+        this.pageSize(),
+        this.searchQuery || undefined,
+        sortStr,
+        this.statusFilter || undefined,
+        this.clientFilter || undefined
+      )
+      .subscribe((pageData) => {
+        this.projects.set(pageData.content || []);
+        this.totalElements.set(pageData.totalElements || 0);
+        this.applyFilters();
+      });
   }
 
   loadClients() {
-    this.clientService.getAllClients().subscribe((data) => {
-      this.clients.set(data);
+    this.clientService.getAllClients(0, 100).subscribe((pageData) => {
+      this.clients.set(pageData.content || []);
     });
   }
 
+  onSearch() {
+    this.pageIndex.set(0);
+    this.loadProjects();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadProjects();
+  }
+
+  onSortChange(event: Sort) {
+    if (!event.active || !event.direction) {
+      this.sortField.set('');
+      this.sortOrder.set('');
+    } else {
+      this.sortField.set(event.active);
+      this.sortOrder.set(event.direction);
+    }
+    this.pageIndex.set(0);
+    this.loadProjects();
+  }
+
+  toggleView(mode: 'table' | 'grid') {
+    this.viewMode.set(mode);
+  }
+
   filteredProjects(): Project[] {
+    return this.applyFilters();
+  }
+
+  applyFilters(): Project[] {
     let result = this.projects();
-
-    if (this.statusFilter) {
-      result = result.filter((p) => p.status === this.statusFilter);
-    }
-
-    if (this.clientFilter) {
-      result = result.filter((p) => p.client && p.client.id.toString() === this.clientFilter);
-    }
-
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          (p.requestId && p.requestId.toLowerCase().includes(query)) ||
-          p.client?.name?.toLowerCase().includes(query),
-      );
-    }
 
     result = [...result].sort((a, b) => {
       const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
       const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
       if (bHasNotif !== aHasNotif) return bHasNotif - aHasNotif;
-      return a.name.localeCompare(b.name);
+      return 0;
     });
 
+    this.dataSource.data = result;
     return result;
+  }
+
+  onFilterChange() {
+    this.pageIndex.set(0);
+    this.loadProjects();
   }
 
   // ========== ACTIONS ==========

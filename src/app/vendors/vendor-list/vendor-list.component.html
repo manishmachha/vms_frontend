@@ -2,7 +2,23 @@
   <!-- Header with Stats -->
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div></div>
-    <div class="flex gap-3">
+    <div class="flex items-center gap-3">
+      <div class="bg-gray-50 p-1 rounded-xl flex border border-gray-200">
+        <button (click)="toggleView('table')" [class.bg-white]="viewMode() === 'table'"
+          [class.shadow-sm]="viewMode() === 'table'"
+          class="p-2 text-gray-500 hover:text-indigo-600 rounded-lg transition-all cursor-pointer" title="Table View">
+          <i class="bi bi-list-task"></i>
+        </button>
+        <button (click)="toggleView('grid')" [class.bg-white]="viewMode() === 'grid'"
+          [class.shadow-sm]="viewMode() === 'grid'"
+          class="p-2 text-gray-500 hover:text-indigo-600 rounded-lg transition-all cursor-pointer" title="Grid View">
+          <i class="bi bi-grid"></i>
+        </button>
+      </div>
+      <button (click)="loadVendors()"
+        class="p-2.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all border border-gray-200 bg-white cursor-pointer" title="Refresh">
+        <i class="bi bi-arrow-clockwise text-xl"></i>
+      </button>
       <a [routerLink]="resolvePath('/vendors/create')" class="btn-primary px-4 py-2 rounded-xl">Create vendor</a>
       <span class="badge badge-success">{{ activeCount() }} Active</span>
       <span class="badge badge-warning">{{ inactiveCount() }} Inactive</span>
@@ -10,12 +26,12 @@
   </div>
 
   <!-- Filter Tabs -->
-  <div class="card-modern p-4 flex flex-col md:flex-row gap-4">
-    <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+  <div class="card-modern p-4 flex flex-col md:flex-row gap-4 items-center">
+    <div class="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
       <button
         *ngFor="let tab of tabs"
-        (click)="activeTab = tab.value"
-        class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors"
+        (click)="onTabChange(tab.value)"
+        class="px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors cursor-pointer"
         [class.bg-indigo-100]="activeTab === tab.value"
         [class.text-indigo-700]="activeTab === tab.value"
         [class.bg-gray-100]="activeTab !== tab.value"
@@ -24,19 +40,111 @@
         {{ tab.label }}
       </button>
     </div>
-    <div class="relative flex-1">
+    <div class="relative flex-1 w-full">
       <i class="bi bi-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
       <input
         type="text"
-        [(ngModel)]="searchQuery"
+        [ngModel]="searchQuery"
+        (ngModelChange)="searchQuery = $event; onSearchChange()"
         placeholder="Search vendors..."
-        class="input-modern pl-11"
+        class="input-modern pl-4 pr-11 w-full"
       />
     </div>
   </div>
 
+  <!-- Vendor Table View -->
+  <div [class.hidden]="viewMode() !== 'table' || filteredVendors().length === 0"
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" class="w-full text-left">
+
+      <!-- Vendor Column -->
+      <ng-container matColumnDef="vendor">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header
+          class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50/50 border-b border-gray-100">
+          Vendor</th>
+        <td mat-cell *matCellDef="let vendor" class="px-6 py-6 border-b border-gray-50">
+          <div class="flex items-center gap-4">
+            <app-organization-logo [org]="vendor" size="md" [rounded]="true"></app-organization-logo>
+            <div>
+              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer" [routerLink]="resolvePath('/vendors/' + vendor.id)">
+                {{ vendor.name }}
+              </div>
+              <div class="text-xs text-gray-500">ID: #{{ vendor.id }}</div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Org Type Column -->
+      <ng-container matColumnDef="orgType">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header
+          class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50/50 border-b border-gray-100">
+          Type</th>
+        <td mat-cell *matCellDef="let vendor" class="px-6 py-6 border-b border-gray-50">
+          <span class="text-sm text-gray-600">{{ vendor.orgType }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Registered Column -->
+      <ng-container matColumnDef="registered">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header
+          class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50/50 border-b border-gray-100">
+          Registered</th>
+        <td mat-cell *matCellDef="let vendor" class="px-6 py-6 border-b border-gray-50">
+          <span class="text-sm text-gray-600">{{ vendor.createdAt | date: 'mediumDate' }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header
+          class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50/50 border-b border-gray-100">
+          Status</th>
+        <td mat-cell *matCellDef="let vendor" class="px-6 py-6 border-b border-gray-50">
+          <span class="badge text-xs" [ngClass]="getStatusBadgeClass(vendor.status)">
+            {{ vendor.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef
+          class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right bg-gray-50/50 border-b border-gray-100">
+          Actions</th>
+        <td mat-cell *matCellDef="let vendor" class="px-6 py-6 text-right border-b border-gray-50">
+          <div class="flex items-center justify-end gap-2">
+            <button
+              *ngIf="vendor.status === 'ACTIVE'"
+              (click)="toggleStatus(vendor, 'INACTIVE')"
+              class="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors"
+              title="Deactivate"
+            >
+              <i class="bi bi-pause-fill"></i>
+            </button>
+            <button
+              *ngIf="vendor.status === 'INACTIVE'"
+              (click)="toggleStatus(vendor, 'ACTIVE')"
+              class="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+              title="Activate"
+            >
+              <i class="bi bi-play-fill"></i>
+            </button>
+            <a [routerLink]="resolvePath('/vendors/' + vendor.id)" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="View Details">
+              <i class="bi bi-eye"></i>
+            </a>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50/80 transition-colors group"></tr>
+    </table>
+  </div>
+
   <!-- Vendor Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+  <div *ngIf="viewMode() === 'grid' && filteredVendors().length > 0"
+    class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     <div
       *ngFor="let vendor of filteredVendors(); let i = index"
       class="card-modern relative p-6 animate-fade-in-up cursor-pointer transition-all group"
@@ -130,5 +238,18 @@
     <p class="text-gray-500">
       {{ searchQuery ? 'Try a different search term' : 'No vendors in this category' }}
     </p>
+  </div>
+
+  <!-- Shared Paginator -->
+  <div [class.hidden]="filteredVendors().length === 0"
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm mt-4 px-4 py-2">
+    <mat-paginator 
+      [length]="totalElements()" 
+      [pageSize]="pageSize()" 
+      [pageIndex]="pageIndex()" 
+      [pageSizeOptions]="[12, 24, 48, 96]" 
+      (page)="onPageChange($event)"
+      aria-label="Select page of vendors">
+    </mat-paginator>
   </div>
 </div>

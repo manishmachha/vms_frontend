@@ -123,8 +123,8 @@ export class ClientSubmissionsComponent implements OnInit {
   }
 
   loadClients() {
-    this.clientService.getAllClients().subscribe((clients) => {
-      this.clients.set(clients);
+    this.clientService.getAllClients(0, 100).subscribe((page) => {
+      this.clients.set(page.content || []);
     });
   }
 

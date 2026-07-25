@@ -10,11 +10,23 @@ import { AuthStore } from '../../services/auth.store';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ScheduleInterviewDialogComponent } from '../../applications/dialogs/schedule-interview-dialog/schedule-interview-dialog.component';
 import { HeaderService } from '../../services/header.service';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 
 @Component({
   selector: 'app-interview-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    FormsModule,
+    MatIconModule,
+    MatDialogModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+  ],
   templateUrl: './interview-list.component.html',
   styleUrls: ['./interview-list.component.css'],
 })
@@ -24,6 +36,16 @@ export class InterviewListComponent implements OnInit {
   private dialog = inject(MatDialog);
   private headerService = inject(HeaderService);
   private mfeNav = inject(MfeNavigationService);
+
+  viewMode = signal<'table' | 'grid'>('grid');
+  dataSource = new MatTableDataSource<Interview>([]);
+  displayedColumns: string[] = ['candidate', 'job', 'round', 'date', 'type', 'status', 'actions'];
+
+  totalElements = signal(0);
+  pageSize = signal(12);
+  pageIndex = signal(0);
+  sortField = signal('');
+  sortOrder = signal('');
 
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
@@ -56,14 +78,21 @@ export class InterviewListComponent implements OnInit {
   }
 
   loadInterviews() {
+    let sortStr: string | undefined = undefined;
+    if (this.sortField() && this.sortOrder()) {
+      sortStr = `${this.sortField()},${this.sortOrder()}`;
+    }
+    const statusParam = this.activeTab() === 'all' ? undefined : this.activeTab();
     const fetchObservable = this.authStore.isVendor()
-      ? this.interviewService.getVendorInterviews()
-      : this.interviewService.getAllInterviews();
+      ? this.interviewService.getVendorInterviews(this.pageIndex(), this.pageSize(), this.searchQuery || undefined, sortStr, statusParam)
+      : this.interviewService.getAllInterviews(this.pageIndex(), this.pageSize(), this.searchQuery || undefined, sortStr, statusParam);
 
     fetchObservable.subscribe({
       next: (res) => {
-        this.interviews.set(res || []);
-        this.updateStats(res || []);
+        const list = res.content || [];
+        this.interviews.set(list);
+        this.totalElements.set(res.totalElements || 0);
+        this.updateStats(list);
         this.applyFilters();
       },
       error: (err) => console.error(err)
@@ -71,10 +100,10 @@ export class InterviewListComponent implements OnInit {
   }
 
   updateStats(data: Interview[]) {
-    this.totalInterviews.set(data.length);
+    this.totalInterviews.set(this.totalElements());
     
     const today = new Date().toISOString().split('T')[0];
-    this.todayCount.set(data.filter(i => i.scheduledAt.startsWith(today)).length);
+    this.todayCount.set(data.filter(i => i.scheduledAt && i.scheduledAt.startsWith(today)).length);
     
     this.awaitingFeedbackCount.set(
       data.filter(i => i.status === 'COMPLETED' && !i.feedback).length
@@ -82,43 +111,47 @@ export class InterviewListComponent implements OnInit {
 
     const completed = data.filter(i => i.feedback);
     if (completed.length > 0) {
-      // Logic for pass rate could be added here if defined in data
       this.passRate.set(75); // Mock
     }
   }
 
   setActiveTab(id: string) {
     this.activeTab.set(id);
-    this.applyFilters();
+    this.pageIndex.set(0);
+    this.loadInterviews();
   }
 
   onSearch() {
-    this.applyFilters();
+    this.pageIndex.set(0);
+    this.loadInterviews();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadInterviews();
+  }
+
+  onSortChange(event: Sort) {
+    if (!event.active || !event.direction) {
+      this.sortField.set('');
+      this.sortOrder.set('');
+    } else {
+      this.sortField.set(event.active);
+      this.sortOrder.set(event.direction);
+    }
+    this.pageIndex.set(0);
+    this.loadInterviews();
+  }
+
+  toggleView(mode: 'table' | 'grid') {
+    this.viewMode.set(mode);
   }
 
   applyFilters() {
-    let filtered = this.interviews();
-    const now = new Date();
-
-    // Tab Filter
-    if (this.activeTab() === 'upcoming') {
-      filtered = filtered.filter(i => new Date(i.scheduledAt) >= now && i.status !== 'CANCELLED');
-    } else if (this.activeTab() === 'completed') {
-      filtered = filtered.filter(i => i.status === 'COMPLETED');
-    }
-
-    // Search Query
-    if (this.searchQuery) {
-      const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(i => 
-        i.application?.candidate?.firstName.toLowerCase().includes(query) ||
-        i.application?.candidate?.lastName.toLowerCase().includes(query) ||
-        i.application?.job?.title.toLowerCase().includes(query) ||
-        (i.application?.job?.requestId && i.application.job.requestId.toLowerCase().includes(query))
-      );
-    }
-
+    const filtered = this.interviews();
     this.filteredInterviews.set(filtered);
+    this.dataSource.data = filtered;
   }
 
   getDateBg(interview: Interview): string {
@@ -129,8 +162,8 @@ export class InterviewListComponent implements OnInit {
     return 'bg-gray-50 text-gray-900';
   }
 
-  getStatusClass(interview: Interview): string {
-    switch (interview.status) {
+  getStatusClass(status?: string): string {
+    switch (status) {
       case 'SCHEDULED': return 'bg-blue-100 text-blue-700 border border-blue-200';
       case 'COMPLETED': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
       case 'CANCELLED': return 'bg-red-100 text-red-700 border border-red-200';

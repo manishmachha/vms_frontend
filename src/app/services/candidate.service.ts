@@ -3,6 +3,8 @@ import { ApiService } from './api.service';
 import { Candidate } from '../candidates/models/candidate.model';
 import { Observable } from 'rxjs';
 import { DashboardStatsResponse } from '../models/dashboard-stats.model';
+import { Page } from '../models/page.model';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +13,20 @@ export class CandidateService {
   private api = inject(ApiService);
   private readonly BASE_URL = '/candidates';
 
-  getCandidates(): Observable<Candidate[]> {
-    return this.api.get<Candidate[]>(this.BASE_URL);
+  getCandidates(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    sort?: string,
+    filterType?: string,
+    source?: string
+  ): Observable<Page<Candidate>> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (search) params = params.set('search', search);
+    if (sort) params = params.set('sort', sort);
+    if (filterType) params = params.set('filterType', filterType);
+    if (source) params = params.set('source', source);
+    return this.api.get<Page<Candidate>>(this.BASE_URL, params);
   }
 
   getCandidate(id: string | number): Observable<Candidate> {

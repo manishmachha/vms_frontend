@@ -29,10 +29,20 @@ export class UserService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/v1/users`;
 
-  getUsers(page: number = 0, size: number = 20, sort?: string) {
-    let params = new HttpParams().set('page', page).set('size', size);
+  getUsers(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    role?: string,
+    status?: string,
+    sort?: string
+  ): Observable<Page<User>> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (search) params = params.set('search', search);
+    if (role && role !== 'ALL') params = params.set('role', role);
+    if (status && status !== 'ALL') params = params.set('status', status);
     if (sort) params = params.set('sort', sort);
-    return this.api.get<User[]>('/v1/users', params);
+    return this.api.get<Page<User>>('/v1/users', params);
   }
 
   getUser(userId: string | number) {

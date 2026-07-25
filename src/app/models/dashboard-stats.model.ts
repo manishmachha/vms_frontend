@@ -4,6 +4,7 @@ export interface StatItem {
     icon: string;
     route: string;
     items?: StatDetail[];
+    subStats?: Record<string, import('../services/dashboard.service').ChartData[]>;
 }
 
 export interface StatDetail {

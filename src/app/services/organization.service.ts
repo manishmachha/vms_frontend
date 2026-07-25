@@ -6,6 +6,7 @@ import { DashboardStatsResponse } from '../models/dashboard-stats.model';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
+import { Page } from '../models/page.model';
 
 @Injectable({
   providedIn: 'root',
@@ -14,12 +15,37 @@ export class OrganizationService {
   private api = inject(ApiService);
   private http = inject(HttpClient);
 
-  getAllOrganizations(): Observable<Organization[]> {
-    return this.api.get<Organization[]>('/v1/organizations');
+  getAllOrganizations(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    type?: string,
+    status?: string,
+    sort?: string
+  ): Observable<Page<Organization>> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (search) params = params.set('search', search);
+    if (type && type !== 'ALL') params = params.set('type', type);
+    if (status && status !== 'ALL') params = params.set('status', status);
+    if (sort) params = params.set('sort', sort);
+    return this.api.get<Page<Organization>>('/v1/organizations', params);
   }
 
-  getVendors(): Observable<Vendor[]> {
-    return this.api.get<Vendor[]>('/v1/organizations/type/VENDOR');
+  getVendors(
+    page: number = 0,
+    size: number = 20,
+    search?: string,
+    status?: string,
+    sort?: string
+  ): Observable<Page<Vendor>> {
+    let params = new HttpParams()
+      .set('type', 'VENDOR')
+      .set('page', page.toString())
+      .set('size', size.toString());
+    if (search) params = params.set('search', search);
+    if (status && status !== 'ALL') params = params.set('status', status);
+    if (sort) params = params.set('sort', sort);
+    return this.api.get<Page<Vendor>>('/v1/organizations', params);
   }
 
   getOrganizationById(id: string | number): Observable<Organization> {
