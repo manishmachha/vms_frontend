@@ -55,6 +55,7 @@ export class CandidateListComponent implements OnInit {
   availableSources = signal<string[]>(['vms', 'LinkedIn', 'Referral']);
   totalCandidates = signal<number>(0);
   candidatesCreatedByYou = signal<number>(0);
+  naukriCandidates = signal<number>(0);
   unreadCandidateIds = new Set<string>();
 
   ngOnInit() {
@@ -107,6 +108,10 @@ export class CandidateListComponent implements OnInit {
           const currentUserId = String(this.authStore.user()?.id);
           this.candidatesCreatedByYou.set(
             sorted.filter((c) => String(c.createdBy?.id) === currentUserId).length
+          );
+          
+          this.naukriCandidates.set(
+            sorted.filter((c) => c.source?.toLowerCase() === 'naukri').length
           );
 
           const sources = new Set(sorted.map((c) => c.source).filter((s) => !!s));
@@ -181,5 +186,14 @@ export class CandidateListComponent implements OnInit {
         this.loadCandidates();
       }
     });
+  }
+
+  onCardClick(candidateId: string | number) {
+    if (this.hasNotification(candidateId)) {
+      this.notificationService.markAsReadByEntity('CANDIDATE', candidateId).subscribe(() => {
+        this.unreadCandidateIds.delete(String(candidateId));
+        this.notificationService.refreshCounts();
+      });
+    }
   }
 }

@@ -112,6 +112,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-person-badge',
           roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
+          notificationCategory: 'CANDIDATE',
         },
         {
           label: 'Applications',
@@ -134,7 +135,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-list-check',
           roles: ['VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
-          notificationCategory: 'TRACKING',
+          notificationCategory: 'APPLICATION',
         },
       ],
     },
@@ -156,6 +157,20 @@ export class SidebarComponent implements OnInit {
           roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'PROJECT',
+        },
+      ],
+    },
+    {
+      title: 'Support',
+      icon: 'bi bi-headset',
+      items: [
+        {
+          label: 'Tickets',
+          route: '/tickets',
+          icon: 'bi bi-ticket-detailed',
+          roles: ['SUPER_ADMIN', 'MANAGER', 'TALENT_ACQUISITION', 'EMPLOYEE', 'VENDOR'],
+          orgTypes: ['SOLVENTEK', 'VENDOR'],
+          notificationCategory: 'TICKET',
         },
       ],
     },

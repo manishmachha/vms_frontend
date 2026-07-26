@@ -21,8 +21,8 @@
           </div>
           <input
             type="text"
-            [(ngModel)]="searchText"
-            (ngModelChange)="applyFilter()"
+            [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event); applyFilter()"
             placeholder="Search by role, company or applicant..."
             class="input-modern pl-11! py-2.5! bg-white shadow-sm w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
           />
@@ -31,8 +31,8 @@
         <!-- Status Filter -->
         <div class="md:col-span-4 relative">
           <select
-            [(ngModel)]="statusFilter"
-            (ngModelChange)="applyFilter()"
+            [ngModel]="statusFilter()"
+            (ngModelChange)="statusFilter.set($event); applyFilter()"
             class="input-modern w-full pl-4 pr-10 py-2.5! rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all text-sm cursor-pointer appearance-none"
           >
             <option value="">All Statuses</option>
@@ -52,7 +52,7 @@
             color="warn"
             (click)="clearFilters()"
             class="bg-red-50! hover:bg-red-100! text-red-600! rounded-lg! transition-colors"
-            *ngIf="searchText || statusFilter"
+            *ngIf="searchText() || statusFilter()"
           >
             <mat-icon class="mr-1">filter_list_off</mat-icon>
             Clear Filters
@@ -64,14 +64,15 @@
     <!-- DATA VIEW (CARD GRID) -->
     <div class="bg-gray-50/30 p-6">
       <div
-        *ngIf="dataSource.filteredData.length > 0"
+        *ngIf="applications().length > 0"
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         <div
-          *ngFor="let app of dataSource.connect() | async"
+          *ngFor="let app of applications()"
           class="card-modern bg-white p-5 flex flex-col gap-5 relative group hover:border-indigo-100 transition-all border border-gray-100 shadow-sm"
           [ngClass]="hasNotification(app.id) ? 'ring-2 ring-red-100/50 border-red-200' : ''"
           [routerLink]="resolvePath('/applications/' + app.id)"
+          (click)="onCardClick(app.id)"
         >
           <!-- Notification Indicator -->
           <div *ngIf="hasNotification(app.id)" class="absolute top-4 right-4 z-10">
@@ -166,7 +167,7 @@
 
       <!-- Empty State (No results) -->
       <div
-        *ngIf="dataSource.data.length === 0"
+        *ngIf="applications().length === 0"
         class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200"
       >
         <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
@@ -178,15 +179,17 @@
         </p>
       </div>
     </div>
+  </div>
 
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mt-4 px-4 sticky bottom-5 z-20">
     <mat-paginator
-      [length]="totalElements"
-      [pageSize]="pageSize"
-      [pageIndex]="currentPage"
+      [length]="totalElements()"
+      [pageSize]="pageSize()"
+      [pageIndex]="currentPage()"
       [pageSizeOptions]="[9, 18, 36, 72]"
       (page)="onPageChange($event)"
       showFirstLastButtons
-      class="border-t border-gray-100"
+      class="bg-transparent!"
     ></mat-paginator>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
@@ -41,6 +41,8 @@ export class UserListComponent implements OnInit {
   displayedColumns: string[] = ['user', 'contact', 'role', 'organization', 'status', 'actions'];
 
   totalElements = signal(0);
+  users = signal<User[]>([]);
+  activeUsersCount = computed(() => this.users().filter((u) => u.status).length);
   pageSize = signal(10);
   pageIndex = signal(0);
   sortField = signal('');
@@ -88,6 +90,7 @@ export class UserListComponent implements OnInit {
       )
       .subscribe({
         next: (pageData) => {
+          this.users.set(pageData.content || []);
           this.dataSource.data = pageData.content;
           this.totalElements.set(pageData.totalElements);
         },

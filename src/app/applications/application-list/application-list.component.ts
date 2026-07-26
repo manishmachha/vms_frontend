@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, ViewChild, AfterViewInit, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, ViewChild, AfterViewInit, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -51,6 +51,9 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
   dataSource = new MatTableDataSource<JobApplication>([]);
+  applications = signal<any[]>([]);
+  shortlistedCount = computed(() => this.applications().filter((a) => a.status === 'SHORTLISTED' || a.status === 'INTERVIEW_SCHEDULED').length);
+  offeredCount = computed(() => this.applications().filter((a) => a.status === 'OFFERED' || a.status === 'ONBOARDED').length);
   unreadAppIds = new Set<string>();
   totalElements = 0;
 
@@ -116,6 +119,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
         
         // If empty, just set and return
         if (!page.content || page.content.length === 0) {
+          this.applications.set([]);
           this.dataSource.data = [];
           return;
         }
@@ -166,6 +170,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
             return bHasNotif - aHasNotif;
           });
 
+          this.applications.set(sorted);
           this.dataSource.data = sorted;
           this.cdr.detectChanges();
         });
@@ -184,6 +189,7 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   viewDetails(app: JobApplication) {
+    this.onCardClick(app.id);
     this.mfeNav.navigate('/applications/' + app.id);
   }
 
@@ -216,5 +222,14 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
     if (score > 40) return isBg ? 'bg-orange-500' : 'text-orange-600';
     // Low score = Low Risk (Green)
     return isBg ? 'bg-green-500' : 'text-green-600';
+  }
+
+  onCardClick(appId: string | number) {
+    if (this.hasNotification(appId)) {
+      this.notificationService.markAsReadByEntity('APPLICATION', appId).subscribe(() => {
+        this.unreadAppIds.delete(String(appId));
+        this.notificationService.refreshCounts();
+      });
+    }
   }
 }

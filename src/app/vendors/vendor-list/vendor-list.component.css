@@ -1,1 +1,4 @@
 /* Vendor List Styles */
+:host {
+  display: block;
+}

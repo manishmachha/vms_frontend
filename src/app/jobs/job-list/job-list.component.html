@@ -1,5 +1,54 @@
 <div class="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div
+      class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-blue-500 to-blue-600"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-blue-100 text-sm font-medium">Total Jobs</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ totalElements }}</h3>
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl"
+        >
+          <i class="bi bi-briefcase-fill"></i>
+        </div>
+      </div>
+    </div>
+    <div
+      class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-emerald-500 to-emerald-600"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-emerald-100 text-sm font-medium">Published Jobs</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ publishedCount() }}</h3>
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl"
+        >
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+      </div>
+    </div>
+    <div
+      class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-purple-500 to-purple-600"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-purple-100 text-sm font-medium">Full-Time (FTE)</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ fteCount() }}</h3>
+        </div>
+        <div
+          class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl"
+        >
+          <i class="bi bi-person-workspace"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Filters & Search Bar -->
   <div
     class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center"
@@ -74,6 +123,8 @@
             ? 'border-red-300 ring-2 ring-red-100 hover:shadow-red-100'
             : 'border-gray-100 hover:shadow-xl hover:border-indigo-100'
         "
+        (click)="onCardClick(job.id)"
+              [routerLink]="resolvePath('/jobs/' + job.id)"
       >
         <!-- Notification Indicator -->
         <div *ngIf="hasNotification(job.id)" class="absolute top-3 right-3 z-10">
@@ -163,7 +214,7 @@
             >
               Apply
             </button>
-            <a
+            <a (click)="onCardClick(job.id)"
               [routerLink]="resolvePath('/jobs/' + job.id)"
               class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
@@ -199,7 +250,7 @@
   </div>
 
   <!-- Server-Side Pagination -->
-  <div class="border-t border-gray-200 bg-white rounded-2xl shadow-sm overflow-hidden mt-6">
+  <div class="border border-gray-100 bg-white rounded-2xl shadow-sm mt-6 px-4 sticky bottom-5 z-20">
     <mat-paginator
       [length]="totalElements"
       [pageSize]="pageSize"

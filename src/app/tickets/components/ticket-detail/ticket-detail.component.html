@@ -1,0 +1,315 @@
+<div class="h-[calc(100vh-64px)] p-6 bg-gray-50 flex flex-col" *ngIf="ticket()">
+  
+  <!-- 3 Evenly Spaced, Fixed-Height Stat Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 h-[260px] mb-6">
+    
+    <!-- Card 1: Overview & Status -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden">
+      <div class="p-3.5 border-b border-gray-100 bg-gray-50/50 shrink-0 flex items-center justify-between">
+        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Ticket Overview</h3>
+        <i class="bi bi-info-circle text-gray-400"></i>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-gray-500 font-medium">Status</span>
+          <span [ngClass]="getStatusClass(ticket()!.status)" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold shadow-2xs">
+            {{ ticket()?.status }}
+          </span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-gray-500 font-medium">Priority</span>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-800">
+            {{ ticket()?.priority }}
+          </span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-gray-500 font-medium">Category</span>
+          <span class="text-xs font-semibold text-gray-900">{{ ticket()?.category }}</span>
+        </div>
+        <div *ngIf="ticket()?.refEntityName" class="pt-2 border-t border-gray-100">
+          <span class="text-xs text-gray-500 font-medium block mb-0.5">Related Item</span>
+          <span class="text-xs font-semibold text-indigo-600 block truncate" [title]="ticket()?.refEntityName">{{ ticket()?.refEntityName }}</span>
+        </div>
+        <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
+          <span class="text-gray-500 font-medium">Created At</span>
+          <span class="text-gray-700 font-medium">{{ ticket()?.createdAt | date:'short' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: People & Assignment -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden">
+      <div class="p-3.5 border-b border-gray-100 bg-gray-50/50 shrink-0 flex items-center justify-between">
+        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">People & CC</h3>
+        <i class="bi bi-people text-gray-400"></i>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-3">
+        <div>
+          <span class="text-xs text-gray-500 font-medium block mb-1">Created By</span>
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 shrink-0">
+              {{ ticket()?.createdBy?.firstName?.charAt(0) }}{{ ticket()?.createdBy?.lastName?.charAt(0) }}
+            </div>
+            <span class="text-xs font-semibold text-gray-900 truncate">{{ ticket()?.createdBy?.firstName }} {{ ticket()?.createdBy?.lastName }}</span>
+          </div>
+        </div>
+        
+        <div class="pt-2 border-t border-gray-100">
+          <span class="text-xs text-gray-500 font-medium block mb-1">Assigned To</span>
+          <ng-container *ngIf="isAdminOrManager(); else readonlyAssignee">
+            <select 
+              class="block w-full text-xs border-gray-200 rounded-lg shadow-2xs focus:ring-indigo-500 focus:border-indigo-500 py-1.5 bg-gray-50 focus:bg-white"
+              [ngModel]="ticket()?.assignedTo?.id"
+              (change)="onAssigneeChange($event)"
+            >
+              <option [ngValue]="null">Unassigned</option>
+              <option *ngFor="let user of eligibleUsers()" [value]="user.id">
+                {{ user.firstName }} {{ user.lastName }}
+              </option>
+            </select>
+          </ng-container>
+          <ng-template #readonlyAssignee>
+            <div *ngIf="ticket()?.assignedTo; else unassignedBadge" class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-700 shrink-0">
+                {{ ticket()?.assignedTo?.firstName?.charAt(0) }}{{ ticket()?.assignedTo?.lastName?.charAt(0) }}
+              </div>
+              <span class="text-xs font-semibold text-gray-900 truncate">{{ ticket()?.assignedTo?.firstName }} {{ ticket()?.assignedTo?.lastName }}</span>
+            </div>
+            <ng-template #unassignedBadge>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Unassigned</span>
+            </ng-template>
+          </ng-template>
+        </div>
+
+        <!-- CC Users Section with Searchable Dropdown -->
+        <div class="pt-2 border-t border-gray-100">
+          <div class="text-xs text-gray-500 font-medium mb-1.5 flex justify-between items-center">
+            <span>CC Users</span>
+            <button *ngIf="!isEditingCc" (click)="startEditingCc()" class="text-indigo-600 hover:text-indigo-800 text-[10px] uppercase font-bold tracking-wider">Edit</button>
+          </div>
+          
+          <div *ngIf="!isEditingCc" class="flex flex-wrap gap-1">
+            <span *ngFor="let cc of ticket()?.ccUsers" class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-700 border border-gray-200">
+              {{ cc.firstName }} {{ cc.lastName }}
+            </span>
+            <span *ngIf="!ticket()?.ccUsers?.length" class="text-gray-400 italic text-xs">No CC users added</span>
+          </div>
+
+          <!-- CC Searchable Dropdown Editing Mode -->
+          <div *ngIf="isEditingCc" class="mt-1 space-y-2 relative">
+            <div class="relative">
+              <input 
+                type="text" 
+                [value]="ccSearchTerm()" 
+                (input)="ccSearchTerm.set($any($event.target).value); isCcDropdownOpen.set(true)"
+                (focus)="isCcDropdownOpen.set(true)"
+                placeholder="Search users to CC..."
+                class="block w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <!-- Dropdown List -->
+            <div *ngIf="isCcDropdownOpen()" class="absolute z-20 left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-36 flex flex-col">
+              <div class="flex-1 overflow-y-auto p-1 divide-y divide-gray-100">
+                <div *ngFor="let user of filteredCcUsers" 
+                     (click)="toggleCcUser(user.id)" 
+                     class="flex items-center justify-between p-1.5 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                  <div class="flex flex-col min-w-0">
+                    <span class="text-xs font-medium text-gray-800 truncate">{{ user.firstName }} {{ user.lastName }}</span>
+                    <span class="text-[10px] text-gray-500 truncate">{{ user.email }}</span>
+                  </div>
+                  <div class="w-4 h-4 rounded border flex items-center justify-center shrink-0 ml-2"
+                       [ngClass]="selectedCcUserIds.includes(user.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300 bg-white'">
+                    <i *ngIf="selectedCcUserIds.includes(user.id)" class="bi bi-check text-[10px] font-bold"></i>
+                  </div>
+                </div>
+                <div *ngIf="filteredCcUsers.length === 0" class="p-2 text-center text-xs text-gray-500">
+                  No users found
+                </div>
+              </div>
+              <div class="p-1.5 border-t border-gray-100 bg-gray-50 rounded-b-xl flex justify-between items-center text-[10px]">
+                <span class="text-gray-500 font-medium">{{ selectedCcUserIds.length }} selected</span>
+                <button type="button" (click)="isCcDropdownOpen.set(false)" class="px-2 py-0.5 bg-indigo-600 text-white rounded font-medium">Done</button>
+              </div>
+            </div>
+
+            <div class="flex gap-1.5 pt-1">
+              <button (click)="saveCcUsers()" class="flex-1 bg-indigo-600 text-white py-1 rounded-lg text-xs font-medium hover:bg-indigo-700 transition-colors shadow-2xs">Save</button>
+              <button (click)="cancelEditingCc()" class="flex-1 bg-gray-200 text-gray-800 py-1 rounded-lg text-xs font-medium hover:bg-gray-300 transition-colors">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Management & Actions -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden">
+      <div class="p-3.5 border-b border-gray-100 bg-gray-50/50 shrink-0 flex items-center justify-between">
+        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider">Management & Actions</h3>
+        <i class="bi bi-sliders text-gray-400"></i>
+      </div>
+      <div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-2.5">
+        <div *ngIf="isAdminOrManager()" class="space-y-2">
+          <button 
+            *ngIf="ticket()?.status === 'OPEN' || ticket()?.status === 'IN_PROGRESS'"
+            (click)="updateStatus('RESOLVED')"
+            class="w-full text-left px-3 py-2 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors font-semibold flex items-center justify-between border border-emerald-100 shadow-2xs"
+          >
+            <span class="flex items-center"><i class="bi bi-check-circle-fill mr-2 text-emerald-600"></i> Mark as Resolved</span>
+            <i class="bi bi-arrow-right text-emerald-500"></i>
+          </button>
+          
+          <button 
+            *ngIf="ticket()?.status !== 'CLOSED'"
+            (click)="updateStatus('CLOSED')"
+            class="w-full text-left px-3 py-2 text-xs text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors font-semibold flex items-center justify-between border border-gray-200 shadow-2xs"
+          >
+            <span class="flex items-center"><i class="bi bi-x-circle-fill mr-2 text-gray-500"></i> Close Ticket</span>
+            <i class="bi bi-arrow-right text-gray-400"></i>
+          </button>
+
+          <button 
+            *ngIf="ticket()?.status !== 'ESCALATED' && ticket()?.status !== 'CLOSED' && ticket()?.status !== 'RESOLVED'"
+            (click)="updateStatus('ESCALATED')"
+            class="w-full text-left px-3 py-2 text-xs text-red-700 bg-red-50 hover:bg-red-100 rounded-xl transition-colors font-semibold flex items-center justify-between border border-red-100 shadow-2xs"
+          >
+            <span class="flex items-center"><i class="bi bi-arrow-up-circle-fill mr-2 text-red-600"></i> Escalate Ticket</span>
+            <i class="bi bi-arrow-right text-red-500"></i>
+          </button>
+          
+          <div *ngIf="(!ticket()?.assignedTo || ticket()?.assignedTo?.id !== authStore.user()?.id)" class="pt-1">
+            <button 
+              (click)="assignToMe()"
+              class="w-full text-left px-3 py-2 text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors font-semibold flex items-center justify-between border border-indigo-100 shadow-2xs"
+            >
+              <span class="flex items-center"><i class="bi bi-person-check-fill mr-2 text-indigo-600"></i> Assign to Me</span>
+              <i class="bi bi-plus text-indigo-500"></i>
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="!isAdminOrManager()" class="space-y-3">
+          <div *ngIf="(!ticket()?.assignedTo || ticket()?.assignedTo?.id !== authStore.user()?.id) && authStore.user()?.type === 'SOLVENTEK'" class="mb-2">
+            <button 
+              (click)="assignToMe()"
+              class="w-full text-left px-3 py-2 text-xs text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors font-semibold flex items-center justify-between border border-indigo-100 shadow-2xs"
+            >
+              <span class="flex items-center"><i class="bi bi-person-check-fill mr-2 text-indigo-600"></i> Assign to Me</span>
+              <i class="bi bi-plus text-indigo-500"></i>
+            </button>
+          </div>
+
+          <div class="p-3 bg-gray-50 rounded-xl border border-gray-100 text-xs text-gray-600 space-y-1.5">
+            <div class="font-semibold text-gray-800 flex items-center gap-1.5">
+              <i class="bi bi-shield-check text-indigo-600"></i> Support Guidance
+            </div>
+            <p class="text-[11px] leading-relaxed">This ticket is being tracked by our support team. You will be notified when updates or attachments are posted.</p>
+          </div>
+
+          <button 
+            *ngIf="ticket()?.status !== 'CLOSED' && ticket()?.createdBy?.id === authStore.user()?.id"
+            (click)="updateStatus('CLOSED')"
+            class="w-full text-left px-3 py-2 text-xs text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors font-semibold flex items-center justify-between border border-gray-200 shadow-2xs"
+          >
+            <span class="flex items-center"><i class="bi bi-check2-all mr-2 text-gray-500"></i> Mark as Resolved & Close</span>
+            <i class="bi bi-arrow-right text-gray-400"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Conversation -->
+  <div class="flex-1 min-h-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
+    <div class="p-5 border-b border-gray-100 bg-gray-50/50 shrink-0">
+      <h2 class="text-base font-bold text-gray-900">{{ ticket()?.title }}</h2>
+      <p class="mt-1.5 text-xs text-gray-600 bg-white p-3.5 rounded-xl border border-gray-100 shadow-2xs leading-relaxed">{{ ticket()?.description }}</p>
+    </div>
+      
+    <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/30 custom-scrollbar">
+        
+        <div *ngFor="let msg of messages()" class="flex gap-4" [ngClass]="{'flex-row-reverse': msg.sender?.id === authStore.user()?.id}">
+          <!-- Avatar -->
+          <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+            <span class="text-indigo-700 font-bold text-sm">{{ msg.sender?.firstName?.charAt(0) }}{{ msg.sender?.lastName?.charAt(0) }}</span>
+          </div>
+          
+          <!-- Message Bubble -->
+          <div class="max-w-[80%]" [ngClass]="{'items-end flex flex-col': msg.sender?.id === authStore.user()?.id}">
+            <div class="flex items-baseline gap-2 mb-1" [ngClass]="{'flex-row-reverse': msg.sender?.id === authStore.user()?.id}">
+              <span class="text-sm font-medium text-gray-900">{{ msg.sender?.firstName }} {{ msg.sender?.lastName }}</span>
+              <span class="text-xs text-gray-500">{{ msg.createdAt | date:'short' }}</span>
+            </div>
+            
+            <div class="p-4 rounded-2xl shadow-sm" [ngClass]="msg.sender?.id === authStore.user()?.id ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-gray-100 text-gray-800 rounded-tl-none'">
+              <p class="whitespace-pre-wrap text-sm">{{ msg.message }}</p>
+              
+              <!-- Attachments -->
+              <div *ngIf="msg.attachments && msg.attachments.length > 0" class="mt-3 pt-3 border-t" [ngClass]="msg.sender?.id === authStore.user()?.id ? 'border-indigo-500' : 'border-gray-100'">
+                <div class="flex flex-wrap gap-2">
+                  <a *ngFor="let att of msg.attachments" [href]="att.fileUrl" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" [ngClass]="msg.sender?.id === authStore.user()?.id ? 'bg-indigo-700 text-indigo-50 hover:bg-indigo-800' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'">
+                    <i class="bi bi-paperclip"></i>
+                    <span class="truncate max-w-[150px]">{{ att.fileName }}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="messages().length === 0" class="text-center py-10">
+          <p class="text-gray-500 text-sm">No messages yet. Start the conversation!</p>
+        </div>
+        
+      </div>
+      
+      <!-- Reply Box -->
+      <div class="p-4 border-t border-gray-100 bg-white">
+        
+        <!-- Selected Files Preview -->
+        <div *ngIf="selectedFiles.length > 0" class="flex flex-wrap gap-2 mb-3 px-2">
+          <div *ngFor="let file of selectedFiles; let i = index" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-700">
+            <i class="bi bi-file-earmark"></i>
+            <span class="truncate max-w-[100px]">{{ file.name }}</span>
+            <button type="button" (click)="removeFile(i)" class="text-gray-400 hover:text-red-500">
+              <i class="bi bi-x-circle-fill"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex items-end gap-3">
+          <div class="relative flex-1">
+            <textarea 
+              [(ngModel)]="newMessage" 
+              rows="2"
+              placeholder="Type your message here..."
+              class="block w-full rounded-2xl border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3 px-4 resize-none bg-gray-50 focus:bg-white transition-colors"
+              (keydown.enter)="!$any($event).shiftKey && sendMessage(); $event.preventDefault()"
+            ></textarea>
+          </div>
+          
+          <div class="flex gap-2 shrink-0">
+            <button 
+              type="button" 
+              (click)="fileInput.click()"
+              class="p-3 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors border border-transparent"
+              title="Attach Files"
+            >
+              <i class="bi bi-paperclip text-xl"></i>
+            </button>
+            <input type="file" multiple class="hidden" #fileInput (change)="onFileSelected($event)">
+            
+            <button 
+              type="button" 
+              (click)="sendMessage()"
+              [disabled]="isSubmitting || (!newMessage.trim() && selectedFiles.length === 0)"
+              class="p-3 bg-indigo-600 text-white rounded-xl shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+            >
+              <i class="bi" [ngClass]="isSubmitting ? 'bi-hourglass-split animate-spin' : 'bi-send-fill'"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

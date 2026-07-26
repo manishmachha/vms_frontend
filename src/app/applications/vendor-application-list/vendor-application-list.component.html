@@ -83,6 +83,9 @@
         No applications found.
       </li>
     </ul>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mt-4 px-4 sticky bottom-0 z-20">
     <mat-paginator
       [length]="totalElements"
       [pageSize]="pageSize"
@@ -90,7 +93,7 @@
       [pageSizeOptions]="[10, 20, 50]"
       (page)="onPageChange($event)"
       showFirstLastButtons
-      class="border-t border-gray-100"
+      class="bg-transparent!"
     ></mat-paginator>
   </div>
 </div>

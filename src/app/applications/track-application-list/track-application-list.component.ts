@@ -18,7 +18,6 @@ import { ApplicationService } from '../../services/application.service';
 import { NotificationService } from '../../services/notification.service';
 import { HeaderService } from '../../services/header.service';
 import { JobApplication, ApplicationStatus } from '../../models/application.model';
-import { MatTableDataSource } from '@angular/material/table';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 
 @Component({
@@ -54,20 +53,16 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
     return `${base}${path.startsWith('/') ? path : '/' + path}`;
   }
 
-  // View Children
-  // View Children
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   // State
-  dataSource = new MatTableDataSource<JobApplication>([]);
-  unreadAppIds = new Set<string>();
-  totalElements = 0;
-  pageSize = 9;
-  currentPage = 0;
+  applications = signal<JobApplication[]>([]);
+  unreadAppIds = signal<Set<string>>(new Set<string>());
+  totalElements = signal(0);
+  pageSize = signal(9);
+  currentPage = signal(0);
 
   // Filters
-  searchText = '';
-  statusFilter: ApplicationStatus | '' = '';
+  searchText = signal('');
+  statusFilter = signal<ApplicationStatus | ''>('');
 
   displayedColumns = [];
 
@@ -96,21 +91,21 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
 
   loadUnreadAppIds() {
     this.notificationService.getUnreadEntityIds('APPLICATION').subscribe({
-      next: (ids) => (this.unreadAppIds = new Set(ids.map(String))),
-      error: () => (this.unreadAppIds = new Set()),
+      next: (ids) => this.unreadAppIds.set(new Set(ids.map(String))),
+      error: () => this.unreadAppIds.set(new Set()),
     });
   }
 
   hasNotification(appId: string | number): boolean {
-    return this.unreadAppIds.has(String(appId));
+    return this.unreadAppIds().has(String(appId));
   }
 
   ngAfterViewInit() {
   }
 
   loadApplications(pageIndex?: number, pageSize?: number) {
-    const p = pageIndex ?? this.paginator?.pageIndex ?? 0;
-    const s = pageSize ?? this.paginator?.pageSize ?? this.pageSize;
+    const p = pageIndex ?? this.currentPage();
+    const s = pageSize ?? this.pageSize();
 
     this.appService
       .getApplications(
@@ -118,39 +113,38 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
         p,
         s,
         'OUTBOUND',
-        this.searchText || undefined,
-        (this.statusFilter || undefined) as any
+        this.searchText() || undefined,
+        (this.statusFilter() || undefined) as any
       )
       .subscribe({
         next: (page: any) => {
-          this.totalElements = page.totalElements || 0;
-          this.currentPage = page.number || p;
+          this.totalElements.set(page.totalElements || 0);
+          this.currentPage.set(page.number || p);
           const sorted = [...(page.content || [])].sort((a, b) => {
             const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
             const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
             return bHasNotif - aHasNotif;
           });
-          this.dataSource.data = sorted;
+          this.applications.set(sorted);
         },
         error: (error) => console.error(error),
       });
   }
 
   onPageChange(event: any) {
-    this.pageSize = event.pageSize;
+    this.pageSize.set(event.pageSize);
+    this.currentPage.set(event.pageIndex);
     this.loadApplications(event.pageIndex, event.pageSize);
   }
 
   applyFilter() {
-    if (this.paginator) {
-      this.paginator.pageIndex = 0;
-    }
-    this.loadApplications(0, this.pageSize);
+    this.currentPage.set(0);
+    this.loadApplications(0, this.pageSize());
   }
 
   clearFilters() {
-    this.searchText = '';
-    this.statusFilter = '';
+    this.searchText.set('');
+    this.statusFilter.set('');
     this.applyFilter();
   }
 
@@ -181,6 +175,17 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
         return 'bg-red-50 text-red-700 border-red-200 ring-1 ring-red-100/50';
       default:
         return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  }
+
+  onCardClick(appId: string | number) {
+    if (this.hasNotification(appId)) {
+      this.notificationService.markAsReadByEntity('APPLICATION', appId).subscribe(() => {
+        const currentSet = this.unreadAppIds();
+        currentSet.delete(String(appId));
+        this.unreadAppIds.set(new Set(currentSet));
+        this.notificationService.refreshCounts();
+      });
     }
   }
 }

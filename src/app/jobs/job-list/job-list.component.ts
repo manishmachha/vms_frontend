@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
@@ -35,6 +35,8 @@ export class JobListComponent implements OnInit {
 
   jobs = signal<Job[]>([]);
   filteredJobs = signal<Job[]>([]);
+  publishedCount = computed(() => this.jobs().filter((j) => j.status === 'PUBLISHED').length);
+  fteCount = computed(() => this.jobs().filter((j) => j.employmentType === 'FTE').length);
   unreadJobIds = new Set<string>();
 
   searchQuery = '';
@@ -143,5 +145,14 @@ export class JobListComponent implements OnInit {
       maxWidth: '95vw',
       data: { job },
     });
+  }
+
+  onCardClick(jobId: string | number) {
+    if (this.hasNotification(jobId)) {
+      this.notificationService.markAsReadByEntity('JOB', jobId).subscribe(() => {
+        this.unreadJobIds.delete(String(jobId));
+        this.notificationService.refreshCounts();
+      });
+    }
   }
 }

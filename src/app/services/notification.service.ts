@@ -133,6 +133,10 @@ export class NotificationService {
     return this.apiService.post<void>(`${this.baseUrl}/${id}/read`, {}, undefined, skipLoading);
   }
 
+  markAsReadByEntity(category: string, entityId: number | string, skipLoading: boolean = false) {
+    return this.apiService.post<number>(`${this.baseUrl}/read/entity/${category}/${entityId}`, {}, undefined, skipLoading);
+  }
+
   markAllAsRead(skipLoading: boolean = false) {
     return this.apiService.post<number>(`${this.baseUrl}/mark-all-read`, {}, undefined, skipLoading);
   }

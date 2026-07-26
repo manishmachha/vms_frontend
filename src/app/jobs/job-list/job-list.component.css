@@ -1,4 +1,7 @@
 /* Job List Styles */
+:host {
+  display: block;
+}
 .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;

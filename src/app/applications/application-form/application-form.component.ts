@@ -93,6 +93,7 @@ export class ApplicationFormComponent implements OnInit {
         lastName: candidate.lastName,
         email: candidate.email,
         phone: candidate.phone,
+        location: candidate.city,
         currentTitle: candidate.currentDesignation,
         currentCompany: candidate.currentCompany,
         experienceYears: candidate.experienceYears || 0,

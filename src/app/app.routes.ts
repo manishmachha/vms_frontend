@@ -120,6 +120,10 @@ export const routes: Routes = [
           import('./notifications/notifications.component').then((m) => m.NotificationsComponent),
       },
       {
+        path: 'tickets',
+        loadChildren: () => import('./tickets/ticket.routes').then((m) => m.TICKET_ROUTES),
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./profile/my-profile.component').then((m) => m.MyProfileComponent),

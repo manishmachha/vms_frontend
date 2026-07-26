@@ -1,0 +1,180 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+    
+    <div class="mb-8 border-b border-gray-100 pb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Ticket Details</h2>
+      <p class="mt-1 text-sm text-gray-500">Provide the necessary information so we can assist you better.</p>
+    </div>
+
+    <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <!-- Title -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Subject / Title <span class="text-red-500">*</span></label>
+        <input 
+          type="text" 
+          formControlName="title" 
+          placeholder="Brief summary of the issue"
+          class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+          [ngClass]="{'border-red-300 ring-1 ring-red-100': ticketForm.get('title')?.invalid && ticketForm.get('title')?.touched}"
+        />
+        <div *ngIf="ticketForm.get('title')?.invalid && ticketForm.get('title')?.touched" class="mt-1 text-sm text-red-500">
+          Subject is required.
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Description <span class="text-red-500">*</span></label>
+        <textarea 
+          formControlName="description" 
+          rows="5"
+          placeholder="Detailed explanation of your request or issue..."
+          class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+          [ngClass]="{'border-red-300 ring-1 ring-red-100': ticketForm.get('description')?.invalid && ticketForm.get('description')?.touched}"
+        ></textarea>
+        <div *ngIf="ticketForm.get('description')?.invalid && ticketForm.get('description')?.touched" class="mt-1 text-sm text-red-500">
+          Description is required.
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Category -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Category <span class="text-red-500">*</span></label>
+          <select 
+            formControlName="category" 
+            class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors cursor-pointer"
+          >
+            <option value="" disabled>Select category</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <!-- Priority -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Priority <span class="text-red-500">*</span></label>
+          <select 
+            formControlName="priority" 
+            class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors cursor-pointer"
+          >
+            <option *ngFor="let pri of priorities" [value]="pri">{{ pri }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- CC Users (Searchable Dropdown) -->
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">CC Users (Optional)</label>
+          
+          <!-- Selected Chips -->
+          <div class="flex flex-wrap gap-1.5 mb-2" *ngIf="selectedCcUsersList.length > 0">
+            <span *ngFor="let u of selectedCcUsersList" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-2xs">
+              {{ u.firstName }} {{ u.lastName }}
+              <button type="button" (click)="removeCcUser(u.id, $event)" class="text-indigo-400 hover:text-indigo-600 focus:outline-none">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </span>
+          </div>
+
+          <!-- Dropdown Trigger / Search Input -->
+          <div class="relative">
+            <input 
+              type="text" 
+              [value]="ccSearchTerm()" 
+              (input)="ccSearchTerm.set($any($event.target).value); isCcDropdownOpen.set(true)"
+              (focus)="isCcDropdownOpen.set(true)"
+              placeholder="Search users to CC..."
+              class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button type="button" (click)="isCcDropdownOpen.set(!isCcDropdownOpen())" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <i class="bi" [ngClass]="isCcDropdownOpen() ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dropdown List -->
+          <div *ngIf="isCcDropdownOpen()" class="absolute z-20 mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 flex flex-col">
+            <div class="flex-1 overflow-y-auto p-2 divide-y divide-gray-100">
+              <div *ngFor="let user of filteredCcUsers" 
+                   (click)="toggleCcUser(user.id)" 
+                   class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-gray-800">{{ user.firstName }} {{ user.lastName }}</span>
+                  <span class="text-xs text-gray-500">{{ user.email }}</span>
+                </div>
+                <div class="w-5 h-5 rounded border flex items-center justify-center transition-colors"
+                     [ngClass]="(ticketForm.get('ccUserIds')?.value || []).includes(user.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300 bg-white'">
+                  <i *ngIf="(ticketForm.get('ccUserIds')?.value || []).includes(user.id)" class="bi bi-check text-xs font-bold"></i>
+                </div>
+              </div>
+              <div *ngIf="filteredCcUsers.length === 0" class="p-4 text-center text-sm text-gray-500">
+                No users found matching "{{ ccSearchTerm() }}"
+              </div>
+            </div>
+            <div class="p-2 border-t border-gray-100 bg-gray-50 rounded-b-xl flex justify-between items-center text-xs">
+              <span class="text-gray-500 font-medium">{{ selectedCcUsersList.length }} selected</span>
+              <button type="button" (click)="isCcDropdownOpen.set(false)" class="px-3 py-1 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">Done</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attachments -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Attachments (Optional)</label>
+          <input 
+            type="file" 
+            multiple
+            (change)="onFileSelected($event)"
+            class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+          />
+        </div>
+      </div>
+
+      <!-- Reference Entity -->
+      <div *ngIf="showReferenceSearch()" class="p-5 bg-indigo-50 rounded-xl border border-indigo-100">
+        <label class="block text-sm font-medium text-indigo-900 mb-2">Related {{ ticketForm.get('category')?.value | titlecase }} (Optional)</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="bi bi-search text-gray-400"></i>
+          </div>
+          <input 
+            type="text" 
+            (input)="onSearchReference($event)"
+            placeholder="Search to select a related item..."
+            class="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+          />
+        </div>
+        
+        <div class="mt-3 bg-white rounded-xl border border-gray-200 max-h-48 overflow-y-auto shadow-sm" *ngIf="referenceEntities().length > 0">
+          <div class="divide-y divide-gray-100">
+            <label *ngFor="let item of referenceEntities()" class="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition-colors">
+              <input type="radio" formControlName="refEntityId" [value]="item.id" class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+              <span class="ml-3 text-sm text-gray-700">{{ item.name }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-gray-100 flex items-center justify-end gap-4 mt-8">
+        <button 
+          type="button" 
+          (click)="cancel()"
+          class="px-6 py-2.5 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+        >
+          Cancel
+        </button>
+        <button 
+          type="submit" 
+          [disabled]="isSubmitting() || ticketForm.invalid"
+          class="inline-flex items-center px-6 py-2.5 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <i class="bi" [ngClass]="isSubmitting() ? 'bi-hourglass-split animate-spin' : 'bi-send'"></i>
+          <span class="ml-2">{{ isSubmitting() ? 'Submitting...' : 'Submit Ticket' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

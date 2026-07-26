@@ -1,23 +1,38 @@
 <div class="p-6 space-y-6">
 
-  <!-- Dashboard Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-500">Total Candidates</p>
-        <p class="text-2xl font-bold text-gray-900">{{ totalCandidates() }}</p>
-      </div>
-      <div class="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
-        <i class="bi bi-people-fill text-lg"></i>
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-blue-500 to-blue-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-blue-100 text-sm font-medium">Total Candidates</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ totalCandidates() }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-people-fill"></i>
+        </div>
       </div>
     </div>
-    <div class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-500">Created By You</p>
-        <p class="text-2xl font-bold text-gray-900">{{ candidatesCreatedByYou() }}</p>
+    <div class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-emerald-500 to-emerald-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-emerald-100 text-sm font-medium">Created By You</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ candidatesCreatedByYou() }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-person-check-fill"></i>
+        </div>
       </div>
-      <div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
-        <i class="bi bi-person-check-fill text-lg"></i>
+    </div>
+    <div class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-amber-500 to-amber-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-amber-100 text-sm font-medium">Naukri Candidates</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ naukriCandidates() }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-briefcase-fill"></i>
+        </div>
       </div>
     </div>
   </div>
@@ -209,7 +224,9 @@
         hasNotification(candidate.id)
           ? 'border-red-300 ring-2 ring-red-100 hover:shadow-red-100'
           : 'border-gray-100 hover:border-indigo-100'
-      ">
+      "
+      (click)="onCardClick(candidate.id)"
+    >
       <!-- Notification Indicator -->
       <div *ngIf="hasNotification(candidate.id)" class="absolute top-3 right-3 z-10">
         <span class="flex h-3 w-3">
@@ -262,22 +279,24 @@
         </div>
       </div>
 
-      <!-- Skills -->
-      <div class="px-6 pb-4">
-        <div class="flex flex-wrap gap-2">
-          <span *ngFor="let skill of candidate.skills.slice(0, 4)"
-            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-800">
-            {{ skill }}
-          </span>
-          <span *ngIf="candidate.skills.length > 4" class="text-xs text-gray-500 self-center">
-            +{{ candidate.skills.length - 4 }} more
-          </span>
+      <!-- Candidate Details -->
+      <div class="px-6 pb-4 space-y-2">
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <i class="bi bi-geo-alt text-gray-400 w-4 text-center shrink-0"></i>
+          <span class="truncate">{{ candidate.city || 'Location N/A' }}</span>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <i class="bi bi-briefcase text-gray-400 w-4 text-center shrink-0"></i>
+          <span>{{ candidate.experienceYears || 0 }} Years Experience</span>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <i class="bi bi-telephone text-gray-400 w-4 text-center shrink-0"></i>
+          <span class="truncate">{{ candidate.phone || 'Phone N/A' }}</span>
         </div>
       </div>
 
       <!-- Footer Actions -->
-      <div class="mt-auto bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-between items-center">
-        <span class="text-xs text-gray-500"> Exp: {{ candidate.experienceYears || 0 }} yrs </span>
+      <div class="mt-auto bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end items-center">
         <div class="flex space-x-3">
           <a [routerLink]="[candidate.id]"
             class="text-gray-600 hover:text-indigo-600 text-sm font-medium cursor-pointer">View</a>
@@ -293,7 +312,7 @@
 
   <!-- Shared Paginator -->
   <div [class.hidden]="filteredCandidates().length === 0"
-    class="bg-white rounded-3xl border border-gray-100 shadow-sm mt-4 px-4 py-2">
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm mt-4 px-4 sticky bottom-5 z-20">
     <mat-paginator 
       [length]="totalElements()" 
       [pageSize]="pageSize()" 

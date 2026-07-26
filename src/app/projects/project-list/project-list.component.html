@@ -416,7 +416,7 @@
 
   <!-- Shared Paginator -->
   <div [class.hidden]="filteredProjects().length === 0"
-    class="bg-white rounded-3xl border border-gray-100 shadow-sm mt-4 px-4 py-2">
+    class="bg-white rounded-2xl border border-gray-100 shadow-sm mt-4 px-4 sticky bottom-5 z-20">
     <mat-paginator 
       [length]="totalElements()" 
       [pageSize]="pageSize()" 

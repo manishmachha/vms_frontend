@@ -142,7 +142,8 @@ export class NotificationsComponent implements OnInit {
     }
     // Navigate if actionUrl is set
     if (notification.actionUrl) {
-      this.mfeNav.navigateByUrl(notification.actionUrl);
+      const fixedUrl = notification.actionUrl.replace(/^\/portal/, '');
+      this.mfeNav.navigateByUrl(fixedUrl);
     }
   }
 
