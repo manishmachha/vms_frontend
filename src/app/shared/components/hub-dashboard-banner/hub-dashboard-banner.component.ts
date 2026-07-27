@@ -23,7 +23,7 @@ export class HubDashboardBannerComponent {
     }
   }
 
-  navigateToItem(id: number, baseRoute: string, event: Event) {
+  navigateToItem(id: string, baseRoute: string, event: Event) {
     event.stopPropagation();
     if (baseRoute && id) {
       this.mfeNav.navigate(baseRoute + '/' + id);

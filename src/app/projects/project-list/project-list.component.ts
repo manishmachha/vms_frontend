@@ -62,8 +62,8 @@ export class ProjectListComponent implements OnInit {
 
   projects = signal<Project[]>([]);
   clients = signal<Client[]>([]);
-  unreadProjectIds = new Set<number>();
-  activeMenuId: number | null = null;
+  unreadProjectIds = new Set<string>();
+  activeMenuId: string | null = null;
 
   searchQuery = '';
   statusFilter = '';
@@ -96,7 +96,7 @@ export class ProjectListComponent implements OnInit {
     });
   }
 
-  hasNotification(projectId: number): boolean {
+  hasNotification(projectId: string): boolean {
     return this.unreadProjectIds.has(projectId);
   }
 
@@ -179,7 +179,7 @@ export class ProjectListComponent implements OnInit {
 
   // ========== ACTIONS ==========
 
-  toggleMenu(projectId: number) {
+  toggleMenu(projectId: string) {
     this.activeMenuId = this.activeMenuId === projectId ? null : projectId;
   }
 

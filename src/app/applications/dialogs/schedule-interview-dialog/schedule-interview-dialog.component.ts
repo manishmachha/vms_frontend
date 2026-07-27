@@ -185,7 +185,7 @@ export class ScheduleInterviewDialogComponent implements OnInit {
     const formValue = this.scheduleForm.value;
     const request = {
       ...formValue,
-      applicationId: Number(formValue.applicationId),
+      applicationId: formValue.applicationId,
       interviewerId: this.authStore.user()?.id || 1,
     };
 

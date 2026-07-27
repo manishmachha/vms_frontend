@@ -144,6 +144,20 @@ export class InterviewListComponent implements OnInit {
     this.loadInterviews();
   }
 
+  onSortChangeSelect(event: Event) {
+    const val = (event.target as HTMLSelectElement).value;
+    if (!val) {
+      this.sortField.set('');
+      this.sortOrder.set('');
+    } else {
+      const parts = val.split(',');
+      this.sortField.set(parts[0]);
+      this.sortOrder.set(parts[1]);
+    }
+    this.pageIndex.set(0);
+    this.loadInterviews();
+  }
+
   toggleView(mode: 'table' | 'grid') {
     this.viewMode.set(mode);
   }

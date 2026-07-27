@@ -22,6 +22,7 @@ import { TimelineService, TimelineEvent } from '../../../services/timeline.servi
 import { TimelineComponent } from '../../../layout/components/timeline/timeline.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-candidate-detail',
@@ -35,7 +36,8 @@ import { MfeNavigationService } from '../../../services/mfe-navigation.service';
     HubDashboardBannerComponent,
     MatIconModule,
     TimelineComponent,
-    MatTabsModule
+    MatTabsModule,
+    FormsModule
   ],
   templateUrl: './candidate-detail.component.html',
   styleUrls: ['./candidate-detail.component.css'],
@@ -60,10 +62,22 @@ export class CandidateDetailComponent implements OnInit {
   candidate = signal<Candidate | null>(null);
   timelineEvents = signal<TimelineEvent[]>([]);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
+  
+  selectedStatus = signal<string>('AVAILABLE');
   brandedResume = signal<BrandedResume | null>(null);
   applications = signal<JobApplication[]>([]);
   interviews = signal<Interview[]>([]);
   skillsExpanded = signal(false);
+
+  readonly candidateStatuses = [
+    'AVAILABLE',
+    'ONBOARDING',
+    'OFFERED',
+    'IN_BILLING',
+    'BENCH',
+    'NOTICE_PERIOD',
+    'PROBATION'
+  ];
 
 
   ngOnInit() {
@@ -84,6 +98,7 @@ export class CandidateDetailComponent implements OnInit {
     this.candidateService.getCandidate(id).subscribe({
       next: (c) => {
         this.candidate.set(c);
+        this.selectedStatus.set(c.status || 'AVAILABLE');
         
         this.loadApplications(c.id);
         this.loadInterviews(c.id);
@@ -97,8 +112,8 @@ export class CandidateDetailComponent implements OnInit {
               stats.stats = stats.stats.map(s => {
                 if (s.label.toLowerCase().includes('vendor')) {
                   if (!s.items) s.items = [];
-                  if (!s.items.find(i => i.id === Number(c.organization!.id))) {
-                    s.items = [{ id: Number(c.organization!.id), name: c.organization!.name }, ...s.items];
+                  if (!s.items.find(i => i.id === c.organization!.id)) {
+                    s.items = [{ id: c.organization!.id, name: c.organization!.name }, ...s.items];
                   }
                 }
                 return s;
@@ -185,6 +200,20 @@ export class CandidateDetailComponent implements OnInit {
         });
       }
     });
+  }
+
+  updateStatus(status: string) {
+    const c = this.candidate();
+    if (c) {
+      this.candidateService.updateStatus(c.id, status).subscribe({
+        next: (updated: Candidate) => {
+          this.candidate.set(updated);
+          this.selectedStatus.set(updated.status || 'AVAILABLE');
+          this.snackBar.open('Status updated successfully', 'OK', { duration: 3000 });
+        },
+        error: () => this.snackBar.open('Failed to update status', 'Close', { duration: 3000 })
+      });
+    }
   }
 
   openDeleteConfirm() {

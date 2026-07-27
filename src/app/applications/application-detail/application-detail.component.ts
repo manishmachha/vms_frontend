@@ -414,8 +414,8 @@ export class ApplicationDetailComponent implements OnInit {
     });
   }
 
-  loadInterviews(id: string | number) {
-    this.interviewService.getInterviewsByApplication(Number(id)).subscribe({
+  loadInterviews(id: string) {
+    this.interviewService.getInterviewsByApplication(id).subscribe({
       next: (res: any) => this.interviews.set(res || []),
     });
   }

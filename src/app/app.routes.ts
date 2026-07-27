@@ -115,6 +115,10 @@ export const routes: Routes = [
         loadChildren: () => import('./vendors/vendor.routes').then((m) => m.VENDOR_ROUTES),
       },
       {
+        path: 'timesheets',
+        loadChildren: () => import('./timesheets/timesheets.routes').then((m) => m.TIMESHEET_ROUTES),
+      },
+      {
         path: 'notifications',
         loadComponent: () =>
           import('./notifications/notifications.component').then((m) => m.NotificationsComponent),

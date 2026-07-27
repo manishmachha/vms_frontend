@@ -60,7 +60,7 @@ export class AllocateResourceModalComponent implements OnInit {
     if (this.allocateForm.valid && this.data.projectId) {
       const val = this.allocateForm.value;
       const req: AllocateUserRequest = {
-        candidateId: Number(val.candidateId),
+        candidateId: val.candidateId!,
         startDate: val.startDate!,
         percentage: val.percentage!,
         billingRole: val.billingRole || undefined,

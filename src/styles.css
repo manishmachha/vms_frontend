@@ -523,3 +523,26 @@ mat-icon[class*='text-'] {
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+
+/* ===== Paginator Reset ===== */
+/* Revert the global dark theme overrides specifically for the paginator to make it white/light */
+.mat-mdc-paginator .mat-mdc-text-field-wrapper {
+  background-color: transparent !important;
+}
+.mat-mdc-paginator .mat-mdc-select-value {
+  color: var(--color-text-main) !important;
+}
+.mat-mdc-paginator .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+.mat-mdc-paginator .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+.mat-mdc-paginator .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+.mat-mdc-paginator .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__leading,
+.mat-mdc-paginator .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__notch,
+.mat-mdc-paginator .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover .mdc-notched-outline__trailing {
+  border-color: rgba(0, 0, 0, 0.87) !important;
+}
+.mat-mdc-paginator .mat-mdc-select-arrow {
+  color: rgba(0, 0, 0, 0.54) !important;
+}
+

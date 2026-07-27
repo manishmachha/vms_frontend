@@ -23,7 +23,7 @@ export class InterviewService {
     return this.api.post<any>(`/interviews/${id}/request-feedback`, {});
   }
 
-  getInterviewsByApplication(applicationId: number) {
+  getInterviewsByApplication(applicationId: string) {
     return this.api.get<Interview[]>(`/interviews/application/${applicationId}`);
   }
 

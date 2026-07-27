@@ -3,7 +3,7 @@ import { Vendor } from './organization.model';
 
 // ===== JobApplication (matches backend JobApplication entity) =====
 export interface JobApplication {
-  id: number;
+  id: string;
   job: Job;
   candidate: {
     id: number;

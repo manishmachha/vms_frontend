@@ -120,9 +120,9 @@ export class AddClientSubmissionDialogComponent implements OnInit {
     const val = this.submissionForm.value;
 
     this.submissionService.createSubmission({
-      candidateId: Number(this.data.candidateId),
-      clientId: Number(val.clientId!),
-      jobId: this.data.jobId ? Number(this.data.jobId) : undefined,
+      candidateId: this.data.candidateId,
+      clientId: val.clientId!,
+      jobId: this.data.jobId ? this.data.jobId : undefined,
       externalReferenceId: val.externalReferenceId || undefined,
       remarks: val.remarks || undefined,
     }).subscribe({

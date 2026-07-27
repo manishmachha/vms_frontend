@@ -8,7 +8,7 @@ export interface StatItem {
 }
 
 export interface StatDetail {
-    id: number;
+    id: string;
     name: string;
     subtitle?: string;
     date?: string;

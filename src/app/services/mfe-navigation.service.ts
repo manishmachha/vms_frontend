@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 
 /**
@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class MfeNavigationService {
   private router = inject(Router);
+  private ngZone = inject(NgZone);
 
   /**
    * Detect the MFE base path by checking the current URL.
@@ -33,17 +34,21 @@ export class MfeNavigationService {
   navigate(path: string): void {
     const base = this.basePath;
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    this.router.navigateByUrl(`${base}${normalizedPath}`);
+    this.ngZone.run(() => {
+      this.router.navigateByUrl(`${base}${normalizedPath}`);
+    });
   }
 
   /**
    * Navigate by full URL, prepending MFE base if the URL is relative (starts with /).
    */
   navigateByUrl(url: string): void {
-    if (url.startsWith('/') && !url.startsWith(this.basePath)) {
-      this.router.navigateByUrl(`${this.basePath}${url}`);
-    } else {
-      this.router.navigateByUrl(url);
-    }
+    this.ngZone.run(() => {
+      if (url.startsWith('/') && !url.startsWith(this.basePath)) {
+        this.router.navigateByUrl(`${this.basePath}${url}`);
+      } else {
+        this.router.navigateByUrl(url);
+      }
+    });
   }
 }

@@ -68,7 +68,7 @@ export class AddProjectDialogComponent implements OnInit {
         requestId: formVal.requestId || undefined,
         billRate: formVal.billRate || undefined,
         payRate: formVal.payRate || undefined,
-        clientId: formVal.clientId ? Number(formVal.clientId) : undefined,
+        clientId: formVal.clientId ? formVal.clientId : undefined,
       };
 
       const request$ = this.data.editProject

@@ -71,6 +71,13 @@ export class CandidateService {
   }
 
   /**
+   * Update candidate status
+   */
+  updateStatus(id: string, status: string): Observable<Candidate> {
+    return this.api.put<Candidate>(`${this.BASE_URL}/${id}/status?status=${status}`, {});
+  }
+
+  /**
    * Delete candidate
    */
   deleteCandidate(id: string): Observable<void> {

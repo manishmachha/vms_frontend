@@ -1,0 +1,86 @@
+<div class="p-6 space-y-6">
+  <div class="flex justify-between items-center">
+    <div class="flex gap-4">
+      <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value); loadTimesheets()" class="border-gray-300 rounded-md shadow-sm py-2 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500">
+        <option value="">All Statuses</option>
+        <option value="DRAFT">Draft</option>
+        <option value="SUBMITTED">Submitted</option>
+        <option value="APPROVED">Approved</option>
+        <option value="REJECTED">Rejected</option>
+        <option value="CLARIFICATION_REQUESTED">Needs Clarification</option>
+      </select>
+    </div>
+    <a *ngIf="authStore.isEmployee()" routerLink="new" class="px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">+ New Timesheet</a>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <table mat-table [dataSource]="dataSource" class="w-full text-left">
+      <ng-container matColumnDef="period">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Period</th>
+        <td mat-cell *matCellDef="let ts" class="px-6 py-4 border-b border-gray-50">
+          <div class="font-bold text-gray-900">{{ ts.weekStartDate | date:'MMM d' }} - {{ ts.weekEndDate | date:'MMM d, yyyy' }}</div>
+          <div class="text-xs text-gray-500 font-medium mt-0.5" *ngIf="!authStore.isEmployee()"><i class="bi bi-person-fill"></i> {{ ts.employeeName }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="project">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Project</th>
+        <td mat-cell *matCellDef="let ts" class="px-6 py-4 border-b border-gray-50">
+          <div class="font-bold text-gray-900">{{ ts.projectName }}</div>
+          <div class="text-xs text-gray-500 font-medium mt-0.5"><i class="bi bi-hash"></i> {{ ts.projectRequestId || 'No ID' }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="hours">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Total Hours</th>
+        <td mat-cell *matCellDef="let ts" class="px-6 py-4 border-b border-gray-50 font-bold text-indigo-600">{{ ts.totalHours }}h</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Status</th>
+        <td mat-cell *matCellDef="let ts" class="px-6 py-4 border-b border-gray-50">
+          <span class="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider"
+            [ngClass]="{
+              'bg-gray-100 text-gray-700': ts.status === 'DRAFT',
+              'bg-blue-100 text-blue-700': ts.status === 'SUBMITTED',
+              'bg-green-100 text-green-700': ts.status === 'APPROVED',
+              'bg-red-100 text-red-700': ts.status === 'REJECTED',
+              'bg-yellow-100 text-yellow-700': ts.status === 'CLARIFICATION_REQUESTED'
+            }">
+            {{ ts.status.replace('_', ' ') }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Actions</th>
+        <td mat-cell *matCellDef="let ts" class="px-6 py-4 text-right border-b border-gray-50">
+          <a [routerLink]="[ts.id]" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">
+            View <i class="bi bi-arrow-right"></i>
+          </a>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50/80 transition-colors group"></tr>
+    </table>
+    
+    <div class="p-8 flex flex-col items-center justify-center text-center" *ngIf="dataSource.data.length === 0">
+      <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mb-4">
+        <i class="bi bi-inbox text-2xl"></i>
+      </div>
+      <h3 class="text-sm font-bold text-gray-900 mb-1">No timesheets found</h3>
+      <p class="text-sm text-gray-500">There are no timesheets matching your criteria.</p>
+    </div>
+  </div>
+  
+  <mat-paginator
+    [length]="totalElements()"
+    [pageSize]="pageSize()"
+    [pageIndex]="pageIndex()"
+    [pageSizeOptions]="[10, 25, 50]"
+    (page)="onPageChange($event)"
+    class="bg-white rounded-2xl shadow-sm border border-gray-100 hidden [&.mat-paginator]:block"
+    [class.hidden]="dataSource.data.length === 0">
+  </mat-paginator>
+</div>

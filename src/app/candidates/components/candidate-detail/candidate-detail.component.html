@@ -53,6 +53,12 @@
             >
               <i class="bi bi-cloud-upload"></i> Update Resume
             </button>
+            <div *ngIf="authStore.orgType() === 'SOLVENTEK'" class="py-2 inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-md shadow-sm">
+                <i class="bi bi-person-badge pl-2 text-purple-500"></i>
+                <select [ngModel]="selectedStatus()" (ngModelChange)="updateStatus($event)" class="bg-transparent text-xs font-semibold uppercase tracking-wide border-none focus:ring-0 pr-8 text-purple-700 cursor-pointer">
+                  <option *ngFor="let s of candidateStatuses" [value]="s">{{ s }}</option>
+                </select>
+              </div>
             <a
               *ngIf="!authStore.isEmployee()"
               [routerLink]="resolvePath('/candidates/edit/' + candidate()!.id)"

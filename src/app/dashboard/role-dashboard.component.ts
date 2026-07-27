@@ -4,6 +4,7 @@ import { ManagerDashboardComponent } from './manager-dashboard/manager-dashboard
 import { VendorDashboardComponent } from './vendor-dashboard/vendor-dashboard.component';
 import { AuthStore } from '../services/auth.store';
 import { SuperAdminDashboardComponent } from './super-admin-dashboard/super-admin-dashboard.component';
+import { EmployeeDashboardComponent } from './employee-dashboard/employee-dashboard.component';
 
 @Component({
   selector: 'app-role-dashboard',
@@ -34,6 +35,9 @@ export class RoleDashboardComponent implements OnInit {
         break;
       case 'VENDOR':
         component = VendorDashboardComponent;
+        break;
+      case 'EMPLOYEE':
+        component = EmployeeDashboardComponent;
         break;
       default:
         component = VendorDashboardComponent;

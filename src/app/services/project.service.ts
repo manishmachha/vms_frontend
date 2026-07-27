@@ -28,7 +28,7 @@ export interface UpdateStatusRequest {
 }
 
 export interface AllocateUserRequest {
-  candidateId: number;
+  candidateId: string;
   startDate: string;
   endDate?: string;
   percentage?: number;
@@ -67,7 +67,7 @@ export class ProjectService {
     return this.api.get<Page<Project>>('/projects', params);
   }
 
-  getProject(id: number) {
+  getProject(id: string) {
     return this.api.get<Project>(`/projects/${id}`);
   }
 
@@ -79,15 +79,15 @@ export class ProjectService {
     return this.api.put<Project>(`/projects/${id}`, request);
   }
 
-  updateStatus(id: number, request: UpdateStatusRequest) {
+  updateStatus(id: string, request: UpdateStatusRequest) {
     return this.api.put<Project>(`/projects/${id}/status`, request);
   }
 
-  deleteProject(id: number) {
+  deleteProject(id: string) {
     return this.api.delete<void>(`/projects/${id}`);
   }
 
-  getAllocations(projectId: number) {
+  getAllocations(projectId: string) {
     return this.api.get<ProjectAllocation[]>(`/projects/${projectId}/allocations`);
   }
 
@@ -102,7 +102,7 @@ export class ProjectService {
     );
   }
 
-  deallocateUser(projectId: number, allocationId: number) {
+  deallocateUser(projectId: string, allocationId: number) {
     return this.api.delete<void>(`/projects/${projectId}/allocations/${allocationId}`);
   }
 }

@@ -20,7 +20,7 @@
             "outputPath": "dist/vms_frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": [],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "extraWebpackConfig": "webpack.config.js",
             "assets": [

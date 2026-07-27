@@ -126,7 +126,7 @@ export class NotificationService {
   }
 
   getUnreadEntityIds(category: string) {
-    return this.apiService.get<number[]>(`${this.baseUrl}/unread-entity-ids/${category}`);
+    return this.apiService.get<string[]>(`${this.baseUrl}/unread-entity-ids/${category}`);
   }
 
   markAsRead(id: number | string, skipLoading: boolean = false) {

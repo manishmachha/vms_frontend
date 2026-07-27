@@ -126,7 +126,7 @@ export class SidebarComponent implements OnInit {
           label: 'Interviews',
           route: '/interviews',
           icon: 'bi bi-calendar-event',
-          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'VENDOR'],
+          roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'VENDOR', 'EMPLOYEE'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
         },
         {
@@ -157,6 +157,13 @@ export class SidebarComponent implements OnInit {
           roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'PROJECT',
+        },
+        {
+          label: 'Timesheets',
+          route: '/timesheets',
+          icon: 'bi bi-clock-history',
+          roles: ['SUPER_ADMIN', 'MANAGER', 'EMPLOYEE'],
+          orgTypes: ['SOLVENTEK'],
         },
       ],
     },
@@ -284,6 +291,7 @@ export class SidebarComponent implements OnInit {
     if (role === 'ADMIN') return 'badge-primary';
     if (role === 'TALENT_ACQUISITION') return 'badge-info';
     if (role === 'VENDOR') return 'badge-success';
+    if (role === 'EMPLOYEE') return 'badge-secondary';
     return 'badge-primary';
   }
 

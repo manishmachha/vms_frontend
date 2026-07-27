@@ -1,6 +1,6 @@
 // ===== Project =====
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   clientId?: number;
@@ -47,7 +47,7 @@ export interface ProjectAllocation {
   };
   startDate: string;
   endDate?: string;
-  allocationPercentage: number;
+
   billingRole?: string;
   status: 'ACTIVE' | 'ENDED' | 'PLANNED';
 }

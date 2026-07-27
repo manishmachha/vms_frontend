@@ -66,14 +66,7 @@ export class ProjectDetailComponent implements OnInit {
     '#ec4899',
   ];
 
-  // Computed values
-  totalAllocation = computed(() =>
-    this.allocations().reduce((sum, a) => sum + a.allocationPercentage, 0),
-  );
-  avgAllocation = computed(() => {
-    const allocs = this.allocations();
-    return allocs.length ? Math.round(this.totalAllocation() / allocs.length) : 0;
-  });
+
 
   projectDuration = computed(() => {
     const p = this.project();
@@ -84,27 +77,7 @@ export class ProjectDetailComponent implements OnInit {
     return months <= 1 ? '1 mo' : `${months} mo`;
   });
 
-  chartSegments = computed(() => {
-    const allocs = this.allocations();
-    if (!allocs.length) return [];
 
-    const total = this.totalAllocation();
-    const circumference = 2 * Math.PI * 40;
-    let offset = 0;
-
-    return allocs.map((alloc, i) => {
-      const percentage = alloc.allocationPercentage / total;
-      const dashLength = circumference * percentage;
-      const dashArray = `${dashLength} ${circumference - dashLength}`;
-      const segment = {
-        color: this.colors[i % this.colors.length],
-        dashArray,
-        offset: -offset,
-      };
-      offset += dashLength;
-      return segment;
-    });
-  });
 
   ngOnInit() {
     this.headerService.setTitle(
@@ -114,7 +87,7 @@ export class ProjectDetailComponent implements OnInit {
     );
     const projectIdStr = this.route.snapshot.paramMap.get('id');
     if (projectIdStr) {
-      const projectId = Number(projectIdStr);
+      const projectId = projectIdStr;
       this.loadProject(projectId);
       this.loadAllocations(projectId);
     }
@@ -122,7 +95,7 @@ export class ProjectDetailComponent implements OnInit {
     this.loadCandidates();
   }
 
-  loadProject(id: number) {
+  loadProject(id: string) {
     this.projectService.getProject(id).subscribe((p) => {
       this.project.set(p);
       this.loadTimeline(id.toString());
@@ -136,7 +109,7 @@ export class ProjectDetailComponent implements OnInit {
     });
   }
 
-  loadAllocations(id: number) {
+  loadAllocations(id: string) {
     this.projectService.getAllocations(id).subscribe((data) => {
       this.allocations.set(data);
     });

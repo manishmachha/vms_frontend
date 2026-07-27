@@ -31,7 +31,7 @@ export type ClientSubmissionStatus =
 
 export interface CreateSubmissionRequest {
   candidateId: number;
-  clientId: number;
+  clientId: string;
   jobId?: number;
   externalReferenceId?: string;
   remarks?: string;
