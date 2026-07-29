@@ -13,7 +13,7 @@ import { MfeNavigationService } from '../services/mfe-navigation.service';
   styleUrls: ['./vms.login.component.css', '../../styles.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class VMSLoginComponent {
+export default class VMSLoginComponent {
   private fb = inject(FormBuilder);
   authService = inject(AuthService);
   router = inject(Router);

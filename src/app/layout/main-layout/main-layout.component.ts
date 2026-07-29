@@ -12,6 +12,6 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./main-layout.component.css', '../../../styles.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class MainLayoutComponent {
+export default class MainLayoutComponent {
   sidebarOpen = signal(false);
 }

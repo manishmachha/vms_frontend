@@ -18,13 +18,13 @@ export const routes: Routes = [
       { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
     ],
     children: [
-      { 
-        path: '', 
-        loadComponent: () => import('./login/vms.login.component').then(m => m.VMSLoginComponent) 
+      {
+        path: '',
+        loadComponent: () => import('./login/vms.login.component')
       },
       {
         path: '',
-        loadComponent: () => import('./layout/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
+        loadComponent: () => import('./layout/main-layout/main-layout.component'),
         children: [
       {
         path: 'dashboard',
@@ -102,11 +102,6 @@ export const routes: Routes = [
         path: 'activities',
         loadComponent: () =>
           import('./activities/components/activity-dashboard.component').then((m) => m.ActivityDashboardComponent),
-      },
-      {
-        path: 'login',
-        loadComponent: () =>
-          import('./login/vms.login.component').then((m) => m.VMSLoginComponent),
       },
     ],
   },
