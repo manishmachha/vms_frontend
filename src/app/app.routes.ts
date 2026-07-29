@@ -8,24 +8,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { RemoteEntryComponent } from './remote-entry.component';
 import { importProvidersFrom } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ApiService } from './services/api.service';
-import { LoadingService } from './services/loading.service';
-import { AuthStore } from './services/auth.store';
-import { ProjectService } from './services/project.service';
-import { OrganizationService } from './services/organization.service';
-import { ClientSubmissionService } from './services/client-submission.service';
-import { AuthService } from './services/auth.service';
-import { DashboardService } from './services/dashboard.service';
-import { AuditLogService } from './services/audit-log.service';
-import { ApplicationService } from './services/application.service';
-import { UserService } from './services/user.service';
-import { BrandedResumeService } from './services/branded-resume.service';
-import { JobService } from './services/job.service';
-import { ClientService } from './services/client.service';
-import { InterviewService } from './services/interview.service';
-import { CandidateService } from './services/candidate.service';
-import { NotificationService } from './services/notification.service';
-import { ActivityService } from './activities/services/activity.service';
 
 export const routes: Routes = [
   {
@@ -35,27 +17,7 @@ export const routes: Routes = [
       importProvidersFrom(MatDialogModule),
       provideHttpClient(withInterceptorsFromDi()),
       { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-      { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
-      ApiService,
-      LoadingService,
-      AuthStore,
-      ProjectService,
-      OrganizationService,
-
-      ClientSubmissionService,
-      AuthService,
-      DashboardService,
-      AuditLogService,
-
-      ApplicationService,
-      UserService,
-      BrandedResumeService,
-      JobService,
-      ClientService,
-      InterviewService,
-      CandidateService,
-      NotificationService,
-      ActivityService,
+      { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
     ],
     children: [
       { path: '', component: VMSLoginComponent },
