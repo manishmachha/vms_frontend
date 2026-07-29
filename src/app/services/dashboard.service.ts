@@ -1,12 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { StatItem } from '../models/dashboard-stats.model';
-
-export interface ChartData {
-  label: string;
-  value: number;
-}
+import { StatItem, ChartData } from '../models/dashboard-stats.model';
 
 export interface RecentActivity {
   id: number;
