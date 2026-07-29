@@ -1,9 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Client, StompSubscription, IMessage } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { AuthStore } from './auth.store';
+import type { IMessage, Client, StompSubscription } from '@stomp/stompjs';
 import { ActivityLog } from '../models/notification.model';
 import { SKIP_LOADER } from './api.service';
 
@@ -78,7 +77,7 @@ export class NotificationService {
   /**
    * Connects to the STOMP WebSocket broker
    */
-  public connect() {
+  public async connect() {
     if (this.stompClient && this.stompClient.connected) {
       return;
     }
@@ -91,31 +90,39 @@ export class NotificationService {
       ? environment.apiUrl.replace('http', 'ws') + '/ws'
       : window.location.protocol.replace('http', 'ws') + '//' + window.location.host + environment.apiUrl + '/ws';
 
-    this.stompClient = new Client({
-      brokerURL: wsUrl,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`
-      },
-      debug: (str) => {
-        // console.log('STOMP: ' + str);
-      },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
+    try {
+      const { Client } = await import('@stomp/stompjs');
 
-    // Fallback for environments where WebSockets aren't natively supported
-    if (typeof WebSocket !== 'function') {
-      const httpUrl = environment.apiUrl.startsWith('http') 
-        ? environment.apiUrl + '/ws'
-        : window.location.origin + environment.apiUrl + '/ws';
-        
-      this.stompClient.webSocketFactory = () => {
-        return new (SockJS as any)(httpUrl);
-      };
-    }
+      // Fallback for environments where WebSockets aren't natively supported
+      let SockJSClass: any = null;
+      if (typeof WebSocket !== 'function') {
+        SockJSClass = (await import('sockjs-client')).default;
+      }
 
-    this.stompClient.onConnect = (frame) => {
+      this.stompClient = new Client({
+        brokerURL: wsUrl,
+        connectHeaders: {
+          Authorization: `Bearer ${token}`
+        },
+        debug: (str) => {
+          // console.log('STOMP: ' + str);
+        },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+      });
+
+      if (SockJSClass) {
+        const httpUrl = environment.apiUrl.startsWith('http') 
+          ? environment.apiUrl + '/ws'
+          : window.location.protocol + '//' + window.location.host + environment.apiUrl + '/ws';
+          
+        this.stompClient.webSocketFactory = () => {
+          return new SockJSClass(httpUrl);
+        };
+      }
+
+      this.stompClient.onConnect = (frame) => {
       console.log('Connected to Notifications WebSocket');
       this.subscribeToNotifications();
     };
@@ -124,7 +131,10 @@ export class NotificationService {
       console.error('STOMP Error', frame.headers['message'], frame.body);
     };
 
-    this.stompClient.activate();
+      this.stompClient.activate();
+    } catch (err) {
+      console.error('Failed to load STOMP/SockJS', err);
+    }
   }
 
   /**
