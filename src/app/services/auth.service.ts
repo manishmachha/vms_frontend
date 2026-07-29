@@ -2,21 +2,19 @@ import { Injectable, inject } from '@angular/core';
 import { AuthStore } from './auth.store';
 import { User, AuthResponse, ApiResponse } from '../models/auth.model';
 import { tap } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private store = inject(AuthStore);
-  private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl;
+  private api = inject(ApiService);
 
   login(credentials: { email: string; password: string }) {
-    return this.http
-      .post<ApiResponse<AuthResponse>>(`${this.baseUrl}/v1/auth/login`, credentials)
-      .pipe(tap((response: ApiResponse<AuthResponse>) => this.store.login(response.data)));
+    return this.api
+      .post<AuthResponse>(`/v1/auth/login`, credentials)
+      .pipe(tap((data: AuthResponse) => this.store.login(data)));
   }
 
   registerVendor(data: any) {
@@ -29,8 +27,8 @@ export class AuthService {
       type: 'VENDOR',
       role: 'VENDOR',
     };
-    return this.http.post<ApiResponse<AuthResponse>>(
-      `${this.baseUrl}/v1/auth/register`,
+    return this.api.post<AuthResponse>(
+      `/v1/auth/register`,
       registerRequest,
     );
   }

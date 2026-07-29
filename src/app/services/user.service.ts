@@ -14,9 +14,8 @@ import {
   UpdateStatusRequest,
 } from '../models/auth.model';
 import { Page } from '../models/page.model';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { DashboardStatsResponse } from '../models/dashboard-stats.model';
 import { ApiResponse } from '../models/auth.model';
@@ -26,7 +25,6 @@ import { ApiResponse } from '../models/auth.model';
 })
 export class UserService {
   private api = inject(ApiService);
-  private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/v1/users`;
 
   getUsers(
@@ -67,7 +65,7 @@ export class UserService {
 
   assignRole(userId: string | number, role: string) {
     const params = new HttpParams().set('role', role);
-    return this.api.put<User>(`/v1/users/${userId}/role`, {});
+    return this.api.put<User>(`/v1/users/${userId}/role`, {}, undefined, params);
   }
 
   deleteUser(userId: string | number) {
@@ -77,9 +75,7 @@ export class UserService {
   uploadProfilePhoto(userId: string | number, file: File): Observable<User> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http
-      .post<ApiResponse<User>>(`${this.baseUrl}/${userId}/profile-photo`, formData)
-      .pipe(map((res) => res.data));
+    return this.api.post<User>(`/v1/users/${userId}/profile-photo`, formData);
   }
 
   // Placeholder methods for features not yet in backend
@@ -120,7 +116,7 @@ export class UserService {
   }
 
   getProfilePhoto(userId: string): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/${userId}/profile-photo`, { responseType: 'blob' });
+    return this.api.download(`/v1/users/${userId}/profile-photo`);
   }
 
   // ========== MY PROFILE ENDPOINTS ==========

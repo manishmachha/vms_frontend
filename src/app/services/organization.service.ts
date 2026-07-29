@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { ApiService } from './api.service';
 import { ApiResponse, Organization, Vendor } from '../models/organization.model';
 import { DashboardStatsResponse } from '../models/dashboard-stats.model';
@@ -13,7 +13,6 @@ import { Page } from '../models/page.model';
 })
 export class OrganizationService {
   private api = inject(ApiService);
-  private http = inject(HttpClient);
 
   getAllOrganizations(
     page: number = 0,
@@ -80,12 +79,10 @@ export class OrganizationService {
   uploadLogo(id: string | number, file: File): Observable<Organization> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http
-      .post<ApiResponse<Organization>>(
-        `${environment.apiUrl}/v1/organizations/${id}/logo`,
-        formData,
-      )
-      .pipe(map((res) => res.data));
+    return this.api.post<Organization>(
+      `/v1/organizations/${id}/logo`,
+      formData,
+    );
   }
 
   getApprovedOrganizations(): Observable<Organization[]> {

@@ -1,10 +1,9 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { HttpClient, HttpContext } from '@angular/common/http';
+import { ApiService } from './api.service';
 import { environment } from '../../environments/environment';
 import { AuthStore } from './auth.store';
 import type { IMessage, Client, StompSubscription } from '@stomp/stompjs';
 import { ActivityLog } from '../models/notification.model';
-import { SKIP_LOADER } from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +22,7 @@ export class NotificationService {
   readonly unreadCount = computed(() => this._unreadCount());
 
   constructor(
-    private http: HttpClient,
+    private api: ApiService,
     private authStore: AuthStore
   ) {
     // Initial fetch if already logged in
@@ -38,18 +37,18 @@ export class NotificationService {
    */
   public fetchInitialNotifications() {
     const orgId = this.authStore.organizationId();
-    let url = `${environment.apiUrl}/activities?size=50`;
+    let url = `/activities?size=50`;
     if (orgId) {
       url += `&organizationId=${orgId}`;
     }
 
-    const context = new HttpContext().set(SKIP_LOADER, true);
-    this.http.get<any>(url, { context }).subscribe({
-      next: (res) => {
+    this.api.get<any>(url, undefined, undefined, true).subscribe({
+      next: (res: any) => {
         // Assume pageable response: res.content
+        // ApiService extracts .data, but if it's already extracted, res is the payload
         this._notifications.set(res.content || []);
       },
-      error: (err) => console.error('Failed to fetch notifications', err)
+      error: (err: any) => console.error('Failed to fetch notifications', err)
     });
 
     this.fetchUnreadCount();
@@ -60,17 +59,16 @@ export class NotificationService {
    */
   public fetchUnreadCount() {
     const orgId = this.authStore.organizationId();
-    let url = `${environment.apiUrl}/activities/unread-count`;
+    let url = `/activities/unread-count`;
     if (orgId) {
       url += `?organizationId=${orgId}`;
     }
 
-    const context = new HttpContext().set(SKIP_LOADER, true);
-    this.http.get<{count: number}>(url, { context }).subscribe({
-      next: (res) => {
+    this.api.get<{count: number}>(url, undefined, undefined, true).subscribe({
+      next: (res: any) => {
         this._unreadCount.set(res.count || 0);
       },
-      error: (err) => console.error('Failed to fetch unread count', err)
+      error: (err: any) => console.error('Failed to fetch unread count', err)
     });
   }
 
@@ -192,15 +190,14 @@ export class NotificationService {
    * Marks a notification as read
    */
   public markAsRead(id: string) {
-    const context = new HttpContext().set(SKIP_LOADER, true);
-    this.http.put(`${environment.apiUrl}/activities/${id}/read`, {}, { context }).subscribe({
+    this.api.put(`/activities/${id}/read`, {}, undefined, undefined, true).subscribe({
       next: () => {
         this._notifications.update(list => {
           return list.map(n => n.id === id ? { ...n, read: true } : n);
         });
         this._unreadCount.update(count => Math.max(0, count - 1));
       },
-      error: (err) => console.error('Failed to mark notification as read', err)
+      error: (err: any) => console.error('Failed to mark notification as read', err)
     });
   }
 
@@ -222,20 +219,19 @@ export class NotificationService {
    */
   public markAllAsRead() {
     const orgId = this.authStore.organizationId();
-    let url = `${environment.apiUrl}/activities/mark-all-read`;
+    let url = `/activities/mark-all-read`;
     if (orgId) {
       url += `?organizationId=${orgId}`;
     }
 
-    const context = new HttpContext().set(SKIP_LOADER, true);
-    this.http.post(url, {}, { context }).subscribe({
+    this.api.post(url, {}, undefined, true).subscribe({
       next: () => {
         this._notifications.update(list => {
           return list.map(n => ({ ...n, read: true }));
         });
         this._unreadCount.set(0);
       },
-      error: (err) => console.error('Failed to mark all notifications as read', err)
+      error: (err: any) => console.error('Failed to mark all notifications as read', err)
     });
   }
 }

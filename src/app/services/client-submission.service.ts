@@ -1,8 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { ApiService } from './api.service';
 
 export interface ClientSubmission {
   id: number;
@@ -64,31 +62,23 @@ interface ApiResponse<T> {
   providedIn: 'root',
 })
 export class ClientSubmissionService {
-  private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/client-submissions`;
+  private api = inject(ApiService);
+  private apiUrl = `/client-submissions`;
 
   getSubmissionsByCandidate(candidateId: string | number): Observable<ClientSubmission[]> {
-    return this.http
-      .get<ApiResponse<ClientSubmission[]>>(`${this.apiUrl}?candidateId=${candidateId}`)
-      .pipe(map((res) => res.data));
+    return this.api.get<ClientSubmission[]>(`${this.apiUrl}?candidateId=${candidateId}`);
   }
 
   getSubmissionsByClient(clientId: string | number): Observable<ClientSubmission[]> {
-    return this.http
-      .get<ApiResponse<ClientSubmission[]>>(`${this.apiUrl}?clientId=${clientId}`)
-      .pipe(map((res) => res.data));
+    return this.api.get<ClientSubmission[]>(`${this.apiUrl}?clientId=${clientId}`);
   }
 
   createSubmission(request: CreateSubmissionRequest): Observable<ClientSubmission> {
-    return this.http
-      .post<ApiResponse<ClientSubmission>>(this.apiUrl, request)
-      .pipe(map((res) => res.data));
+    return this.api.post<ClientSubmission>(this.apiUrl, request);
   }
 
   updateStatus(id: string | number, request: UpdateStatusRequest): Observable<ClientSubmission> {
-    return this.http
-      .put<ApiResponse<ClientSubmission>>(`${this.apiUrl}/${id}/status`, request)
-      .pipe(map((res) => res.data));
+    return this.api.put<ClientSubmission>(`${this.apiUrl}/${id}/status`, request);
   }
 
   updateDetails(
@@ -96,28 +86,20 @@ export class ClientSubmissionService {
     externalReferenceId?: string,
     remarks?: string,
   ): Observable<ClientSubmission> {
-    return this.http
-      .put<ApiResponse<ClientSubmission>>(`${this.apiUrl}/${id}`, {
-        externalReferenceId,
-        remarks,
-      })
-      .pipe(map((res) => res.data));
+    return this.api.put<ClientSubmission>(`${this.apiUrl}/${id}`, {
+      externalReferenceId,
+      remarks,
+    });
   }
 
   getComments(submissionId: string | number): Observable<ClientSubmissionComment[]> {
-    return this.http
-      .get<ApiResponse<ClientSubmissionComment[]>>(`${this.apiUrl}/${submissionId}/comments`)
-      .pipe(map((res) => res.data));
+    return this.api.get<ClientSubmissionComment[]>(`${this.apiUrl}/${submissionId}/comments`);
   }
 
   addComment(
     submissionId: string | number,
     commentText: string,
   ): Observable<ClientSubmissionComment> {
-    return this.http
-      .post<
-        ApiResponse<ClientSubmissionComment>
-      >(`${this.apiUrl}/${submissionId}/comments`, { commentText })
-      .pipe(map((res) => res.data));
+    return this.api.post<ClientSubmissionComment>(`${this.apiUrl}/${submissionId}/comments`, { commentText });
   }
 }

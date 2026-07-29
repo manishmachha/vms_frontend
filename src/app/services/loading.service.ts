@@ -28,10 +28,12 @@ export class LoadingService {
   }
 
   hide() {
-    this.activeRequests.update((count) => {
-      const next = Math.max(0, count - 1);
-      console.log(`[LoadingService #${this.id}] hide() called. Active requests: ${next}`);
-      return next;
-    });
+    setTimeout(() => {
+      this.activeRequests.update((count) => {
+        const next = Math.max(0, count - 1);
+        console.log(`[LoadingService #${this.id}] hide() called. Active requests: ${next}`);
+        return next;
+      });
+    }, 500); // 500ms delay so the loader has time to fade in and be visible
   }
 }
