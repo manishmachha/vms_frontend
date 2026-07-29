@@ -47,13 +47,13 @@ export class UserCreateComponent implements OnInit {
   }
 
   isEditMode = signal(false);
-  userId = signal<number | null>(null);
+  userId = signal<string | null>(null);
 
   userForm: FormGroup = this.fb.group({
     firstName: ['', [Validators.required]],
     lastName: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    phone: [''],
+    phone: ['', [Validators.maxLength(10)]],
     type: ['SOLVENTEK', [Validators.required]],
     role: ['', [Validators.required]],
     organizationId: [null, [Validators.required]]
@@ -79,13 +79,13 @@ export class UserCreateComponent implements OnInit {
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode.set(true);
-        this.userId.set(+params['id']);
-        this.loadUserForEdit(+params['id']);
+        this.userId.set(params['id']);
+        this.loadUserForEdit(params['id']);
       }
     });
   }
 
-  loadUserForEdit(id: number) {
+  loadUserForEdit(id: string) {
     this.userService.getUser(id).subscribe({
       next: (user) => {
         this.userForm.patchValue({

@@ -18,8 +18,6 @@ import { OrganizationLogoComponent } from '../../../layout/components/organizati
 import { ClientSubmissionsComponent } from '../client-submissions/client-submissions.component';
 import { DialogService } from '../../../services/dialog.service';
 import { HeaderService } from '../../../services/header.service';
-import { TimelineService, TimelineEvent } from '../../../services/timeline.service';
-import { TimelineComponent } from '../../../layout/components/timeline/timeline.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 import { FormsModule } from '@angular/forms';
@@ -35,8 +33,7 @@ import { FormsModule } from '@angular/forms';
     ClientSubmissionsComponent,
     HubDashboardBannerComponent,
     MatIconModule,
-    TimelineComponent,
-    MatTabsModule,
+        MatTabsModule,
     FormsModule
   ],
   templateUrl: './candidate-detail.component.html',
@@ -58,9 +55,7 @@ export class CandidateDetailComponent implements OnInit {
   public authStore = inject(AuthStore);
   private dialogService = inject(DialogService);
   private headerService = inject(HeaderService);
-  private timelineService = inject(TimelineService);
   candidate = signal<Candidate | null>(null);
-  timelineEvents = signal<TimelineEvent[]>([]);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
   
   selectedStatus = signal<string>('AVAILABLE');
@@ -103,7 +98,6 @@ export class CandidateDetailComponent implements OnInit {
         this.loadApplications(c.id);
         this.loadInterviews(c.id);
         this.loadBrandedResume(c.id);
-        this.loadTimeline(c.id);
         
         // Load dashboard stats
         this.candidateService.getDashboardStats(c.id).subscribe({
@@ -179,12 +173,6 @@ export class CandidateDetailComponent implements OnInit {
     });
   }
 
-  loadTimeline(id: string) {
-    this.timelineService.getTimeline('CANDIDATE', id).subscribe({
-      next: (res) => this.timelineEvents.set(res.content),
-      error: (err) => console.error('Failed to load timeline', err),
-    });
-  }
 
   openArchiveConfirm() {
     this.dialogService.confirm('Archive Candidate', 'Are you sure you want to archive this candidate?', 'primary').subscribe(confirmed => {

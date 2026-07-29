@@ -117,24 +117,12 @@
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     <ng-container *ngFor="let job of filteredJobs()">
       <div
-        class="group relative bg-white rounded-2xl shadow-sm border transition-all duration-300 flex flex-col h-full overflow-hidden"
-        [ngClass]="
-          hasNotification(job.id)
-            ? 'border-red-300 ring-2 ring-red-100 hover:shadow-red-100'
-            : 'border-gray-100 hover:shadow-xl hover:border-indigo-100'
-        "
+        class="group relative bg-white rounded-2xl shadow-sm border transition-all duration-300 flex flex-col h-full overflow-hidden border-gray-100 hover:shadow-xl hover:border-indigo-100 cursor-pointer"
         (click)="onCardClick(job.id)"
               [routerLink]="resolvePath('/jobs/' + job.id)"
       >
         <!-- Notification Indicator -->
-        <div *ngIf="hasNotification(job.id)" class="absolute top-3 right-3 z-10">
-          <span class="flex h-3 w-3">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
-            ></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-          </span>
-        </div>
+        <app-notification-dot [entityType]="'JOB'" [entityId]="job.id" [cssClass]="'absolute top-4 right-4 w-3.5 h-3.5'"></app-notification-dot>
         <!-- Badge & Type -->
         <div class="px-6 py-5 flex justify-between items-start">
           <div class="flex gap-3">

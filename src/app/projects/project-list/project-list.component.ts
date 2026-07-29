@@ -11,13 +11,14 @@ import { OrganizationService } from '../../services/organization.service';
 import { FormsModule } from '@angular/forms';
 import { HeaderService } from '../../services/header.service';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
-import { NotificationService } from '../../services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogService } from '../../services/dialog.service';
 import { AddProjectDialogComponent } from '../components/add-project-modal/add-project-dialog.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-project-list',
@@ -31,6 +32,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    NotificationDotComponent
   ],
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css'],
@@ -40,7 +42,6 @@ export class ProjectListComponent implements OnInit {
   clientService = inject(ClientService);
   orgService = inject(OrganizationService);
   headerService = inject(HeaderService);
-  private notificationService = inject(NotificationService);
   private dialog = inject(MatDialog);
   private dialogService = inject(DialogService);
   private mfeNav = inject(MfeNavigationService);
@@ -62,8 +63,8 @@ export class ProjectListComponent implements OnInit {
 
   projects = signal<Project[]>([]);
   clients = signal<Client[]>([]);
-  unreadProjectIds = new Set<string>();
   activeMenuId: string | null = null;
+  public notificationService = inject(NotificationService);
 
   searchQuery = '';
   statusFilter = '';
@@ -81,7 +82,6 @@ export class ProjectListComponent implements OnInit {
       'Manage client and internal projects',
       'bi bi-kanban-fill',
     );
-    this.loadUnreadProjectIds();
     this.loadProjects();
     this.loadClients();
 
@@ -89,15 +89,16 @@ export class ProjectListComponent implements OnInit {
     document.addEventListener('click', () => (this.activeMenuId = null));
   }
 
-  loadUnreadProjectIds() {
-    this.notificationService.getUnreadEntityIds('PROJECT').subscribe({
-      next: (ids) => (this.unreadProjectIds = new Set(ids)),
-      error: () => (this.unreadProjectIds = new Set()),
-    });
+  hasNotification(projectId: string | number): boolean {
+    return this.notificationService.notifications().some(n => 
+      n.entityType === 'PROJECT' && 
+      String(n.entityId) === String(projectId) && 
+      !n.read
+    );
   }
 
-  hasNotification(projectId: string): boolean {
-    return this.unreadProjectIds.has(projectId);
+  onCardClick(projectId: string | number) {
+    this.notificationService.markEntityAsRead('PROJECT', projectId);
   }
 
   loadProjects() {

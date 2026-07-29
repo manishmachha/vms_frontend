@@ -42,8 +42,6 @@ import { Interview, InterviewType } from '../../models/interview.model';
 import { ChangeDetectorRef } from '@angular/core';
 import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 import { ScheduleInterviewDialogComponent } from '../dialogs/schedule-interview-dialog/schedule-interview-dialog.component';
-import { TimelineComponent } from '../../layout/components/timeline/timeline.component';
-import { TimelineEvent, TimelineService } from '../../services/timeline.service';
 
 @Component({
   selector: 'app-application-detail',
@@ -62,8 +60,7 @@ import { TimelineEvent, TimelineService } from '../../services/timeline.service'
     BaseChartDirective,
     OrganizationLogoComponent,
     ClientSubmissionsComponent,
-    TimelineComponent
-  ],
+      ],
   templateUrl: './application-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -79,7 +76,6 @@ export class ApplicationDetailComponent implements OnInit {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
   private dialog = inject(MatDialog);
-  private timelineService = inject(TimelineService);
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
@@ -113,7 +109,6 @@ export class ApplicationDetailComponent implements OnInit {
   dashboardStats = signal<DashboardStatsResponse | null>(null);
   brandedResume = signal<BrandedResume | null>(null);
   analysis = signal<any>(null);
-  timelineEvents = signal<TimelineEvent[]>([]);
   documents = signal<any[]>([]);
 
   isPollingAnalysis = signal(true);
@@ -128,7 +123,6 @@ export class ApplicationDetailComponent implements OnInit {
   docCategories = ['Resume', 'Offer Letter', 'Contract', 'ID Proof', 'Other'];
 
   // Notes
-  newNote = '';
 
   // Analysis Parsing (Derived from analysis signal)
   parsedRedFlags = computed(() => {
@@ -326,7 +320,6 @@ export class ApplicationDetailComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadApplication(id);
-      this.loadTimeline(id);
       this.loadDocuments(id);
       this.startAnalysisPolling(id);
       this.loadInterviews(id);
@@ -402,11 +395,6 @@ export class ApplicationDetailComponent implements OnInit {
     });
   }
 
-  loadTimeline(id: string | number) {
-    this.timelineService.getTimeline('APPLICATION', String(id)).subscribe({
-      next: (res) => this.timelineEvents.set(res.content),
-    });
-  }
 
   loadDocuments(id: string | number) {
     this.appService.getDocuments(id).subscribe({
@@ -431,7 +419,6 @@ export class ApplicationDetailComponent implements OnInit {
     }).afterClosed().pipe(take(1)).subscribe(result => {
       if (result) {
         this.loadInterviews(appId);
-        this.loadTimeline(appId);
       }
     });
   }
@@ -493,7 +480,6 @@ export class ApplicationDetailComponent implements OnInit {
     if (!appId) return;
     this.appService.updateStatus(appId, status).subscribe((updatedApp) => {
       this.application.set(updatedApp);
-      this.loadTimeline(appId);
     });
   }
 
@@ -509,7 +495,7 @@ export class ApplicationDetailComponent implements OnInit {
       next: () => {
         this.selectedFile = null;
         this.loadDocuments(appId);
-        this.loadTimeline(appId); // Refresh timeline to show upload event
+ // Refresh timeline to show upload event
       },
       error: (err) => {
         console.error('Failed to upload document', err);
@@ -536,34 +522,7 @@ export class ApplicationDetailComponent implements OnInit {
   }
 
   // Notes
-  noteType = 'internal'; // internal or public
 
-  addNote() {
-    const appId = this.application()?.id;
-    if (!this.newNote.trim() || !appId) return;
-
-    const title = this.noteType === 'internal' ? 'Internal Note' : 'Message to Candidate';
-
-    // In strict replication, we pass event object, but service expects distinct args
-    // My updated service: addTimelineEvent(id, message, title, userId)
-    // The previous `addTimelineEvent` took an object? No, my updated code takes args.
-    // Wait, Controller takes Request Body. Service takes args.
-    // My frontend `addTimelineEvent` signature:
-    // `addTimelineEvent(appId, event)` from previous view.
-    // Let's check `ApplicationService.ts` again.
-
-    const event = {
-      title: title,
-      message: this.newNote,
-      eventType: 'COMMENT', // This might be used by service to construct request
-      action: 'COMMENT',
-    };
-
-    this.appService.addTimelineEvent(appId, event).subscribe(() => {
-      this.newNote = '';
-      this.loadTimeline(appId);
-    });
-  }
 
   getSeverityClass(severity: string): string {
     switch (severity?.toUpperCase()) {

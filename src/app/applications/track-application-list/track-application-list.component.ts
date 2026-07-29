@@ -1,6 +1,6 @@
-import { Component, OnInit, inject, signal, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, inject, signal, ViewChild, AfterViewInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import {  RouterLink } from '@angular/router';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,10 +15,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 
 import { ApplicationService } from '../../services/application.service';
-import { NotificationService } from '../../services/notification.service';
 import { HeaderService } from '../../services/header.service';
 import { JobApplication, ApplicationStatus } from '../../models/application.model';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-track-application-list',
@@ -38,6 +39,7 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
     MatTooltipModule,
     FormsModule,
     OrganizationLogoComponent,
+    NotificationDotComponent
   ],
   templateUrl: './track-application-list.component.html',
   styleUrls: ['./track-application-list.component.css'],
@@ -45,7 +47,6 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
 export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   private appService = inject(ApplicationService);
   private headerService = inject(HeaderService);
-  private notificationService = inject(NotificationService);
   private mfeNav = inject(MfeNavigationService);
 
   resolvePath(path: string): string {
@@ -55,7 +56,9 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
 
   // State
   applications = signal<JobApplication[]>([]);
-  unreadAppIds = signal<Set<string>>(new Set<string>());
+  public notificationService = inject(NotificationService);
+  shortlistedCount = computed(() => this.applications().filter((a) => a.status === 'SHORTLISTED' || a.status === 'INTERVIEW_SCHEDULED').length);
+  offeredCount = computed(() => this.applications().filter((a) => a.status === 'OFFERED' || a.status === 'ONBOARDED').length);
   totalElements = signal(0);
   pageSize = signal(9);
   currentPage = signal(0);
@@ -85,19 +88,15 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
       'Status of jobs you have applied to',
       'bi bi-cursor',
     );
-    this.loadUnreadAppIds();
     this.loadApplications();
   }
 
-  loadUnreadAppIds() {
-    this.notificationService.getUnreadEntityIds('APPLICATION').subscribe({
-      next: (ids) => this.unreadAppIds.set(new Set(ids.map(String))),
-      error: () => this.unreadAppIds.set(new Set()),
-    });
-  }
-
   hasNotification(appId: string | number): boolean {
-    return this.unreadAppIds().has(String(appId));
+    return this.notificationService.notifications().some(n => 
+      ['APPLICATION', 'SUBMISSION'].includes(n.entityType) && 
+      String(n.entityId) === String(appId) && 
+      !n.read
+    );
   }
 
   ngAfterViewInit() {
@@ -179,13 +178,6 @@ export class TrackApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   onCardClick(appId: string | number) {
-    if (this.hasNotification(appId)) {
-      this.notificationService.markAsReadByEntity('APPLICATION', appId).subscribe(() => {
-        const currentSet = this.unreadAppIds();
-        currentSet.delete(String(appId));
-        this.unreadAppIds.set(new Set(currentSet));
-        this.notificationService.refreshCounts();
-      });
-    }
+    this.notificationService.markEntityAsRead('APPLICATION', appId);
   }
 }

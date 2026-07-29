@@ -1,0 +1,278 @@
+<div class="min-h-screen bg-slate-50/50 p-6 space-y-6">
+  
+  <!-- Header & Title -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-slate-800 tracking-tight">Activity Log</h1>
+      <p class="text-sm text-slate-500 mt-1">Track and monitor all activities across the system</p>
+    </div>
+    <div class="flex items-center bg-white rounded-lg p-1 shadow-xs border border-slate-200">
+      <button 
+        (click)="toggleViewMode('table')"
+        [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'table' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')"
+      >
+        <mat-icon class="text-[18px] w-[18px] h-[18px]">table_rows</mat-icon>
+        Table
+      </button>
+      <button 
+        (click)="toggleViewMode('grid')"
+        [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'grid' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')"
+      >
+        <mat-icon class="text-[18px] w-[18px] h-[18px]">grid_view</mat-icon>
+        Grid
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Total Activities -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
+      <div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+      <div class="relative z-10 flex flex-col h-full">
+        <div class="text-slate-500 text-sm font-medium">Total Activities</div>
+        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalActivities || 0 }}</div>
+        <div class="mt-auto pt-4 text-xs text-slate-400">All time recorded events</div>
+      </div>
+    </div>
+    
+    <!-- Total Creates -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
+      <div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+      <div class="relative z-10 flex flex-col h-full">
+        <div class="text-slate-500 text-sm font-medium flex items-center gap-2">
+          <mat-icon class="text-emerald-500 text-[18px] w-[18px] h-[18px]">add_circle</mat-icon> Creates
+        </div>
+        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalCreates || 0 }}</div>
+      </div>
+    </div>
+
+    <!-- Total Updates -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
+      <div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-amber-50 to-amber-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+      <div class="relative z-10 flex flex-col h-full">
+        <div class="text-slate-500 text-sm font-medium flex items-center gap-2">
+          <mat-icon class="text-amber-500 text-[18px] w-[18px] h-[18px]">edit</mat-icon> Updates
+        </div>
+        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalUpdates || 0 }}</div>
+      </div>
+    </div>
+
+    <!-- Total Deletes -->
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
+      <div class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-red-50 to-red-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+      <div class="relative z-10 flex flex-col h-full">
+        <div class="text-slate-500 text-sm font-medium flex items-center gap-2">
+          <mat-icon class="text-red-500 text-[18px] w-[18px] h-[18px]">delete</mat-icon> Deletes
+        </div>
+        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalDeletes || 0 }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Area -->
+  <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      
+      <!-- Search -->
+      <div class="relative w-full">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <mat-icon class="text-slate-400 text-[20px] w-[20px] h-[20px]">search</mat-icon>
+        </div>
+        <input type="text" placeholder="Search activities..." 
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event); onFilterChange()"
+          class="w-full pl-10 pr-3 py-2.5 bg-slate-50/50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors">
+      </div>
+
+      <!-- User Filter -->
+      <div class="relative w-full">
+        <select [ngModel]="selectedUser()" (ngModelChange)="selectedUser.set($event); onFilterChange()"
+          class="w-full pl-3 pr-10 py-2.5 bg-slate-50/50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors appearance-none">
+          <option value="">All Users</option>
+          <option *ngFor="let u of filteredUsers()" [value]="u.email">
+            {{ u.firstName }} {{ u.lastName }}
+          </option>
+        </select>
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+          <mat-icon class="text-[20px] w-[20px] h-[20px]">expand_more</mat-icon>
+        </div>
+      </div>
+      
+      <!-- Action Filter -->
+      <div class="relative w-full">
+        <select [ngModel]="selectedAction()" (ngModelChange)="selectedAction.set($event); onFilterChange()"
+          class="w-full pl-3 pr-10 py-2.5 bg-slate-50/50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors appearance-none">
+          <option value="">All Actions</option>
+          <option value="CREATE">Creates</option>
+          <option value="UPDATE">Updates</option>
+          <option value="DELETE">Deletes</option>
+        </select>
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+          <mat-icon class="text-[20px] w-[20px] h-[20px]">expand_more</mat-icon>
+        </div>
+      </div>
+      
+      <!-- Category Filter -->
+      <div class="relative w-full">
+        <select [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event); onFilterChange()"
+          class="w-full pl-3 pr-10 py-2.5 bg-slate-50/50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors appearance-none">
+          <option value="">All Entities</option>
+          <option *ngFor="let cat of stats()?.activitiesByCategory | keyvalue" [value]="cat.key">
+            {{ cat.key }} ({{ cat.value }})
+          </option>
+        </select>
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+          <mat-icon class="text-[20px] w-[20px] h-[20px]">expand_more</mat-icon>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Loading Overlay wrapper -->
+  <div class="relative min-h-[400px]">
+    <!-- Table View -->
+    <div [class.hidden]="viewMode() !== 'table'" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300 ease-in-out">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="activities()" matSort class="w-full" [class.opacity-50]="loading()">
+          
+          <!-- Timestamp Column -->
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Date & Time </th>
+            <td mat-cell *matCellDef="let row" class="text-slate-600 whitespace-nowrap py-3"> 
+              {{ row.timestamp | date:'MMM d, y, h:mm a' }} 
+            </td>
+          </ng-container>
+
+          <!-- Action Column -->
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Action </th>
+            <td mat-cell *matCellDef="let row" class="py-3">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium" [ngClass]="getActionColorClass(row.action)">
+                <mat-icon class="text-[14px] w-[14px] h-[14px]">{{ getActionIcon(row.action) }}</mat-icon>
+                {{ row.action }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Entity Type Column -->
+          <ng-container matColumnDef="entityType">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Entity Type </th>
+            <td mat-cell *matCellDef="let row" class="py-3 text-slate-800 font-medium"> 
+              {{ row.entityType }} 
+            </td>
+          </ng-container>
+          
+          <!-- Entity Label Column -->
+          <ng-container matColumnDef="entityLabel">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Entity </th>
+            <td mat-cell *matCellDef="let row" class="py-3 text-slate-600"> 
+              {{ row.entityLabel || row.entityId }} 
+            </td>
+          </ng-container>
+
+          <!-- User Column -->
+          <ng-container matColumnDef="actorEmail">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> User </th>
+            <td mat-cell *matCellDef="let row" class="py-3"> 
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
+                  {{ (row.actorEmail?.charAt(0) || '?') | uppercase }}
+                </div>
+                <span class="text-sm text-slate-700">{{ row.actorEmail || 'System' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Message Column -->
+          <ng-container matColumnDef="message">
+            <th mat-header-cell *matHeaderCellDef> Details </th>
+            <td mat-cell *matCellDef="let row" class="py-3 text-slate-500 max-w-xs truncate" [title]="row.message"> 
+              {{ row.message }} 
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="bg-slate-50 border-b border-slate-200"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"></tr>
+          
+          <!-- No Data Row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell text-center py-12 text-slate-500" colspan="6">
+              <mat-icon class="text-4xl text-slate-300 mb-2">inbox</mat-icon>
+              <p>No activities found matching your filters.</p>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Grid View -->
+    <div [class.hidden]="viewMode() !== 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 transition-all duration-300 ease-in-out" [class.opacity-50]="loading()">
+      <div *ngFor="let row of activities()" class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col h-full">
+        <!-- Header (Icon + Title + Date) -->
+        <div class="flex items-start gap-4 mb-4">
+           <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" [ngClass]="getActionColorClass(row.action)">
+             <mat-icon class="text-[24px] w-[24px] h-[24px]">{{ getActionIcon(row.action) }}</mat-icon>
+           </div>
+           <div class="flex-1 min-w-0 pt-1">
+             <h3 class="text-base font-semibold text-slate-800 leading-tight mb-1 truncate">{{ row.entityType }}</h3>
+             <p class="text-xs font-medium text-slate-500">{{ row.timestamp | date:'MMM d, y, h:mm a' }}</p>
+           </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="h-px w-full bg-slate-100 mb-4"></div>
+
+        <!-- Content -->
+        <div class="flex flex-col gap-4 flex-1">
+          <div>
+            <p class="text-sm font-medium text-slate-800 truncate" [title]="row.entityLabel || row.entityId">
+              {{ row.entityLabel || row.entityId }}
+            </p>
+            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-1">Entity</p>
+          </div>
+          
+          <div>
+            <p class="text-sm text-slate-700 truncate flex items-center gap-1.5" [title]="row.actorEmail || 'System'">
+              <mat-icon class="text-[16px] w-[16px] h-[16px] text-slate-400 -ml-0.5">person</mat-icon>
+              {{ row.actorEmail || 'System' }}
+            </p>
+            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-1">User</p>
+          </div>
+          
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mt-auto">
+            <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed" [title]="row.message">
+              {{ row.message }}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- No Data State Grid -->
+      <div *ngIf="activities().length === 0" class="col-span-full flex flex-col items-center justify-center py-12 bg-white rounded-xl border border-slate-200 border-dashed">
+        <mat-icon class="text-4xl text-slate-300 mb-2">inbox</mat-icon>
+        <p class="text-slate-500">No activities found matching your filters.</p>
+      </div>
+    </div>
+    
+    <!-- Paginator -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 mt-4 overflow-hidden">
+      <mat-paginator 
+        [length]="totalElements()" 
+        [pageSize]="20" 
+        [pageSizeOptions]="[10, 20, 50, 100]" 
+        showFirstLastButtons 
+        class="border-none">
+      </mat-paginator>
+    </div>
+
+    <!-- Global Loading Spinner -->
+    <div *ngIf="loading()" class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+      <div class="bg-white/80 p-4 rounded-full shadow-lg backdrop-blur-sm border border-slate-100 flex items-center gap-3">
+        <div class="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+        <span class="text-sm font-medium text-indigo-700">Loading activities...</span>
+      </div>
+    </div>
+  </div>
+</div>

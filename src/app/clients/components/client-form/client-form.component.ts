@@ -30,7 +30,7 @@ export class ClientFormComponent {
       name: [data?.name || '', Validators.required],
       industry: [data?.industry || ''],
       email: [data?.email || '', [Validators.email]],
-      phone: [data?.phone || ''],
+      phone: [data?.phone || '', [Validators.maxLength(10)]],
       city: [data?.city || ''],
       country: [data?.country || ''],
       website: [data?.website || ''],

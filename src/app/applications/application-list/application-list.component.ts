@@ -17,10 +17,11 @@ import { map, catchError } from 'rxjs/operators';
 
 import { ApplicationService } from '../../services/application.service';
 import { JobApplication } from '../../models/application.model';
-import { NotificationService } from '../../services/notification.service';
 import { HeaderService } from '../../services/header.service';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-application-list',
@@ -40,6 +41,7 @@ import { MfeNavigationService } from '../../services/mfe-navigation.service';
     MatTooltipModule,
     FormsModule,
     OrganizationLogoComponent,
+    NotificationDotComponent
   ],
   templateUrl: './application-list.component.html',
 })
@@ -48,13 +50,12 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   private appService = inject(ApplicationService);
   private router = inject(Router);
   private mfeNav = inject(MfeNavigationService);
-  private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
   dataSource = new MatTableDataSource<JobApplication>([]);
   applications = signal<any[]>([]);
   shortlistedCount = computed(() => this.applications().filter((a) => a.status === 'SHORTLISTED' || a.status === 'INTERVIEW_SCHEDULED').length);
   offeredCount = computed(() => this.applications().filter((a) => a.status === 'OFFERED' || a.status === 'ONBOARDED').length);
-  unreadAppIds = new Set<string>();
+  public notificationService = inject(NotificationService);
   totalElements = 0;
 
   filterValues = {
@@ -79,19 +80,15 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
       'Manage job applications and recruitment pipeline',
       'bi bi-file-earmark-person',
     );
-    this.loadUnreadAppIds();
     this.loadApplications();
   }
 
-  loadUnreadAppIds() {
-    this.notificationService.getUnreadEntityIds('APPLICATION').subscribe({
-      next: (ids: (string | number)[]) => (this.unreadAppIds = new Set(ids.map(String))),
-      error: () => (this.unreadAppIds = new Set()),
-    });
-  }
-
   hasNotification(appId: string | number): boolean {
-    return this.unreadAppIds.has(String(appId));
+    return this.notificationService.notifications().some(n => 
+      ['APPLICATION', 'SUBMISSION'].includes(n.entityType) && 
+      String(n.entityId) === String(appId) && 
+      !n.read
+    );
   }
 
   ngAfterViewInit() {
@@ -225,11 +222,6 @@ export class ApplicationListComponent implements OnInit, AfterViewInit {
   }
 
   onCardClick(appId: string | number) {
-    if (this.hasNotification(appId)) {
-      this.notificationService.markAsReadByEntity('APPLICATION', appId).subscribe(() => {
-        this.unreadAppIds.delete(String(appId));
-        this.notificationService.refreshCounts();
-      });
-    }
+    this.notificationService.markEntityAsRead('APPLICATION', appId);
   }
 }

@@ -7,13 +7,14 @@ import { TicketService } from '../../services/ticket.service';
 import { Ticket, TicketCategory, TicketStatus, TicketPriority } from '../../models/ticket.model';
 import { HeaderService } from '../../../services/header.service';
 import { AuthStore } from '../../../services/auth.store';
-import { NotificationService } from '../../../services/notification.service';
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
+import { NotificationDotComponent } from '../../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-ticket-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatPaginatorModule],
+  imports: [CommonModule, RouterLink, FormsModule, MatPaginatorModule, NotificationDotComponent],
   templateUrl: './ticket-list.component.html',
   styleUrls: ['./ticket-list.component.css'],
 })
@@ -21,7 +22,6 @@ export class TicketListComponent implements OnInit {
   ticketService = inject(TicketService);
   headerService = inject(HeaderService);
   authStore = inject(AuthStore);
-  private notificationService = inject(NotificationService);
   private mfeNav = inject(MfeNavigationService);
 
   resolvePath(path: string): string {
@@ -33,7 +33,7 @@ export class TicketListComponent implements OnInit {
   
   openCount = computed(() => this.tickets().filter((t) => t.status === TicketStatus.OPEN).length);
   resolvedCount = computed(() => this.tickets().filter((t) => t.status === TicketStatus.RESOLVED).length);
-  unreadTicketIds = new Set<string>();
+  public notificationService = inject(NotificationService);
 
   searchQuery = '';
   statusFilter = '';
@@ -56,19 +56,15 @@ export class TicketListComponent implements OnInit {
       'Manage and track support requests',
       'bi bi-headset',
     );
-    this.loadUnreadTicketIds();
     this.loadTickets();
   }
 
-  loadUnreadTicketIds() {
-    this.notificationService.getUnreadEntityIds('TICKET').subscribe({
-      next: (ids) => (this.unreadTicketIds = new Set(ids.map(String))),
-      error: () => (this.unreadTicketIds = new Set()),
-    });
-  }
-
   hasNotification(ticketId: string | number): boolean {
-    return this.unreadTicketIds.has(String(ticketId));
+    return this.notificationService.notifications().some(n => 
+      n.entityType === 'TICKET' && 
+      String(n.entityId) === String(ticketId) && 
+      !n.read
+    );
   }
 
   loadTickets(page: number = 0) {
@@ -153,11 +149,6 @@ export class TicketListComponent implements OnInit {
   }
 
   onCardClick(ticketId: string | number) {
-    if (this.hasNotification(ticketId)) {
-      this.notificationService.markAsReadByEntity('TICKET', ticketId).subscribe(() => {
-        this.unreadTicketIds.delete(String(ticketId));
-        this.notificationService.refreshCounts();
-      });
-    }
+    this.notificationService.markEntityAsRead('TICKET', ticketId);
   }
 }

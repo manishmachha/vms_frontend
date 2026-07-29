@@ -26,7 +26,7 @@ export enum TicketPriority {
 }
 
 export interface TicketAttachment {
-  id: number;
+  id: string;
   fileName: string;
   fileUrl: string;
   fileType: string;
@@ -35,8 +35,8 @@ export interface TicketAttachment {
 }
 
 export interface TicketMessage {
-  id: number;
-  ticketId: number;
+  id: string;
+  ticketId: string;
   sender: User;
   message: string;
   attachments: TicketAttachment[];
@@ -44,11 +44,11 @@ export interface TicketMessage {
 }
 
 export interface Ticket {
-  id: number;
+  id: string;
   title: string;
   description: string;
   category: TicketCategory;
-  refEntityId?: number;
+  refEntityId?: string;
   refEntityName?: string;
   status: TicketStatus;
   priority: TicketPriority;

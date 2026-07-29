@@ -66,15 +66,6 @@ export class ApplicationService {
     return this.api.get<any[]>(`/applications/${id}/documents`);
   }
 
-  getTimeline(id: string | number, page: number = 0, size: number = 50) {
-    const params = new HttpParams().set('page', page).set('size', size);
-    return this.api.get<any>(`/applications/${id}/timeline`, params);
-  }
-
-  addTimelineEvent(id: string | number, event: any) {
-    return this.api.post(`/applications/${id}/timeline`, event);
-  }
-
   runAnalysis(id: string | number) {
     return this.api.post<void>(`/applications/${id}/analysis`, {});
   }

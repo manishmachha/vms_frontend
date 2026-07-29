@@ -126,8 +126,9 @@
           <div class="flex items-center gap-3">
             <app-organization-logo [org]="project.client || project.internalOrg" size="md" [rounded]="true"></app-organization-logo>
             <div>
-              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer" [routerLink]="resolvePath('/projects/' + project.id)">
+              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer relative inline-block pr-3" [routerLink]="resolvePath('/projects/' + project.id)" (click)="onCardClick(project.id)">
                 {{ project.name }}
+                <app-notification-dot [entityType]="'PROJECT'" [entityId]="project.id"></app-notification-dot>
               </div>
               <span *ngIf="project.requestId" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-gray-100 text-gray-800 border border-gray-200 mt-1">
                 Req: {{ project.requestId }}
@@ -229,19 +230,12 @@
     class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     <div
       *ngFor="let project of filteredProjects(); let i = index"
-      class="card-modern p-6 group animate-fade-in-up relative"
-      [ngClass]="hasNotification(project.id) ? 'ring-2 ring-red-200 border-red-300' : ''"
+      class="card-modern p-6 group animate-fade-in-up relative cursor-pointer"
       [style.animation-delay.ms]="i * 50"
+      (click)="onCardClick(project.id)"
     >
       <!-- Notification Indicator -->
-      <div *ngIf="hasNotification(project.id)" class="absolute top-3 right-12 z-10">
-        <span class="flex h-3 w-3">
-          <span
-            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
-          ></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-        </span>
-      </div>
+      <app-notification-dot [entityType]="'PROJECT'" [entityId]="project.id" [cssClass]="'absolute top-4 right-4 w-3.5 h-3.5'"></app-notification-dot>
 
       <!-- Action Menu -->
       <div class="absolute top-3 right-3 z-20">

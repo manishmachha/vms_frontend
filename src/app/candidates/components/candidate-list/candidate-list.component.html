@@ -137,8 +137,9 @@
               {{ candidate.firstName.charAt(0) }}{{ candidate.lastName.charAt(0) }}
             </span>
             <div>
-              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer" [routerLink]="[candidate.id]">
+              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer relative inline-block pr-3" [routerLink]="[candidate.id]" (click)="onCardClick(candidate.id)">
                 {{ candidate.firstName }} {{ candidate.lastName }}
+                <app-notification-dot [entityType]="'CANDIDATE'" [entityId]="candidate.id"></app-notification-dot>
               </div>
               <div class="text-xs text-gray-500">{{ candidate.currentDesignation || 'Candidate' }}</div>
             </div>
@@ -223,22 +224,11 @@
   <div *ngIf="viewMode() === 'grid' && filteredCandidates().length > 0"
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <div *ngFor="let candidate of filteredCandidates()"
-     class="group bg-white rounded-xl border transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex flex-col relative overflow-hidden"
-     [ngClass]="
-       hasNotification(candidate.id)
-         ? 'border-red-200 ring-2 ring-red-500/10 hover:border-red-300'
-         : 'border-gray-200/80 hover:border-indigo-200'
-     "
+     class="group bg-white rounded-xl border transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex flex-col relative overflow-hidden border-gray-200/80 hover:border-indigo-200 cursor-pointer"
      (click)="onCardClick(candidate.id)">
 
   <!-- Active Notification Pill -->
-  <div *ngIf="hasNotification(candidate.id)" class="absolute top-3 right-3 z-10 flex items-center gap-1.5 px-2 py-1 rounded-full bg-red-50 border border-red-100">
-    <span class="relative flex h-2 w-2">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-    </span>
-    <span class="text-[10px] font-semibold text-red-600 uppercase tracking-wider">New</span>
-  </div>
+  <app-notification-dot [entityType]="'CANDIDATE'" [entityId]="candidate.id" [cssClass]="'absolute top-4 right-4 w-3.5 h-3.5'"></app-notification-dot>
 
   <!-- Main Content Container -->
   <div class="p-5 flex-1 flex flex-col">

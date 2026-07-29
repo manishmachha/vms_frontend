@@ -124,8 +124,9 @@
           <div class="flex items-center gap-4">
             <app-organization-logo [org]="client" size="md" [rounded]="true"></app-organization-logo>
             <div>
-              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer" [routerLink]="resolvePath('/clients/' + client.id)">
+              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer relative inline-block pr-3" [routerLink]="resolvePath('/clients/' + client.id)" (click)="onCardClick(client.id)">
                 {{ client.name }}
+                <app-notification-dot [entityType]="'CLIENT'" [entityId]="client.id"></app-notification-dot>
               </div>
               <div class="text-xs text-gray-500">{{ client.email || '--' }}</div>
             </div>
@@ -207,8 +208,12 @@
     class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
     <div
       *ngFor="let client of filteredClients()"
-      class="card-modern group hover:border-indigo-200 transition-all duration-300"
+      class="card-modern group hover:border-indigo-200 transition-all duration-300 cursor-pointer relative"
+      (click)="onCardClick(client.id)"
     >
+      <!-- Notification Indicator -->
+      <app-notification-dot [entityType]="'CLIENT'" [entityId]="client.id" [cssClass]="'absolute top-4 right-4 w-3.5 h-3.5'"></app-notification-dot>
+
       <!-- Card Content -->
       <div class="p-6">
         <div class="flex items-start justify-between mb-6">

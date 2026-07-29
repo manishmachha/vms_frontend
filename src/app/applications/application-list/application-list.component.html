@@ -104,16 +104,13 @@
 
     <!-- CARD GRID VIEW (ALL SCREENS) -->
     <div class="bg-gray-50/50 py-6 min-h-100">
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 overflow-visible">
         <div *ngFor="let app of dataSource.data"
           class="relative flex flex-col p-6 rounded-[28px] transition-all duration-500 ease-out cursor-pointer group bg-white border border-gray-100 hover:border-transparent hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.15)] hover:-translate-y-1.5"
-          [ngClass]="hasNotification(app.id) ? 'ring-2 ring-rose-400 ring-offset-2 ring-offset-white' : ''"
           (click)="viewDetails(app)">
 
           <!-- Absolute Notification Dot -->
-          <div *ngIf="hasNotification(app.id)"
-            class="absolute top-5 right-5 w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.6)]">
-          </div>
+          <app-notification-dot [entityType]="['APPLICATION', 'SUBMISSION']" [entityId]="app.id" [cssClass]="'absolute top-4 right-4 w-3.5 h-3.5'"></app-notification-dot>
 
           <!-- Section 1: Header (Candidate & Match) -->
           <div class="flex justify-between items-start gap-4 mb-4">

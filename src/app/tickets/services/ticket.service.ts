@@ -33,7 +33,7 @@ export class TicketService {
     status?: TicketStatus,
     category?: TicketCategory,
     priority?: TicketPriority,
-    assignedToId?: number,
+    assignedToId?: string,
     sort?: string
   ): Observable<Page<Ticket>> {
     let params = new HttpParams()
@@ -50,19 +50,19 @@ export class TicketService {
     return this.http.get<Page<Ticket>>(this.apiUrl, { params });
   }
 
-  getTicket(id: number): Observable<Ticket> {
+  getTicket(id: string): Observable<Ticket> {
     return this.http.get<Ticket>(`${this.apiUrl}/${id}`);
   }
 
-  updateStatus(id: number, status: TicketStatus): Observable<Ticket> {
+  updateStatus(id: string, status: TicketStatus): Observable<Ticket> {
     return this.http.put<Ticket>(`${this.apiUrl}/${id}/status`, null, { params: { status } });
   }
 
-  assignTicket(id: number, userId: number): Observable<Ticket> {
-    return this.http.put<Ticket>(`${this.apiUrl}/${id}/assign`, null, { params: { userId: userId.toString() } });
+  assignTicket(id: string, userId: string): Observable<Ticket> {
+    return this.http.put<Ticket>(`${this.apiUrl}/${id}/assign`, null, { params: { userId: userId } });
   }
 
-  addMessage(ticketId: number, message: string, files?: File[]): Observable<TicketMessage> {
+  addMessage(ticketId: string, message: string, files?: File[]): Observable<TicketMessage> {
     const formData = new FormData();
     formData.append('request', new Blob([JSON.stringify({ message })], { type: 'application/json' }));
     
@@ -75,7 +75,7 @@ export class TicketService {
     return this.http.post<TicketMessage>(`${this.apiUrl}/${ticketId}/messages`, formData);
   }
 
-  getMessages(ticketId: number): Observable<TicketMessage[]> {
+  getMessages(ticketId: string): Observable<TicketMessage[]> {
     return this.http.get<TicketMessage[]>(`${this.apiUrl}/${ticketId}/messages`);
   }
 
@@ -91,7 +91,7 @@ export class TicketService {
     return this.http.get<User[]>(`${this.apiUrl}/eligible-users`);
   }
 
-  updateCcUsers(ticketId: number, ccUserIds: number[]): Observable<Ticket> {
+  updateCcUsers(ticketId: string, ccUserIds: string[]): Observable<Ticket> {
     return this.http.put<Ticket>(`${this.apiUrl}/${ticketId}/cc`, ccUserIds);
   }
 }

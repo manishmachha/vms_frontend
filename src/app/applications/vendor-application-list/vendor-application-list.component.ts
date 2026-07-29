@@ -3,23 +3,23 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { ApplicationService } from '../../services/application.service';
-import { NotificationService } from '../../services/notification.service';
 import { HeaderService } from '../../services/header.service';
 import { JobApplication } from '../../models/application.model';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-vendor-application-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatPaginatorModule],
+  imports: [CommonModule, FormsModule, MatPaginatorModule, NotificationDotComponent],
   templateUrl: './vendor-application-list.component.html',
   styleUrls: ['./vendor-application-list.component.css'],
 })
 export class VendorApplicationListComponent implements OnInit {
   applicationService = inject(ApplicationService);
-  notificationService = inject(NotificationService);
   headerService = inject(HeaderService);
   applications = signal<JobApplication[]>([]);
-  unreadAppIds = new Set<string>();
+  public notificationService = inject(NotificationService);
 
   totalElements = 0;
   pageSize = 10;
@@ -33,19 +33,20 @@ export class VendorApplicationListComponent implements OnInit {
       'Track the status of your candidates',
       'bi bi-people',
     );
-    this.loadUnreadAppIds();
     this.loadApplications();
   }
 
-  loadUnreadAppIds() {
-    this.notificationService.getUnreadEntityIds('APPLICATION').subscribe({
-      next: (ids) => (this.unreadAppIds = new Set(ids.map(String))),
-      error: () => (this.unreadAppIds = new Set()),
-    });
+  hasNotification(appId: string | number): boolean {
+    return this.notificationService.notifications().some(n => 
+      ['APPLICATION', 'SUBMISSION'].includes(n.entityType) && 
+      String(n.entityId) === String(appId) && 
+      !n.read
+    );
   }
 
-  hasNotification(appId: string | number): boolean {
-    return this.unreadAppIds.has(String(appId));
+  onCardClick(appId: string | number) {
+    this.notificationService.markEntityAsRead('APPLICATION', appId);
+    this.notificationService.markEntityAsRead('SUBMISSION', appId);
   }
 
   loadApplications(pageIndex: number = 0, pageSize: number = this.pageSize) {

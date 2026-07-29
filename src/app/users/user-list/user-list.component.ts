@@ -12,6 +12,8 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-user-list',
@@ -25,6 +27,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    NotificationDotComponent,
   ],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.css',
@@ -35,6 +38,7 @@ export class UserListComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   public authStore = inject(AuthStore);
   private mfeNav = inject(MfeNavigationService);
+  private notificationService = inject(NotificationService);
 
   viewMode = signal<'table' | 'grid'>('grid');
   dataSource = new MatTableDataSource<User>([]);
@@ -154,5 +158,9 @@ export class UserListComponent implements OnInit {
 
   toggleView(mode: 'table' | 'grid') {
     this.viewMode.set(mode);
+  }
+
+  onCardClick(userId: string | number) {
+    this.notificationService.markEntityAsRead('USER', userId);
   }
 }

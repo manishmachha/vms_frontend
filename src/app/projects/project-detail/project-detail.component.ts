@@ -14,10 +14,8 @@ import { CandidateService } from '../../services/candidate.service';
 import { Candidate } from '../../candidates/models/candidate.model';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogService } from '../../services/dialog.service';
-import { TimelineService, TimelineEvent } from '../../services/timeline.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
-import { TimelineComponent } from '../../layout/components/timeline/timeline.component';
 @Component({
   selector: 'app-project-detail',
   standalone: true,
@@ -28,8 +26,7 @@ import { TimelineComponent } from '../../layout/components/timeline/timeline.com
     UserAvatarComponent,
     MatTabsModule,
     MatIconModule,
-    TimelineComponent
-  ],
+      ],
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.css'],
 })
@@ -41,7 +38,6 @@ export class ProjectDetailComponent implements OnInit {
   private headerService = inject(HeaderService);
   private dialog = inject(MatDialog);
   private dialogService = inject(DialogService);
-  private timelineService = inject(TimelineService);
   private mfeNav = inject(MfeNavigationService);
 
   resolvePath(path: string): string {
@@ -50,7 +46,6 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   project = signal<Project | null>(null);
-  timelineEvents = signal<TimelineEvent[]>([]);
   allocations = signal<ProjectAllocation[]>([]);
   users = signal<User[]>([]);
   candidates = signal<Candidate[]>([]);
@@ -98,16 +93,9 @@ export class ProjectDetailComponent implements OnInit {
   loadProject(id: string) {
     this.projectService.getProject(id).subscribe((p) => {
       this.project.set(p);
-      this.loadTimeline(id.toString());
     });
   }
 
-  loadTimeline(id: string) {
-    this.timelineService.getTimeline('PROJECT', id).subscribe({
-      next: (res) => this.timelineEvents.set(res.content),
-      error: (err) => console.error('Failed to load timeline', err),
-    });
-  }
 
   loadAllocations(id: string) {
     this.projectService.getAllocations(id).subscribe((data) => {

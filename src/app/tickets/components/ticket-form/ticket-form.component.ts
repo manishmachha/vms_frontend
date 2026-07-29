@@ -50,8 +50,8 @@ export class TicketFormComponent implements OnInit {
     return this.eligibleUsers().filter(u => ids.includes(u.id));
   }
 
-  toggleCcUser(userId: number) {
-    const current: number[] = [...(this.ticketForm.get('ccUserIds')?.value || [])];
+  toggleCcUser(userId: string) {
+    const current: string[] = [...(this.ticketForm.get('ccUserIds')?.value || [])];
     const idx = current.indexOf(userId);
     if (idx > -1) {
       current.splice(idx, 1);
@@ -61,11 +61,11 @@ export class TicketFormComponent implements OnInit {
     this.ticketForm.get('ccUserIds')?.setValue(current);
   }
 
-  removeCcUser(userId: number, event?: Event) {
+  removeCcUser(userId: string, event?: Event) {
     if (event) {
       event.stopPropagation();
     }
-    const current: number[] = [...(this.ticketForm.get('ccUserIds')?.value || [])];
+    const current: string[] = [...(this.ticketForm.get('ccUserIds')?.value || [])];
     const idx = current.indexOf(userId);
     if (idx > -1) {
       current.splice(idx, 1);

@@ -43,7 +43,7 @@ export class VendorCreateComponent {
   vendorForm: FormGroup = this.fb.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    phone: [''],
+    phone: ['', [Validators.maxLength(10)]],
     address: [''],
     website: ['']
   });

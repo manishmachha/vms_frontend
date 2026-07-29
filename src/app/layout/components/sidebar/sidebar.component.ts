@@ -11,9 +11,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { OrganizationLogoComponent } from '../organization-logo/organization-logo.component';
-import { NotificationCounts, NotificationService } from '../../../services/notification.service';
 import { AuthStore } from '../../../services/auth.store';
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
+import { NotificationService } from '../../../services/notification.service';
 
 export type UserRole =
   | 'SUPER_ADMIN'
@@ -29,7 +29,7 @@ interface MenuItem {
   icon: string;
   roles: UserRole[];
   orgTypes: OrganizationType[];
-  notificationCategory?: string;
+  notificationCategory?: string | string[];
 }
 
 interface MenuSection {
@@ -49,11 +49,9 @@ interface MenuSection {
 export class SidebarComponent implements OnInit {
   @Output() menuItemClick = new EventEmitter<void>();
   authStore = inject(AuthStore);
-  private notificationService = inject(NotificationService);
+  notificationService = inject(NotificationService);
   private destroyRef = inject(DestroyRef);
   private mfeNav = inject(MfeNavigationService);
-
-  notificationCounts = signal<NotificationCounts | null>(null);
 
   // State for visible sections
   visibleSections = signal<MenuSection[]>([]);
@@ -77,6 +75,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-building',
           roles: ['SUPER_ADMIN', 'MANAGER'],
           orgTypes: ['SOLVENTEK'],
+          notificationCategory: 'USER',
         },
       ],
     },
@@ -84,6 +83,13 @@ export class SidebarComponent implements OnInit {
       title: 'Administration',
       icon: 'bi bi-shield-lock',
       items: [
+        {
+          label: 'Activity Log',
+          route: '/activities',
+          icon: 'bi bi-activity',
+          roles: ['SUPER_ADMIN', 'MANAGER'],
+          orgTypes: ['SOLVENTEK'],
+        },
         {
           label: 'Vendors',
           route: '/vendors',
@@ -120,7 +126,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-file-earmark-text',
           roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
-          notificationCategory: 'APPLICATION',
+          notificationCategory: ['APPLICATION', 'SUBMISSION'],
         },
         {
           label: 'Interviews',
@@ -128,6 +134,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-calendar-event',
           roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'VENDOR', 'EMPLOYEE'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
+          notificationCategory: 'INTERVIEW',
         },
         {
           label: 'Track Applications',
@@ -135,7 +142,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-list-check',
           roles: ['VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
-          notificationCategory: 'APPLICATION',
+          notificationCategory: ['APPLICATION', 'SUBMISSION'],
         },
       ],
     },
@@ -149,6 +156,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-briefcase',
           roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION'],
           orgTypes: ['SOLVENTEK'],
+          notificationCategory: 'CLIENT',
         },
         {
           label: 'Projects',
@@ -164,6 +172,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-clock-history',
           roles: ['SUPER_ADMIN', 'MANAGER', 'EMPLOYEE'],
           orgTypes: ['SOLVENTEK'],
+          notificationCategory: 'TIMESHEET_ENTRY',
         },
       ],
     },
@@ -202,9 +211,15 @@ export class SidebarComponent implements OnInit {
   }
 
   getNotificationCount(item: MenuItem): number {
-    const counts = this.notificationService.notificationCounts();
-    if (!counts || !item.notificationCategory) return 0;
-    return (counts as any)[item.notificationCategory] || 0;
+    if (!item.notificationCategory) return 0;
+    
+    const categories = Array.isArray(item.notificationCategory) 
+      ? item.notificationCategory 
+      : [item.notificationCategory];
+      
+    const notifications = this.notificationService.notifications();
+    
+    return notifications.filter(n => !n.read && categories.includes(n.entityType)).length;
   }
 
   getSectionNotificationCount(section: MenuSection): number {

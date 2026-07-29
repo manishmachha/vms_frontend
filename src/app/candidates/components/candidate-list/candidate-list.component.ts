@@ -6,13 +6,14 @@ import { CandidateService } from '../../services/candidate.service';
 import { Candidate } from '../../models/candidate.model';
 import { HeaderService } from '../../../services/header.service';
 import { AuthStore } from '../../../services/auth.store';
-import { NotificationService } from '../../../services/notification.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CandidateUploadDialogComponent } from '../candidate-upload-dialog/candidate-upload-dialog.component';
 import { OrganizationLogoComponent } from '../../../layout/components/organization-logo/organization-logo.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { NotificationDotComponent } from '../../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-candidate-list',
@@ -26,6 +27,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    NotificationDotComponent
   ],
   templateUrl: './candidate-list.component.html',
   styleUrls: ['./candidate-list.component.css'],
@@ -34,8 +36,8 @@ export class CandidateListComponent implements OnInit {
   private candidateService = inject(CandidateService);
   private headerService = inject(HeaderService);
   public authStore = inject(AuthStore);
-  private notificationService = inject(NotificationService);
   private dialog = inject(MatDialog);
+  public notificationService = inject(NotificationService);
 
   viewMode = signal<'table' | 'grid'>('grid');
   dataSource = new MatTableDataSource<Candidate>([]);
@@ -56,7 +58,6 @@ export class CandidateListComponent implements OnInit {
   totalCandidates = signal<number>(0);
   candidatesCreatedByYou = signal<number>(0);
   naukriCandidates = signal<number>(0);
-  unreadCandidateIds = new Set<string>();
 
   ngOnInit() {
     this.headerService.setTitle(
@@ -64,19 +65,15 @@ export class CandidateListComponent implements OnInit {
       'Manage your candidate database',
       'bi bi-people-fill',
     );
-    this.loadUnreadCandidateIds();
     this.loadCandidates();
   }
 
-  loadUnreadCandidateIds() {
-    this.notificationService.getUnreadEntityIds('CANDIDATE').subscribe({
-      next: (ids) => (this.unreadCandidateIds = new Set(ids.map(String))),
-      error: () => (this.unreadCandidateIds = new Set()),
-    });
-  }
-
   hasNotification(candidateId: string | number): boolean {
-    return this.unreadCandidateIds.has(String(candidateId));
+    return this.notificationService.notifications().some(n => 
+      n.entityType === 'CANDIDATE' && 
+      String(n.entityId) === String(candidateId) && 
+      !n.read
+    );
   }
 
   loadCandidates() {
@@ -189,11 +186,6 @@ export class CandidateListComponent implements OnInit {
   }
 
   onCardClick(candidateId: string | number) {
-    if (this.hasNotification(candidateId)) {
-      this.notificationService.markAsReadByEntity('CANDIDATE', candidateId).subscribe(() => {
-        this.unreadCandidateIds.delete(String(candidateId));
-        this.notificationService.refreshCounts();
-      });
-    }
+    this.notificationService.markEntityAsRead('CANDIDATE', candidateId);
   }
 }

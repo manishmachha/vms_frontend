@@ -29,7 +29,7 @@ export class CandidateFormComponent {
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    phone: [''],
+    phone: ['', [Validators.maxLength(10)]],
     currentDesignation: [''],
     currentCompany: [''],
     experienceYears: [0, [Validators.min(0)]],

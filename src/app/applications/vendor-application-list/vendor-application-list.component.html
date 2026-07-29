@@ -31,7 +31,9 @@
   <div class="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
     <ul role="list" class="divide-y divide-gray-200">
       <li *ngFor="let app of applications()">
-        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50 transition-colors">
+        <div class="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50 transition-colors cursor-pointer relative" (click)="onCardClick(app.id)">
+          <!-- Notification Indicator -->
+          <app-notification-dot [entityType]="['APPLICATION', 'SUBMISSION']" [entityId]="app.id" [cssClass]="'relative shrink-0 mr-4 w-3.5 h-3.5'"></app-notification-dot>
           <div class="min-w-0 flex-1 sm:flex sm:items-center sm:justify-between">
             <div class="truncate">
               <div class="flex text-sm">

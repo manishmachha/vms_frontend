@@ -21,13 +21,13 @@ export class TicketDetailComponent implements OnInit {
   private headerService = inject(HeaderService);
   authStore = inject(AuthStore);
 
-  ticketId = signal<number>(0);
+  ticketId = signal<string>('');
   ticket = signal<Ticket | null>(null);
   messages = signal<TicketMessage[]>([]);
   eligibleUsers = signal<User[]>([]);
   
   isEditingCc = false;
-  selectedCcUserIds: number[] = [];
+  selectedCcUserIds: string[] = [];
   ccSearchTerm = signal('');
   isCcDropdownOpen = signal(false);
   
@@ -44,7 +44,7 @@ export class TicketDetailComponent implements OnInit {
     );
   }
 
-  toggleCcUser(userId: number) {
+  toggleCcUser(userId: string) {
     const idx = this.selectedCcUserIds.indexOf(userId);
     if (idx > -1) {
       this.selectedCcUserIds.splice(idx, 1);
@@ -62,7 +62,7 @@ export class TicketDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      const id = +params['id'];
+      const id = params['id'];
       if (id) {
         this.ticketId.set(id);
         this.loadTicket();
@@ -155,7 +155,7 @@ export class TicketDetailComponent implements OnInit {
     }
   }
 
-  assignTicket(userId: number) {
+  assignTicket(userId: string) {
     this.ticketService.assignTicket(this.ticketId(), userId).subscribe({
       next: (updatedTicket) => {
         this.ticket.set(updatedTicket);
@@ -170,7 +170,7 @@ export class TicketDetailComponent implements OnInit {
   onAssigneeChange(event: any) {
     const userId = event.target.value;
     if (userId) {
-      this.assignTicket(+userId);
+      this.assignTicket(userId);
     }
   }
 

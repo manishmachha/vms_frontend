@@ -7,10 +7,11 @@ import { OrganizationService } from '../../services/organization.service';
 import { Vendor } from '../../models/organization.model';
 import { HeaderService } from '../../services/header.service';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
-import { NotificationService } from '../../services/notification.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-vendor-list',
@@ -23,6 +24,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    NotificationDotComponent
   ],
   templateUrl: './vendor-list.component.html',
   styleUrls: ['./vendor-list.component.css'],
@@ -30,7 +32,6 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 export class VendorListComponent implements OnInit {
   organizationService = inject(OrganizationService);
   headerService = inject(HeaderService);
-  notificationService = inject(NotificationService);
   private mfeNav = inject(MfeNavigationService);
 
   viewMode = signal<'table' | 'grid'>('grid');
@@ -49,11 +50,11 @@ export class VendorListComponent implements OnInit {
   }
 
   vendors = signal<Vendor[]>([]);
-  unreadVendorIds = new Set<number>();
   activeCount = signal(0);
   inactiveCount = signal(0);
   searchQuery = '';
   activeTab = 'all';
+  public notificationService = inject(NotificationService);
 
   tabs = [
     { label: 'All', value: 'all' },
@@ -63,19 +64,19 @@ export class VendorListComponent implements OnInit {
 
   ngOnInit() {
     this.headerService.setTitle('Vendor Management', 'Manage vendor organizations', 'bi bi-shop');
-    this.loadUnreadVendorIds();
     this.loadVendors();
   }
 
-  loadUnreadVendorIds() {
-    this.notificationService.getUnreadEntityIds('ORGANIZATION').subscribe({
-      next: (ids: any) => (this.unreadVendorIds = new Set(ids)),
-      error: () => (this.unreadVendorIds = new Set()),
-    });
+  hasNotification(orgId: number | string): boolean {
+    return this.notificationService.notifications().some(n => 
+      n.entityType === 'VENDOR' && 
+      String(n.entityId) === String(orgId) && 
+      !n.read
+    );
   }
 
-  hasNotification(orgId: number | string): boolean {
-    return this.unreadVendorIds.has(orgId as number);
+  onCardClick(orgId: number | string) {
+    this.notificationService.markEntityAsRead('VENDOR', orgId);
   }
 
   loadVendors() {

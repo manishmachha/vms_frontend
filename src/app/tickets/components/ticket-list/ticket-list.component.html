@@ -85,18 +85,12 @@
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
     <div
       *ngFor="let ticket of tickets()"
-      class="bg-white rounded-2xl shadow-sm border relative transition-all duration-300"
-      [ngClass]="hasNotification(ticket.id) ? 'border-red-200 shadow-md ring-1 ring-red-100' : 'border-gray-100 hover:shadow-xl hover:border-indigo-100'"
+      class="bg-white rounded-2xl shadow-sm border relative transition-all duration-300 border-gray-100 hover:shadow-xl hover:border-indigo-100 cursor-pointer"
       (click)="onCardClick(ticket.id)"
       [routerLink]="resolvePath('/tickets/' + ticket.id)"
     >
       <!-- Notification Indicator -->
-      <div *ngIf="hasNotification(ticket.id)" class="absolute top-3 right-3 z-10">
-        <span class="flex h-4 w-4 relative">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-white shadow-sm"></span>
-        </span>
-      </div>
+      <app-notification-dot [entityType]="'TICKET'" [entityId]="ticket.id" [cssClass]="'absolute top-4 right-4 w-3.5 h-3.5'"></app-notification-dot>
 
       <div class="p-6 cursor-pointer h-full flex flex-col">
         <div class="flex justify-between items-start mb-4">

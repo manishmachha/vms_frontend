@@ -10,13 +10,14 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApplicationFormComponent } from '../../applications/application-form/application-form.component';
 import { OrganizationLogoComponent } from '../../layout/components/organization-logo/organization-logo.component';
 import { AuthStore } from '../../services/auth.store';
-import { NotificationService } from '../../services/notification.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-job-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatDialogModule, OrganizationLogoComponent, MatPaginatorModule],
+  imports: [CommonModule, RouterLink, FormsModule, MatDialogModule, OrganizationLogoComponent, MatPaginatorModule, NotificationDotComponent],
   templateUrl: './job-list.component.html',
   styleUrls: ['./job-list.component.css'],
 })
@@ -25,8 +26,8 @@ export class JobListComponent implements OnInit {
   headerService = inject(HeaderService);
   dialog = inject(MatDialog);
   authStore = inject(AuthStore);
-  private notificationService = inject(NotificationService);
   private mfeNav = inject(MfeNavigationService);
+  public notificationService = inject(NotificationService);
 
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
@@ -37,7 +38,6 @@ export class JobListComponent implements OnInit {
   filteredJobs = signal<Job[]>([]);
   publishedCount = computed(() => this.jobs().filter((j) => j.status === 'PUBLISHED').length);
   fteCount = computed(() => this.jobs().filter((j) => j.employmentType === 'FTE').length);
-  unreadJobIds = new Set<string>();
 
   searchQuery = '';
   statusFilter = '';
@@ -56,19 +56,15 @@ export class JobListComponent implements OnInit {
       'Explore and apply to opportunities',
       'bi bi-briefcase',
     );
-    this.loadUnreadJobIds();
     this.loadJobs();
   }
 
-  loadUnreadJobIds() {
-    this.notificationService.getUnreadEntityIds('JOB').subscribe({
-      next: (ids) => (this.unreadJobIds = new Set(ids.map(String))),
-      error: () => (this.unreadJobIds = new Set()),
-    });
-  }
-
   hasNotification(jobId: string | number): boolean {
-    return this.unreadJobIds.has(String(jobId));
+    return this.notificationService.notifications().some(n => 
+      n.entityType === 'JOB' && 
+      String(n.entityId) === String(jobId) && 
+      !n.read
+    );
   }
 
   loadJobs(page: number = 0) {
@@ -148,11 +144,6 @@ export class JobListComponent implements OnInit {
   }
 
   onCardClick(jobId: string | number) {
-    if (this.hasNotification(jobId)) {
-      this.notificationService.markAsReadByEntity('JOB', jobId).subscribe(() => {
-        this.unreadJobIds.delete(String(jobId));
-        this.notificationService.refreshCounts();
-      });
-    }
+    this.notificationService.markEntityAsRead('JOB', jobId);
   }
 }

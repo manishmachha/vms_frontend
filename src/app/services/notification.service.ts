@@ -1,239 +1,231 @@
-import { Injectable, inject, signal, NgZone } from '@angular/core';
-import { HttpParams } from '@angular/common/http';
-import { Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Page } from '../models/page.model';
-import { ApiResponse } from '../models/auth.model';
+import { Injectable, computed, signal } from '@angular/core';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { ApiService } from './api.service';
+import { Client, StompSubscription, IMessage } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import { AuthStore } from './auth.store';
-import { Client, IMessage } from '@stomp/stompjs';
-
-export interface Notification {
-  id: number;
-  title: string;
-  body: string;
-  category: string;
-  priority: string;
-  refEntityType: string;
-  refEntityId: number;
-  actionUrl: string;
-  iconType: string;
-  read: boolean;
-  readAt: string | null;
-  createdAt: string;
-}
-
-export interface NotificationCounts {
-  [key: string]: number;
-}
+import { ActivityLog } from '../models/notification.model';
+import { SKIP_LOADER } from './api.service';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class NotificationService {
-  private apiService = inject(ApiService);
-  private authStore = inject(AuthStore);
-  private zone = inject(NgZone);
-  private baseUrl = `/notifications`;
-  
   private stompClient: Client | null = null;
-  readonly notificationStream = new Subject<Notification>();
+  private orgSubscription: StompSubscription | null = null;
+  private globalSubscription: StompSubscription | null = null;
 
-  // Centralized signal for notification counts
-  readonly notificationCounts = signal<NotificationCounts | null>(null);
+  // State signals
+  private _notifications = signal<ActivityLog[]>([]);
+  private _unreadCount = signal<number>(0);
+  
+  // Computed signals
+  readonly notifications = computed(() => this._notifications());
+  readonly unreadCount = computed(() => this._unreadCount());
 
-  constructor() {
-    this.connectWebSocket();
+  constructor(
+    private http: HttpClient,
+    private authStore: AuthStore
+  ) {
+    // Initial fetch if already logged in
+    if (this.authStore.isAuthenticated()) {
+      this.fetchInitialNotifications();
+      this.connect();
+    }
   }
 
-  private connectWebSocket() {
+  /**
+   * Fetches the initial page of notifications via REST API
+   */
+  public fetchInitialNotifications() {
+    const orgId = this.authStore.organizationId();
+    let url = `${environment.apiUrl}/activities?size=50`;
+    if (orgId) {
+      url += `&organizationId=${orgId}`;
+    }
+
+    const context = new HttpContext().set(SKIP_LOADER, true);
+    this.http.get<any>(url, { context }).subscribe({
+      next: (res) => {
+        // Assume pageable response: res.content
+        this._notifications.set(res.content || []);
+      },
+      error: (err) => console.error('Failed to fetch notifications', err)
+    });
+
+    this.fetchUnreadCount();
+  }
+
+  /**
+   * Fetches the initial unread count via REST API
+   */
+  public fetchUnreadCount() {
+    const orgId = this.authStore.organizationId();
+    let url = `${environment.apiUrl}/activities/unread-count`;
+    if (orgId) {
+      url += `?organizationId=${orgId}`;
+    }
+
+    const context = new HttpContext().set(SKIP_LOADER, true);
+    this.http.get<{count: number}>(url, { context }).subscribe({
+      next: (res) => {
+        this._unreadCount.set(res.count || 0);
+      },
+      error: (err) => console.error('Failed to fetch unread count', err)
+    });
+  }
+
+  /**
+   * Connects to the STOMP WebSocket broker
+   */
+  public connect() {
+    if (this.stompClient && this.stompClient.connected) {
+      return;
+    }
+
     const token = this.authStore.accessToken();
     if (!token) return;
 
-    // Use environment apiUrl to build WS url, fallback to standard localhost
-    let wsUrl = (environment.apiUrl || 'http://localhost:8080/api').replace(/^http/, 'ws') + '/ws';
-    
+    // Use absolute URL for WS if API url is relative
+    const wsUrl = environment.apiUrl.startsWith('http') 
+      ? environment.apiUrl.replace('http', 'ws') + '/ws'
+      : window.location.protocol.replace('http', 'ws') + '//' + window.location.host + environment.apiUrl + '/ws';
+
     this.stompClient = new Client({
       brokerURL: wsUrl,
       connectHeaders: {
         Authorization: `Bearer ${token}`
+      },
+      debug: (str) => {
+        // console.log('STOMP: ' + str);
       },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
 
+    // Fallback for environments where WebSockets aren't natively supported
+    if (typeof WebSocket !== 'function') {
+      const httpUrl = environment.apiUrl.startsWith('http') 
+        ? environment.apiUrl + '/ws'
+        : window.location.origin + environment.apiUrl + '/ws';
+        
+      this.stompClient.webSocketFactory = () => {
+        return new (SockJS as any)(httpUrl);
+      };
+    }
+
     this.stompClient.onConnect = (frame) => {
-      console.log('Connected to Real-time Notifications');
-      this.zone.run(() => {
-        this.refreshCounts();
-      });
-      
-      this.stompClient?.subscribe('/user/queue/notifications', (message: IMessage) => {
-        console.log('[WebSocket] Received message:', message.body);
-        if (message.body) {
-          const notification: Notification = JSON.parse(message.body);
-          this.zone.run(() => {
-            console.log('[WebSocket] Processing notification:', notification);
-            this.notificationStream.next(notification);
-            this.refreshCounts();
-          });
-        }
-      });
+      console.log('Connected to Notifications WebSocket');
+      this.subscribeToNotifications();
+    };
+
+    this.stompClient.onStompError = (frame) => {
+      console.error('STOMP Error', frame.headers['message'], frame.body);
     };
 
     this.stompClient.activate();
   }
 
-  refreshCounts() {
-    this.getCountByCategory(true).subscribe({
-      next: (counts) => this.notificationCounts.set(counts),
-      error: () => this.notificationCounts.set(null),
+  /**
+   * Disconnects from STOMP
+   */
+  public disconnect() {
+    if (this.stompClient) {
+      this.stompClient.deactivate();
+      this.stompClient = null;
+    }
+  }
+
+  private subscribeToNotifications() {
+    if (!this.stompClient || !this.stompClient.connected) return;
+
+    const orgId = this.authStore.organizationId();
+
+    // Subscribe to Organization Notifications
+    if (orgId) {
+      if (this.orgSubscription) this.orgSubscription.unsubscribe();
+      
+      this.orgSubscription = this.stompClient.subscribe(`/topic/notifications/org/${orgId}`, (message: IMessage) => {
+        this.handleIncomingNotification(message);
+      });
+    }
+
+    // Subscribe to Global Notifications
+    if (this.globalSubscription) this.globalSubscription.unsubscribe();
+    this.globalSubscription = this.stompClient.subscribe(`/topic/notifications/global`, (message: IMessage) => {
+      this.handleIncomingNotification(message);
     });
   }
 
-  getNotifications(
-    page: number = 0,
-    size: number = 10,
-    unreadOnly: boolean = false,
-    skipLoading: boolean = false,
-  ) {
-    let params = new HttpParams()
-      .set('page', page)
-      .set('size', size)
-      .set('unreadOnly', unreadOnly);
-    
-    return this.apiService.get<Page<Notification>>(this.baseUrl, params, undefined, skipLoading);
-  }
-
-  getNotificationsByCategory(
-    category: string,
-    page: number = 0,
-    size: number = 20,
-    skipLoading: boolean = false,
-  ) {
-    let params = new HttpParams().set('page', page).set('size', size);
-    return this.apiService.get<Page<Notification>>(`${this.baseUrl}/category/${category}`, params, undefined, skipLoading);
-  }
-
-  getUnreadCount(skipLoading: boolean = false) {
-    return this.apiService.get<number>(`${this.baseUrl}/unread-count`, undefined, undefined, skipLoading);
-  }
-
-  getCountByCategory(skipLoading: boolean = false) {
-    return this.apiService.get<NotificationCounts>(`${this.baseUrl}/count-by-category`, undefined, undefined, skipLoading);
-  }
-
-  getUnreadEntityIds(category: string) {
-    return this.apiService.get<string[]>(`${this.baseUrl}/unread-entity-ids/${category}`);
-  }
-
-  markAsRead(id: number | string, skipLoading: boolean = false) {
-    return this.apiService.post<void>(`${this.baseUrl}/${id}/read`, {}, undefined, skipLoading);
-  }
-
-  markAsReadByEntity(category: string, entityId: number | string, skipLoading: boolean = false) {
-    return this.apiService.post<number>(`${this.baseUrl}/read/entity/${category}/${entityId}`, {}, undefined, skipLoading);
-  }
-
-  markAllAsRead(skipLoading: boolean = false) {
-    return this.apiService.post<number>(`${this.baseUrl}/mark-all-read`, {}, undefined, skipLoading);
-  }
-
-  deleteNotification(id: number | string) {
-    return this.apiService.delete<void>(`${this.baseUrl}/${id}`);
-  }
-
-  deleteAllRead() {
-    return this.apiService.delete<number>(`${this.baseUrl}/read`);
-  }
-
-  // Helper to get icon class based on category
-  getIconClass(notification: Notification): string {
-    if (notification.iconType) return notification.iconType;
-
-    switch (notification.category) {
-      case 'APPLICATION':
-        return 'bi-file-earmark-text-fill';
-      case 'JOB':
-        return 'bi-briefcase-fill';
-      case 'TICKET':
-        return 'bi-ticket-detailed-fill';
-      case 'USER':
-        return 'bi-person-fill';
-      case 'ORGANIZATION':
-        return 'bi-building-fill';
-      case 'PROJECT':
-        return 'bi-kanban-fill';
-      case 'INTERVIEW':
-        return 'bi-calendar-event-fill';
-      case 'ONBOARDING':
-        return 'bi-person-check-fill';
-      case 'ANALYSIS':
-        return 'bi-robot';
-      case 'TRACKING':
-        return 'bi-list-check';
-      default:
-        return 'bi-bell-fill';
+  private handleIncomingNotification(message: IMessage) {
+    if (message.body) {
+      try {
+        const notification: ActivityLog = JSON.parse(message.body);
+        
+        // Update signals
+        this._notifications.update(list => {
+          // Prepend new notification, limit to 50
+          const updated = [notification, ...list];
+          return updated.slice(0, 50);
+        });
+        
+        this._unreadCount.update(count => count + 1);
+        
+      } catch (err) {
+        console.error('Error parsing incoming notification', err);
+      }
     }
   }
 
-  // Helper to get color class based on category
-  getColorClass(notification: Notification): { bg: string; text: string } {
-    switch (notification.category) {
-      case 'APPLICATION':
-        return { bg: 'bg-blue-100', text: 'text-blue-600' };
-      case 'JOB':
-        return { bg: 'bg-purple-100', text: 'text-purple-600' };
-      case 'TICKET':
-        return { bg: 'bg-amber-100', text: 'text-amber-600' };
-      case 'USER':
-        return { bg: 'bg-green-100', text: 'text-green-600' };
-      case 'ORGANIZATION':
-        return { bg: 'bg-indigo-100', text: 'text-indigo-600' };
-      case 'PROJECT':
-        return { bg: 'bg-pink-100', text: 'text-pink-600' };
-      case 'INTERVIEW':
-        return { bg: 'bg-cyan-100', text: 'text-cyan-600' };
-      case 'ONBOARDING':
-        return { bg: 'bg-teal-100', text: 'text-teal-600' };
-      case 'ANALYSIS':
-        return { bg: 'bg-violet-100', text: 'text-violet-600' };
-      case 'TRACKING':
-        return { bg: 'bg-fuchsia-100', text: 'text-fuchsia-600' };
-      default:
-        return { bg: 'bg-gray-100', text: 'text-gray-600' };
-    }
+  /**
+   * Marks a notification as read
+   */
+  public markAsRead(id: string) {
+    const context = new HttpContext().set(SKIP_LOADER, true);
+    this.http.put(`${environment.apiUrl}/activities/${id}/read`, {}, { context }).subscribe({
+      next: () => {
+        this._notifications.update(list => {
+          return list.map(n => n.id === id ? { ...n, read: true } : n);
+        });
+        this._unreadCount.update(count => Math.max(0, count - 1));
+      },
+      error: (err) => console.error('Failed to mark notification as read', err)
+    });
   }
 
-  getPriorityClass(priority: string): string {
-    switch (priority) {
-      case 'URGENT':
-        return 'bg-red-500 text-white';
-      case 'HIGH':
-        return 'bg-orange-500 text-white';
-      case 'NORMAL':
-        return 'bg-gray-200 text-gray-700';
-      case 'LOW':
-        return 'bg-gray-100 text-gray-500';
-      default:
-        return 'bg-gray-200 text-gray-700';
-    }
+  /**
+   * Marks all notifications for a specific entity as read
+   */
+  public markEntityAsRead(entityType: string, entityId: string | number) {
+    const unread = this._notifications().filter(n => 
+      n.entityType === entityType && 
+      String(n.entityId) === String(entityId) && 
+      !n.read
+    );
+
+    unread.forEach(n => this.markAsRead(n.id));
   }
 
-  getRelativeTime(dateStr: string): string {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+  /**
+   * Marks all notifications as read
+   */
+  public markAllAsRead() {
+    const orgId = this.authStore.organizationId();
+    let url = `${environment.apiUrl}/activities/mark-all-read`;
+    if (orgId) {
+      url += `?organizationId=${orgId}`;
+    }
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
+    const context = new HttpContext().set(SKIP_LOADER, true);
+    this.http.post(url, {}, { context }).subscribe({
+      next: () => {
+        this._notifications.update(list => {
+          return list.map(n => ({ ...n, read: true }));
+        });
+        this._unreadCount.set(0);
+      },
+      error: (err) => console.error('Failed to mark all notifications as read', err)
+    });
   }
 }

@@ -2,7 +2,7 @@
 export interface AuthResponse {
   token: string;
   type: string;
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -20,7 +20,7 @@ export interface ApiResponse<T> {
 
 // ===== User (matches backend UserDto) =====
 export interface User {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;

@@ -13,6 +13,8 @@ import { HeaderService } from '../../services/header.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-interview-list',
@@ -26,6 +28,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    NotificationDotComponent
   ],
   templateUrl: './interview-list.component.html',
   styleUrls: ['./interview-list.component.css'],
@@ -55,12 +58,25 @@ export class InterviewListComponent implements OnInit {
   activeTab = signal('all');
   interviews = signal<Interview[]>([]);
   filteredInterviews = signal<Interview[]>([]);
+  public notificationService = inject(NotificationService);
   
   // Stats
   totalInterviews = signal(0);
   todayCount = signal(0);
   awaitingFeedbackCount = signal(0);
   passRate = signal(0);
+
+  hasNotification(interviewId: string | number): boolean {
+    return this.notificationService.notifications().some(n => 
+      n.entityType === 'INTERVIEW' && 
+      String(n.entityId) === String(interviewId) && 
+      !n.read
+    );
+  }
+
+  onCardClick(interviewId: string | number) {
+    this.notificationService.markEntityAsRead('INTERVIEW', interviewId);
+  }
 
   tabs = [
     { id: 'upcoming', label: 'Upcoming' },

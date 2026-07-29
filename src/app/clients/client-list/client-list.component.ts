@@ -14,6 +14,8 @@ import { HeaderService } from '../../services/header.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
+import { NotificationDotComponent } from '../../shared/components/notification-dot/notification-dot.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-client-list',
@@ -27,6 +29,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    NotificationDotComponent
   ],
   templateUrl: './client-list.component.html',
   styleUrls: ['./client-list.component.css'],
@@ -60,6 +63,7 @@ export class ClientListComponent implements OnInit {
   statusFilter = signal<Client['status'] | ''>('');
   availableStatuses: NonNullable<Client['status']>[] = ['ACTIVE', 'LEAD', 'INACTIVE'];
   activeMenuId: number | null = null;
+  public notificationService = inject(NotificationService);
 
   constructor() {
     effect(() => {
@@ -140,7 +144,26 @@ export class ClientListComponent implements OnInit {
     this.viewMode.set(mode);
   }
 
-  filteredClients = computed(() => this.clients());
+  hasNotification(clientId: string | number): boolean {
+    return this.notificationService.notifications().some(n => 
+      n.entityType === 'CLIENT' && 
+      String(n.entityId) === String(clientId) && 
+      !n.read
+    );
+  }
+
+  onCardClick(clientId: string | number) {
+    this.notificationService.markEntityAsRead('CLIENT', clientId);
+  }
+
+  filteredClients = computed(() => {
+    const list = [...this.clients()];
+    return list.sort((a, b) => {
+      const aHasNotif = this.hasNotification(a.id) ? 1 : 0;
+      const bHasNotif = this.hasNotification(b.id) ? 1 : 0;
+      return bHasNotif - aHasNotif;
+    });
+  });
 
   // Stats computed values
   activeProjectsCount = computed(

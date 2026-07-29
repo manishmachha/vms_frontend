@@ -123,7 +123,10 @@
           <div class="flex items-center gap-4">
             <app-organization-logo [name]="user.firstName" size="sm" class="shadow-sm"></app-organization-logo>
             <div>
-              <div class="font-bold text-gray-900">{{ user.firstName }} {{ user.lastName }}</div>
+              <div class="font-bold text-gray-900 hover:text-indigo-600 cursor-pointer relative inline-block pr-3" [routerLink]="resolvePath('/users/' + user.id)" (click)="onCardClick(user.id)">
+                {{ user.firstName }} {{ user.lastName }}
+                <app-notification-dot [entityType]="'USER'" [entityId]="user.id"></app-notification-dot>
+              </div>
               <div class="text-xs text-gray-500">ID: #{{ user.id }}</div>
             </div>
           </div>
@@ -223,8 +226,11 @@
   <!-- Grid View -->
   <div *ngIf="viewMode() === 'grid' && dataSource.data.length > 0"
     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    <div *ngFor="let user of dataSource.data" [routerLink]="resolvePath('/users/' + user.id)"
+    <div *ngFor="let user of dataSource.data" [routerLink]="resolvePath('/users/' + user.id)" (click)="onCardClick(user.id)"
       class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow relative group">
+
+      <!-- Notification Indicator -->
+      <app-notification-dot [entityType]="'USER'" [entityId]="user.id" [cssClass]="'absolute top-4 right-4 w-3.5 h-3.5'"></app-notification-dot>
 
       <!-- Card Header -->
       <div class="flex justify-between items-start mb-4">

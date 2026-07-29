@@ -1,11 +1,11 @@
 import { Component, inject, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { NotificationDropdownComponent } from '../notification-dropdown/notification-dropdown.component';
 
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { AuthStore } from '../../../services/auth.store';
 import { HeaderService } from '../../../services/header.service';
+import { NotificationDropdownComponent } from '../notification-dropdown/notification-dropdown.component';
 import { AuthService } from '../../../services/auth.service';
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 
@@ -15,8 +15,8 @@ import { MfeNavigationService } from '../../../services/mfe-navigation.service';
   imports: [
     CommonModule,
     RouterModule,
-    NotificationDropdownComponent,
     UserAvatarComponent,
+    NotificationDropdownComponent,
   ],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],

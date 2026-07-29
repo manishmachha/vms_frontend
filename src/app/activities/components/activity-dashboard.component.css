@@ -1,0 +1,65 @@
+/* Component specific styles to override or enhance material design defaults */
+
+/* Dense form fields */
+::ng-deep .dense-field .mdc-text-field--outlined {
+  padding-left: 0;
+  padding-right: 0;
+  height: 48px;
+}
+
+::ng-deep .dense-field .mdc-text-field__input {
+  padding: 12px 14px;
+}
+
+::ng-deep .dense-field .mat-mdc-select-trigger {
+  padding-top: 12px;
+}
+
+::ng-deep .dense-field .mat-mdc-form-field-flex {
+  align-items: center;
+}
+
+::ng-deep .dense-field .mat-mdc-form-field-icon-prefix {
+  padding-top: 0;
+  padding-left: 12px;
+}
+
+::ng-deep .dense-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+/* Material Table Adjustments */
+::ng-deep table.mat-mdc-table {
+  background: transparent;
+}
+
+::ng-deep .mat-mdc-header-cell {
+  color: #64748b; /* slate-500 */
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+::ng-deep .mat-mdc-paginator {
+  background: transparent;
+}
+
+/* Scrollbar styling for table */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

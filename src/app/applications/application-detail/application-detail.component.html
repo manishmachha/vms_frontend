@@ -775,40 +775,6 @@
                 </div>
               </div>
 
-              <!-- Right: Timeline Feed (5/12) -->
-              <div class="lg:col-span-5 flex flex-col">
-                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex-1 flex flex-col">
-                  <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2 shrink-0">
-                    <mat-icon class="text-blue-500!">timeline</mat-icon> Process Timeline
-                  </h3>
-
-                  <!-- Note Input -->
-                  <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6 shrink-0">
-                    <div class="flex gap-4">
-                      <textarea
-                        [(ngModel)]="newNote"
-                        rows="2"
-                        placeholder="Write a note or comment..."
-                        class="input-modern w-full resize-none bg-white font-medium"
-                      ></textarea>
-                      <button
-                        mat-mini-fab
-                        color="primary"
-                        [disabled]="!newNote.trim()"
-                        (click)="addNote()"
-                        class="shadow-none! self-end mb-1"
-                      >
-                        <mat-icon>send</mat-icon>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Feed -->
-                  <div class="flex-1 overflow-y-auto custom-scrollbar pr-1">
-                    <app-timeline [events]="timelineEvents()" entityType="APPLICATION" [entityId]="app.id"></app-timeline>
-                  </div>
-                </div>
-              </div>
 
             </div>
           </div>

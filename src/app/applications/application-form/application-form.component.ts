@@ -40,7 +40,7 @@ export class ApplicationFormComponent implements OnInit {
     firstName: ['', Validators.required],
     lastName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    phone: [''],
+    phone: ['', [Validators.maxLength(10)]],
     location: [''],
     dob: [''],
     currentTitle: [''],

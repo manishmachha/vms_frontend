@@ -13,12 +13,10 @@ import { LoadingService } from './services/loading.service';
 import { AuthStore } from './services/auth.store';
 import { ProjectService } from './services/project.service';
 import { OrganizationService } from './services/organization.service';
-import { TimelineService } from './services/timeline.service';
 import { ClientSubmissionService } from './services/client-submission.service';
 import { AuthService } from './services/auth.service';
 import { DashboardService } from './services/dashboard.service';
 import { AuditLogService } from './services/audit-log.service';
-import { NotificationService } from './services/notification.service';
 import { ApplicationService } from './services/application.service';
 import { UserService } from './services/user.service';
 import { BrandedResumeService } from './services/branded-resume.service';
@@ -26,6 +24,8 @@ import { JobService } from './services/job.service';
 import { ClientService } from './services/client.service';
 import { InterviewService } from './services/interview.service';
 import { CandidateService } from './services/candidate.service';
+import { NotificationService } from './services/notification.service';
+import { ActivityService } from './activities/services/activity.service';
 
 export const routes: Routes = [
   {
@@ -41,12 +41,12 @@ export const routes: Routes = [
       AuthStore,
       ProjectService,
       OrganizationService,
-      TimelineService,
+
       ClientSubmissionService,
       AuthService,
       DashboardService,
       AuditLogService,
-      NotificationService,
+
       ApplicationService,
       UserService,
       BrandedResumeService,
@@ -54,6 +54,8 @@ export const routes: Routes = [
       ClientService,
       InterviewService,
       CandidateService,
+      NotificationService,
+      ActivityService,
     ],
     children: [
       { path: '', component: VMSLoginComponent },
@@ -118,11 +120,7 @@ export const routes: Routes = [
         path: 'timesheets',
         loadChildren: () => import('./timesheets/timesheets.routes').then((m) => m.TIMESHEET_ROUTES),
       },
-      {
-        path: 'notifications',
-        loadComponent: () =>
-          import('./notifications/notifications.component').then((m) => m.NotificationsComponent),
-      },
+
       {
         path: 'tickets',
         loadChildren: () => import('./tickets/ticket.routes').then((m) => m.TICKET_ROUTES),
@@ -131,6 +129,16 @@ export const routes: Routes = [
         path: 'profile',
         loadComponent: () =>
           import('./profile/my-profile.component').then((m) => m.MyProfileComponent),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./notifications/components/notifications-page/notifications-page.component').then((m) => m.NotificationsPageComponent),
+      },
+      {
+        path: 'activities',
+        loadComponent: () =>
+          import('./activities/components/activity-dashboard.component').then((m) => m.ActivityDashboardComponent),
       },
       {
         path: 'login',
