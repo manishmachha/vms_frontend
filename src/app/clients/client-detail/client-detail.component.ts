@@ -10,6 +10,8 @@ import { OrganizationLogoComponent } from '../../layout/components/organization-
 import { HubDashboardBannerComponent } from '../../shared/components/hub-dashboard-banner/hub-dashboard-banner.component';
 import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 import { HeaderService } from '../../services/header.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ClientFormComponent } from '../components/client-form/client-form.component';
 
 @Component({
   selector: 'app-client-detail',
@@ -24,6 +26,8 @@ export class ClientDetailComponent implements OnInit {
   private projectService = inject(ProjectService);
   private headerService = inject(HeaderService);
   private mfeNav = inject(MfeNavigationService);
+  private dialog = inject(MatDialog);
+  clientId = signal<string>('');
 
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
@@ -44,10 +48,10 @@ export class ClientDetailComponent implements OnInit {
       'bi bi-building',
     );
     this.route.paramMap.subscribe((params) => {
-      const id = params.get('id');
-      if (id) {
-        this.loadClient(id);
-        this.loadProjects(id);
+      this.clientId.set(params.get('id') || '');
+      if (this.clientId()) {
+        this.loadClient(this.clientId());
+        this.loadProjects(this.clientId());
       }
     });
   }
@@ -58,8 +62,8 @@ export class ClientDetailComponent implements OnInit {
     });
 
     this.clientService.getDashboardStats(id).subscribe({
-        next: stats => this.dashboardStats.set(stats),
-        error: err => console.error('Failed to load dashboard stats', err)
+      next: stats => this.dashboardStats.set(stats),
+      error: err => console.error('Failed to load dashboard stats', err)
     });
   }
 
@@ -69,6 +73,18 @@ export class ClientDetailComponent implements OnInit {
       const id = clientId;
       const filtered = projects.filter((p) => p.client?.id === id);
       this.clientProjects.set(filtered);
+    });
+  }
+
+  openClientDialog(client?: Client) {
+    const dialogRef = this.dialog.open(ClientFormComponent, {
+      width: '600px',
+      data: client,
+      panelClass: 'custom-dialog-container',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) this.loadClient(this.clientId());
     });
   }
 }

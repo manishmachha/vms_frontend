@@ -36,7 +36,7 @@
           <div class="space-y-2">
             <div
               *ngIf="organization.address"
-              class="flex items-center gap-2 text-gray-700"
+              class="flex  gap-2 text-gray-700"
             >
               <div
                 class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 shrink-0"
@@ -100,7 +100,7 @@
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
       <h2 class="text-lg font-bold text-gray-900 mb-4">Vendor Profile</h2>
       <div class="prose max-w-none text-gray-600">
-        <p>Official vendor information and active job postings.</p>
+        <p>{{ organization.name }} is a trusted IT services and consulting partner specializing in delivering innovative technology solutions that help businesses accelerate digital transformation. With expertise across software development, cloud services, cybersecurity, data analytics, enterprise applications, AI, and managed IT services, the organization provides scalable, secure, and business-focused solutions tailored to client needs. Committed to quality, innovation, and customer success, {{ organization.name }} serves organizations across diverse industries, enabling them to improve operational efficiency, reduce costs, and achieve sustainable growth through technology.Official vendor information and active job postings.</p>
       </div>
     </div>
   </ng-container>

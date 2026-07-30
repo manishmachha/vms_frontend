@@ -69,13 +69,6 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'vendor-applications',
-        loadComponent: () =>
-          import('./applications/vendor-application-list/vendor-application-list.component').then(
-            (m) => m.VendorApplicationListComponent,
-          ),
-      },
-      {
         path: 'vendors',
         loadChildren: () => import('./vendors/vendor.routes').then((m) => m.VENDOR_ROUTES),
       },

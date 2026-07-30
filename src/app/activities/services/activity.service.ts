@@ -51,7 +51,8 @@ export class ActivityService {
     page: number = 0,
     size: number = 20,
     sortField: string = 'timestamp',
-    sortDirection: string = 'desc'
+    sortDirection: string = 'desc',
+    entityId?: string
   ): Observable<Page<ActivityLog>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -64,6 +65,7 @@ export class ActivityService {
     if (category) params = params.set('category', category);
     if (search) params = params.set('search', search);
     if (user) params = params.set('user', user);
+    if (entityId) params = params.set('entityId', entityId);
 
     return this.api.get<Page<ActivityLog>>(this.apiUrl, params);
   }

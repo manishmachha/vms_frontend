@@ -1,6 +1,7 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { ProjectService } from '../../services/project.service';
 import { HeaderService } from '../../services/header.service';
@@ -16,21 +17,30 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogService } from '../../services/dialog.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { Subject, debounceTime, merge, startWith, switchMap } from 'rxjs';
+
 @Component({
   selector: 'app-project-detail',
   standalone: true,
   imports: [
     CommonModule,
     RouterLink,
+    FormsModule,
     OrganizationLogoComponent,
     UserAvatarComponent,
     MatTabsModule,
     MatIconModule,
-      ],
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
+  ],
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.css'],
 })
-export class ProjectDetailComponent implements OnInit {
+export class ProjectDetailComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private projectService = inject(ProjectService);
   private userService = inject(UserService);
@@ -40,6 +50,9 @@ export class ProjectDetailComponent implements OnInit {
   private dialogService = inject(DialogService);
   private mfeNav = inject(MfeNavigationService);
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   resolvePath(path: string): string {
     const base = this.mfeNav.basePath;
     return `${base}${path.startsWith('/') ? path : '/' + path}`;
@@ -47,8 +60,14 @@ export class ProjectDetailComponent implements OnInit {
 
   project = signal<Project | null>(null);
   allocations = signal<ProjectAllocation[]>([]);
+  totalAllocations = signal<number>(0);
+  searchQuery = signal<string>('');
+  private searchSubject = new Subject<string>();
+
   users = signal<User[]>([]);
   candidates = signal<Candidate[]>([]);
+
+  displayedColumns: string[] = ['resource', 'role', 'period', 'status', 'actions'];
 
   private colors = [
     '#6366f1',
@@ -61,8 +80,6 @@ export class ProjectDetailComponent implements OnInit {
     '#ec4899',
   ];
 
-
-
   projectDuration = computed(() => {
     const p = this.project();
     if (!p?.startDate) return 'N/A';
@@ -71,8 +88,6 @@ export class ProjectDetailComponent implements OnInit {
     const months = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30));
     return months <= 1 ? '1 mo' : `${months} mo`;
   });
-
-
 
   ngOnInit() {
     this.headerService.setTitle(
@@ -84,10 +99,32 @@ export class ProjectDetailComponent implements OnInit {
     if (projectIdStr) {
       const projectId = projectIdStr;
       this.loadProject(projectId);
-      this.loadAllocations(projectId);
     }
     this.loadUsers();
     this.loadCandidates();
+
+    this.searchSubject.pipe(debounceTime(300)).subscribe(query => {
+      this.searchQuery.set(query);
+      if (this.paginator) {
+        this.paginator.pageIndex = 0;
+      }
+      this.loadAllocations();
+    });
+  }
+
+  ngAfterViewInit() {
+    // If paginator and sort are available, hook them up to reload data
+    setTimeout(() => {
+      merge(this.paginator.page, this.sort.sortChange).subscribe(() => {
+        this.loadAllocations();
+      });
+      // Initial load
+      this.loadAllocations();
+    });
+  }
+
+  onSearch(query: string) {
+    this.searchSubject.next(query);
   }
 
   loadProject(id: string) {
@@ -96,10 +133,24 @@ export class ProjectDetailComponent implements OnInit {
     });
   }
 
+  loadAllocations() {
+    const projectId = this.route.snapshot.paramMap.get('id');
+    if (!projectId) return;
 
-  loadAllocations(id: string) {
-    this.projectService.getAllocations(id).subscribe((data) => {
-      this.allocations.set(data);
+    let sortString = '';
+    if (this.sort?.active && this.sort?.direction) {
+      sortString = `${this.sort.active},${this.sort.direction}`;
+    }
+
+    this.projectService.getAllocations(
+      projectId,
+      this.paginator?.pageIndex || 0,
+      this.paginator?.pageSize || 10,
+      this.searchQuery(),
+      sortString
+    ).subscribe((page) => {
+      this.allocations.set(page.content || []);
+      this.totalAllocations.set(page.totalElements || 0);
     });
   }
 
@@ -120,25 +171,6 @@ export class ProjectDetailComponent implements OnInit {
     return this.colors[index % this.colors.length];
   }
 
-  getTimelineOffset(alloc: ProjectAllocation): number {
-    const p = this.project();
-    if (!p?.startDate || !alloc.startDate) return 0;
-    const projectStart = new Date(p.startDate).getTime();
-    const projectEnd = p.endDate ? new Date(p.endDate).getTime() : Date.now();
-    const allocStart = new Date(alloc.startDate).getTime();
-    return ((allocStart - projectStart) / (projectEnd - projectStart)) * 100;
-  }
-
-  getTimelineWidth(alloc: ProjectAllocation): number {
-    const p = this.project();
-    if (!p?.startDate || !alloc.startDate) return 0;
-    const projectStart = new Date(p.startDate).getTime();
-    const projectEnd = p.endDate ? new Date(p.endDate).getTime() : Date.now();
-    const allocStart = new Date(alloc.startDate).getTime();
-    const allocEnd = alloc.endDate ? new Date(alloc.endDate).getTime() : projectEnd;
-    return Math.min(100, ((allocEnd - allocStart) / (projectEnd - projectStart)) * 100);
-  }
-
   openAllocateModal() {
     this.dialog.open(AllocateResourceModalComponent, {
       width: '500px',
@@ -148,7 +180,7 @@ export class ProjectDetailComponent implements OnInit {
       },
       panelClass: 'dialog-modern'
     }).afterClosed().subscribe(result => {
-      if (result) this.loadAllocations(this.project()!.id);
+      if (result) this.loadAllocations();
     });
   }
 
@@ -160,7 +192,7 @@ export class ProjectDetailComponent implements OnInit {
     ).subscribe(confirmed => {
       if (confirmed && this.project()) {
         this.projectService.deallocateUser(this.project()!.id, alloc.id).subscribe(() => {
-          this.loadAllocations(this.project()!.id);
+          this.loadAllocations();
         });
       }
     });

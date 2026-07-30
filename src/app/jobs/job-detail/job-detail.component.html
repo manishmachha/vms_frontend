@@ -110,14 +110,6 @@
       <!-- Main Content (Tabbed) -->
       <div class="lg:col-span-2 w-full">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
-          <mat-tab-group
-            animationDuration="300ms"
-            mat-stretch-tabs="false"
-            mat-align-tabs="start"
-            class="flex-1"
-          >
-            <!-- Overview Tab -->
-            <mat-tab>
               <ng-template mat-tab-label>
                 <div class="flex items-center gap-2 px-2">
                   <mat-icon class="text-indigo-500">article</mat-icon>
@@ -237,24 +229,6 @@
                 </div>
 
               </div>
-            </mat-tab>
-
-            <!-- Activity Log Tab -->
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <div class="flex items-center gap-2 px-2">
-                  <mat-icon class="text-blue-500">history</mat-icon>
-                  <span class="font-bold">Activity Log</span>
-                </div>
-              </ng-template>
-              <div class="p-6 bg-gray-50/30 overflow-y-auto h-full">
-                <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <mat-icon class="text-blue-500">timeline</mat-icon>
-                  Job Lifecycle Audit
-                </h3>
-              </div>
-            </mat-tab>
-          </mat-tab-group>
         </div>
       </div>
 

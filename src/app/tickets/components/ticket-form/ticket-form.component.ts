@@ -36,8 +36,20 @@ export class TicketFormComponent implements OnInit {
   ccSearchTerm = signal('');
   isCcDropdownOpen = signal(false);
 
+  assigneeSearchTerm = signal('');
+  isAssigneeDropdownOpen = signal(false);
+
   get filteredCcUsers(): User[] {
     const term = this.ccSearchTerm().toLowerCase().trim();
+    if (!term) return this.eligibleUsers();
+    return this.eligibleUsers().filter(u =>
+      `${u.firstName} ${u.lastName}`.toLowerCase().includes(term) ||
+      (u.email && u.email.toLowerCase().includes(term))
+    );
+  }
+  
+  get filteredAssigneeUsers(): User[] {
+    const term = this.assigneeSearchTerm().toLowerCase().trim();
     if (!term) return this.eligibleUsers();
     return this.eligibleUsers().filter(u =>
       `${u.firstName} ${u.lastName}`.toLowerCase().includes(term) ||
@@ -49,6 +61,11 @@ export class TicketFormComponent implements OnInit {
     const ids = this.ticketForm.get('ccUserIds')?.value || [];
     return this.eligibleUsers().filter(u => ids.includes(u.id));
   }
+  
+  get selectedAssignee(): User | undefined {
+    const id = this.ticketForm.get('assignedToId')?.value;
+    return this.eligibleUsers().find(u => u.id === id);
+  }
 
   toggleCcUser(userId: string) {
     const current: string[] = [...(this.ticketForm.get('ccUserIds')?.value || [])];
@@ -59,6 +76,11 @@ export class TicketFormComponent implements OnInit {
       current.push(userId);
     }
     this.ticketForm.get('ccUserIds')?.setValue(current);
+  }
+  
+  setAssignee(userId: string | null) {
+    this.ticketForm.get('assignedToId')?.setValue(userId);
+    this.isAssigneeDropdownOpen.set(false);
   }
 
   removeCcUser(userId: string, event?: Event) {
@@ -80,7 +102,8 @@ export class TicketFormComponent implements OnInit {
       category: ['', Validators.required],
       refEntityId: [null],
       priority: ['MEDIUM', Validators.required],
-      ccUserIds: [[]]
+      ccUserIds: [[]],
+      assignedToId: [null]
     });
 
     // Listen to category changes
@@ -94,6 +117,32 @@ export class TicketFormComponent implements OnInit {
         this.referenceEntities.set([]);
       }
     });
+  }
+
+  refSearchTerm = signal('');
+  isRefDropdownOpen = signal(false);
+  
+  get filteredReferenceEntities(): any[] {
+    const term = this.refSearchTerm().toLowerCase().trim();
+    if (!term) return this.referenceEntities();
+    return this.referenceEntities().filter(r => {
+      const name = r.name || r.title || (r.firstName ? r.firstName + ' ' + r.lastName : '');
+      return name.toLowerCase().includes(term);
+    });
+  }
+  
+  get selectedReferenceEntity(): any | undefined {
+    const id = this.ticketForm.get('refEntityId')?.value;
+    return this.referenceEntities().find(r => r.id === id);
+  }
+  
+  getRefName(r: any): string {
+    return r.name || r.title || (r.firstName ? r.firstName + ' ' + r.lastName : 'Unknown');
+  }
+  
+  setRefEntity(id: string | null) {
+    this.ticketForm.get('refEntityId')?.setValue(id);
+    this.isRefDropdownOpen.set(false);
   }
 
   ngOnInit() {

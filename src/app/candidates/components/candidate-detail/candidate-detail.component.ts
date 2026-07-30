@@ -33,7 +33,7 @@ import { FormsModule } from '@angular/forms';
     ClientSubmissionsComponent,
     HubDashboardBannerComponent,
     MatIconModule,
-        MatTabsModule,
+    MatTabsModule,
     FormsModule
   ],
   templateUrl: './candidate-detail.component.html',
@@ -57,7 +57,7 @@ export class CandidateDetailComponent implements OnInit {
   private headerService = inject(HeaderService);
   candidate = signal<Candidate | null>(null);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
-  
+
   selectedStatus = signal<string>('AVAILABLE');
   brandedResume = signal<BrandedResume | null>(null);
   applications = signal<JobApplication[]>([]);
@@ -65,13 +65,14 @@ export class CandidateDetailComponent implements OnInit {
   skillsExpanded = signal(false);
 
   readonly candidateStatuses = [
-    'AVAILABLE',
     'ONBOARDING',
     'OFFERED',
     'IN_BILLING',
     'BENCH',
     'NOTICE_PERIOD',
-    'PROBATION'
+    'PROBATION',
+    'ACTIVE',
+    'INACTIVE'
   ];
 
 
@@ -94,11 +95,11 @@ export class CandidateDetailComponent implements OnInit {
       next: (c) => {
         this.candidate.set(c);
         this.selectedStatus.set(c.status || 'AVAILABLE');
-        
+
         this.loadApplications(c.id);
         this.loadInterviews(c.id);
         this.loadBrandedResume(c.id);
-        
+
         // Load dashboard stats
         this.candidateService.getDashboardStats(c.id).subscribe({
           next: stats => {
@@ -231,7 +232,7 @@ export class CandidateDetailComponent implements OnInit {
       if (this.candidate()?.experienceDetailsJson) {
         return JSON.parse(this.candidate()!.experienceDetailsJson!);
       }
-    } catch (e) {}
+    } catch (e) { }
     return [];
   }
 
@@ -240,7 +241,7 @@ export class CandidateDetailComponent implements OnInit {
       if (this.candidate()?.educationDetailsJson) {
         return JSON.parse(this.candidate()!.educationDetailsJson!);
       }
-    } catch (e) {}
+    } catch (e) { }
     return [];
   }
 

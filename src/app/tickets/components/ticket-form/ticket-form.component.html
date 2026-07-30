@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
     
     <div class="mb-8 border-b border-gray-100 pb-6">
@@ -64,6 +64,60 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Assign To (Searchable Dropdown) -->
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Assign To (Optional)</label>
+          
+          <!-- Selected Chip -->
+          <div class="flex flex-wrap gap-1.5 mb-2" *ngIf="selectedAssignee">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-2xs">
+              {{ selectedAssignee.firstName }} {{ selectedAssignee.lastName }}
+              <button type="button" (click)="setAssignee(null)" class="text-indigo-400 hover:text-indigo-600 focus:outline-none">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </span>
+          </div>
+
+          <!-- Dropdown Trigger / Search Input -->
+          <div class="relative" *ngIf="!selectedAssignee">
+            <input 
+              type="text" 
+              [value]="assigneeSearchTerm()" 
+              (input)="assigneeSearchTerm.set($any($event.target).value); isAssigneeDropdownOpen.set(true)"
+              (focus)="isAssigneeDropdownOpen.set(true)"
+              placeholder="Search user to assign..."
+              class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button type="button" (click)="isAssigneeDropdownOpen.set(!isAssigneeDropdownOpen())" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <i class="bi" [ngClass]="isAssigneeDropdownOpen() ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dropdown List -->
+          <div *ngIf="isAssigneeDropdownOpen() && !selectedAssignee" class="absolute z-30 mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 flex flex-col">
+            <div class="flex-1 overflow-y-auto p-2 divide-y divide-gray-100">
+              <div *ngFor="let user of filteredAssigneeUsers" 
+                   (click)="setAssignee(user.id)" 
+                   class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-gray-800">
+                    {{ user.firstName }} {{ user.lastName }}
+                    <span *ngIf="user.organizationName" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200">
+                      {{ user.organizationName }}
+                    </span>
+                  </span>
+                  <span class="text-xs text-gray-500">{{ user.email }}</span>
+                </div>
+              </div>
+              <div *ngIf="filteredAssigneeUsers.length === 0" class="p-4 text-center text-sm text-gray-500">
+                No users found matching "{{ assigneeSearchTerm() }}"
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- CC Users (Searchable Dropdown) -->
         <div class="relative">
           <label class="block text-sm font-medium text-gray-700 mb-2">CC Users (Optional)</label>
@@ -102,7 +156,12 @@
                    (click)="toggleCcUser(user.id)" 
                    class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                 <div class="flex flex-col">
-                  <span class="text-sm font-medium text-gray-800">{{ user.firstName }} {{ user.lastName }}</span>
+                  <span class="text-sm font-medium text-gray-800">
+                    {{ user.firstName }} {{ user.lastName }}
+                    <span *ngIf="user.organizationName" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 border border-gray-200">
+                      {{ user.organizationName }}
+                    </span>
+                  </span>
                   <span class="text-xs text-gray-500">{{ user.email }}</span>
                 </div>
                 <div class="w-5 h-5 rounded border flex items-center justify-center transition-colors"
@@ -120,40 +179,75 @@
             </div>
           </div>
         </div>
-
-        <!-- Attachments -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Attachments (Optional)</label>
-          <input 
-            type="file" 
-            multiple
-            (change)="onFileSelected($event)"
-            class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-          />
-        </div>
       </div>
-
-      <!-- Reference Entity -->
-      <div *ngIf="showReferenceSearch()" class="p-5 bg-indigo-50 rounded-xl border border-indigo-100">
-        <label class="block text-sm font-medium text-indigo-900 mb-2">Related {{ ticketForm.get('category')?.value | titlecase }} (Optional)</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i class="bi bi-search text-gray-400"></i>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Reference Entity (Searchable Dropdown) -->
+        <div class="relative" *ngIf="showReferenceSearch()">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Related {{ ticketForm.get('category')?.value | titlecase }} (Optional)</label>
+          
+          <!-- Selected Chip -->
+          <div class="flex flex-wrap gap-1.5 mb-2" *ngIf="selectedReferenceEntity">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-2xs">
+              {{ getRefName(selectedReferenceEntity) }}
+              <button type="button" (click)="setRefEntity(null)" class="text-indigo-400 hover:text-indigo-600 focus:outline-none">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </span>
           </div>
-          <input 
-            type="text" 
-            (input)="onSearchReference($event)"
-            placeholder="Search to select a related item..."
-            class="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
-          />
+
+          <!-- Dropdown Trigger / Search Input -->
+          <div class="relative" *ngIf="!selectedReferenceEntity">
+            <input 
+              type="text" 
+              [value]="refSearchTerm()" 
+              (input)="refSearchTerm.set($any($event.target).value); isRefDropdownOpen.set(true)"
+              (focus)="isRefDropdownOpen.set(true)"
+              placeholder="Search related item..."
+              class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm"
+            />
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <button type="button" (click)="isRefDropdownOpen.set(!isRefDropdownOpen())" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                <i class="bi" [ngClass]="isRefDropdownOpen() ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dropdown List -->
+          <div *ngIf="isRefDropdownOpen() && !selectedReferenceEntity" class="absolute z-10 mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 flex flex-col">
+            <div class="flex-1 overflow-y-auto p-2 divide-y divide-gray-100">
+              <div *ngFor="let item of filteredReferenceEntities" 
+                   (click)="setRefEntity(item.id)" 
+                   class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-gray-800">{{ getRefName(item) }}</span>
+                </div>
+              </div>
+              <div *ngIf="filteredReferenceEntities.length === 0" class="p-4 text-center text-sm text-gray-500">
+                No items found matching "{{ refSearchTerm() }}"
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <div class="mt-3 bg-white rounded-xl border border-gray-200 max-h-48 overflow-y-auto shadow-sm" *ngIf="referenceEntities().length > 0">
-          <div class="divide-y divide-gray-100">
-            <label *ngFor="let item of referenceEntities()" class="flex items-center p-3 hover:bg-gray-50 cursor-pointer transition-colors">
-              <input type="radio" formControlName="refEntityId" [value]="item.id" class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
-              <span class="ml-3 text-sm text-gray-700">{{ item.name }}</span>
-            </label>
+
+        <!-- Attachments (Old Reference Entity Look) -->
+        <div class="p-5 bg-indigo-50 rounded-xl border border-indigo-100 h-full">
+          <label class="block text-sm font-medium text-indigo-900 mb-2">Attachments (Optional)</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="bi bi-paperclip text-gray-400"></i>
+            </div>
+            <input 
+              type="file" 
+              multiple
+              (change)="onFileSelected($event)"
+              class="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors text-sm cursor-pointer file:hidden text-gray-500"
+            />
+          </div>
+          <div class="mt-2 flex flex-wrap gap-2" *ngIf="selectedFiles.length > 0">
+            <span *ngFor="let file of selectedFiles; let i = index" class="inline-flex items-center gap-1 text-xs bg-white text-indigo-700 px-2 py-1 rounded border border-indigo-100 shadow-sm">
+              <i class="bi bi-file-earmark"></i> {{ file.name }}
+            </span>
           </div>
         </div>
       </div>

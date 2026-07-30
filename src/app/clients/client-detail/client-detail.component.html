@@ -6,16 +6,12 @@
   <!-- Header Banner -->
   <div class="card-modern p-6 md:p-8 relative overflow-hidden">
     <div
-      class="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-indigo-50 to-blue-50 rounded-full blur-3xl opacity-50 -mr-16 -mt-16"
-    ></div>
+      class="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-indigo-50 to-blue-50 rounded-full blur-3xl opacity-50 -mr-16 -mt-16">
+    </div>
 
     <div class="relative flex flex-col md:flex-row gap-6 md:items-start z-10">
       <div class="shrink-0">
-        <app-organization-logo
-          [org]="c"
-          size="xl"
-          [rounded]="true"
-        ></app-organization-logo>
+        <app-organization-logo [org]="c" size="xl" [rounded]="true"></app-organization-logo>
       </div>
 
       <div class="flex-1 space-y-4">
@@ -23,8 +19,7 @@
           <div class="flex flex-wrap items-center gap-3 mb-2">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ c.name }}</h1>
             <span
-              class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium border border-green-200"
-            >
+              class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium border border-green-200">
               Active Client
             </span>
           </div>
@@ -35,9 +30,7 @@
 
         <div class="flex flex-wrap gap-4 md:gap-8 pt-2">
           <div class="flex items-center gap-2 text-gray-600">
-            <div
-              class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400"
-            >
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
               <i class="bi bi-briefcase"></i>
             </div>
             <div>
@@ -47,9 +40,7 @@
           </div>
 
           <div class="flex items-center gap-2 text-gray-600">
-            <div
-              class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400"
-            >
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
               <i class="bi bi-geo-alt"></i>
             </div>
             <div>
@@ -59,20 +50,13 @@
           </div>
 
           <div class="flex items-center gap-2 text-gray-600">
-            <div
-              class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400"
-            >
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
               <i class="bi bi-link-45deg"></i>
             </div>
             <div>
               <p class="text-xs text-gray-400 font-medium">Website</p>
-              <a
-                *ngIf="c.website"
-                [href]="c.website"
-                target="_blank"
-                class="font-medium text-indigo-600 hover:underline"
-                >Visit Website</a
-              >
+              <a *ngIf="c.website" [href]="c.website" target="_blank"
+                class="font-medium text-indigo-600 hover:underline">Visit Website</a>
               <span *ngIf="!c.website" class="font-medium">N/A</span>
             </div>
           </div>
@@ -80,20 +64,19 @@
       </div>
 
       <div class="flex flex-col gap-2">
-        <button
-          class="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors px-4 py-2 rounded-lg flex items-center justify-center"
-        >
+        <button (click)="openClientDialog(client())"
+          class="border border-gray-300 text-gray-700 hover:bg-gray-100 cursor-pointer font-medium transition-colors px-4 py-2 rounded-lg flex items-center justify-center">
           <i class="bi bi-pencil mr-2"></i> Edit Details
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Content Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Left Column: Stats & Contact -->
-    <div class="space-y-6">
-      <!-- Quick Stats -->
+  <!-- Content Layout -->
+  <div class="space-y-6">
+    <!-- Row 1: Performance & Contact Details -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Quick Stats / Performance -->
       <div class="card-modern p-5">
         <h3 class="font-bold text-gray-900 mb-4 flex items-center">
           <i class="bi bi-bar-chart-fill mr-2 text-indigo-500"></i> Performance
@@ -120,11 +103,7 @@
             <i class="bi bi-envelope mt-1 text-gray-400"></i>
             <div>
               <p class="text-xs text-gray-400">Email</p>
-              <a
-                [href]="'mailto:' + c.email"
-                class="text-indigo-600 hover:underline break-all"
-                >{{ c.email || 'N/A' }}</a
-              >
+              <a [href]="'mailto:' + c.email" class="text-indigo-600 hover:underline break-all">{{ c.email || 'N/A' }}</a>
             </div>
           </div>
           <div class="flex items-start gap-3">
@@ -145,37 +124,27 @@
       </div>
     </div>
 
-    <!-- Right Column: Projects List -->
-    <div class="lg:col-span-2 space-y-6">
+    <!-- Row 2: Projects List -->
+    <div class="space-y-4 card-modern p-4">
       <div class="flex items-center justify-between">
         <h2 class="text-xl font-bold text-gray-900">Projects</h2>
-        <button class="text-sm font-medium text-indigo-600 hover:text-indigo-800">
-          View All
-        </button>
       </div>
 
-      <div class="grid grid-cols-1 gap-4">
-        <div
-          *ngFor="let project of clientProjects()"
-          class="card-modern p-5 group hover:border-indigo-200 transition-all"
-        >
+      <div>
+        <div *ngFor="let project of clientProjects()"
+          class="p-5 bg-gray-50 border border-gray-100 rounded-2xl group transition-all">
           <div class="flex items-start justify-between">
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <h3
-                  class="font-bold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors"
-                >
+                <h3 class="font-bold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors">
                   <a [routerLink]="resolvePath('/projects/' + project.id)">{{ project.name }}</a>
                 </h3>
-                <span
-                  class="px-2 py-0.5 rounded text-xs font-medium"
-                  [ngClass]="{
+                <span class="px-2 py-0.5 rounded text-xs font-medium" [ngClass]="{
                     'bg-green-100 text-green-700': project.status === 'ACTIVE',
                     'bg-blue-100 text-blue-700': project.status === 'PLANNED',
                     'bg-yellow-100 text-yellow-700': project.status === 'ON_HOLD',
-                    'bg-gray-100 text-gray-700': project.status === 'COMPLETED',
-                  }"
-                >
+                    'bg-gray-100 text-gray-700': project.status === 'COMPLETED'
+                  }">
                   {{ project.status }}
                 </span>
               </div>
@@ -187,23 +156,18 @@
                   {{ project.startDate | date }} -
                   {{ project.endDate ? (project.endDate | date) : 'Ongoing' }}
                 </span>
-                <!-- Add more meta info if available -->
               </div>
             </div>
 
-            <a
-              [routerLink]="resolvePath('/projects/' + project.id)"
-              class="btn-icon rounded-full w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-            >
+            <a [routerLink]="resolvePath('/projects/' + project.id)"
+              class="btn-icon rounded-full w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">
               <i class="bi bi-chevron-right"></i>
             </a>
           </div>
         </div>
 
-        <div
-          *ngIf="clientProjects().length === 0"
-          class="text-center py-12 bg-gray-50 rounded-xl border-dashed border-2 border-gray-200"
-        >
+        <div *ngIf="clientProjects().length === 0"
+          class="col-span-full text-center py-12 bg-gray-50 rounded-xl border-dashed border-2 border-gray-200">
           <i class="bi bi-folder text-4xl text-gray-300 mb-3 block"></i>
           <p class="text-gray-500">No projects started with this client yet.</p>
           <button class="mt-4 text-indigo-600 font-medium hover:underline">

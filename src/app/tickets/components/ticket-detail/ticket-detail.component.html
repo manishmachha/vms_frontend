@@ -56,29 +56,16 @@
         
         <div class="pt-2 border-t border-gray-100">
           <span class="text-xs text-gray-500 font-medium block mb-1">Assigned To</span>
-          <ng-container *ngIf="isAdminOrManager(); else readonlyAssignee">
-            <select 
-              class="block w-full text-xs border-gray-200 rounded-lg shadow-2xs focus:ring-indigo-500 focus:border-indigo-500 py-1.5 bg-gray-50 focus:bg-white"
-              [ngModel]="ticket()?.assignedTo?.id"
-              (change)="onAssigneeChange($event)"
-            >
-              <option [ngValue]="null">Unassigned</option>
-              <option *ngFor="let user of eligibleUsers()" [value]="user.id">
-                {{ user.firstName }} {{ user.lastName }}
-              </option>
-            </select>
-          </ng-container>
-          <ng-template #readonlyAssignee>
-            <div *ngIf="ticket()?.assignedTo; else unassignedBadge" class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-700 shrink-0">
-                {{ ticket()?.assignedTo?.firstName?.charAt(0) }}{{ ticket()?.assignedTo?.lastName?.charAt(0) }}
-              </div>
-              <span class="text-xs font-semibold text-gray-900 truncate">{{ ticket()?.assignedTo?.firstName }} {{ ticket()?.assignedTo?.lastName }}</span>
-            </div>
-            <ng-template #unassignedBadge>
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Unassigned</span>
-            </ng-template>
-          </ng-template>
+          <select 
+            class="block w-full text-xs border-gray-200 rounded-lg shadow-2xs focus:ring-indigo-500 focus:border-indigo-500 py-1.5 bg-gray-50 focus:bg-white"
+            [ngModel]="ticket()?.assignedTo?.id"
+            (change)="onAssigneeChange($event)"
+          >
+            <option [ngValue]="null">Unassigned</option>
+            <option *ngFor="let user of eligibleUsers()" [value]="user.id">
+              {{ user.firstName }} {{ user.lastName }}
+            </option>
+          </select>
         </div>
 
         <!-- CC Users Section with Searchable Dropdown -->

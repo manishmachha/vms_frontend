@@ -4,40 +4,39 @@
 
   <!-- Header Card -->
   <div
-    class="bg-linear-to-r from-indigo-50 to-rose-50 rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-6 relative overflow-hidden group"
-  >
+    class="bg-linear-to-r from-indigo-50 to-rose-50 rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 mb-6 relative overflow-hidden group">
     <div class="flex flex-col md:flex-row gap-6 items-start relative z-10">
       <!-- Avatar -->
       <div class="shrink-0">
         <div
-          class="h-24 w-24 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-3xl font-bold text-indigo-600 shrink-0 relative z-10"
-        >
+          class="h-24 w-24 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-3xl font-bold text-indigo-600 shrink-0 relative z-10">
           {{ getInitials(candidate()!) }}
         </div>
       </div>
 
       <!-- Main Info -->
       <div class="grow space-y-4 w-full">
-        <div class="flex flex-col lg:flex-row justify-between items-start gap-4">
-          <div>
+        <div class="grid grid-cols-2">
+          <div class="justify-self-start">
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
               {{ candidate()!.firstName }} {{ candidate()!.lastName }}
             </h1>
             <p class="text-lg text-gray-600 font-medium mt-1 flex flex-wrap items-center gap-2">
               <span
-                class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-sm font-semibold tracking-wide uppercase"
-                >{{ candidate()!.currentDesignation || 'No Title' }}</span
-              >
+                class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-sm font-semibold tracking-wide uppercase">{{
+                candidate()!.currentDesignation || 'No Title' }}</span>
               <span *ngIf="candidate()!.currentCompany" class="text-gray-400">
                 at {{ candidate()!.currentCompany }}
               </span>
             </p>
             <div class="mt-2 flex flex-wrap items-center gap-2">
-              <span *ngIf="candidate()!.createdBy" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">
+              <span *ngIf="candidate()!.createdBy"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200 shadow-sm">
                 <i class="bi bi-person-fill text-gray-500"></i>
                 Added by {{ candidate()!.createdBy?.firstName }} {{ candidate()!.createdBy?.lastName }}
               </span>
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm">
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm">
                 <i class="bi bi-funnel-fill text-indigo-500"></i>
                 Source: {{ candidate()!.source || 'vms'}}
               </span>
@@ -45,53 +44,37 @@
           </div>
 
           <!-- Actions (Desktop) -->
-          <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            <button
-              *ngIf="!authStore.isEmployee()"
-              (click)="fileInput.click()"
-              class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0"
-            >
+          <div class="justify-self-end flex flex-wrap gap-3">
+            <button *ngIf="!authStore.isEmployee()" (click)="fileInput.click()"
+              class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0">
               <i class="bi bi-cloud-upload"></i> Update Resume
             </button>
-            <div *ngIf="authStore.orgType() === 'SOLVENTEK'" class="py-2 inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-md shadow-sm">
-                <i class="bi bi-person-badge pl-2 text-purple-500"></i>
-                <select [ngModel]="selectedStatus()" (ngModelChange)="updateStatus($event)" class="bg-transparent text-xs font-semibold uppercase tracking-wide border-none focus:ring-0 pr-8 text-purple-700 cursor-pointer">
-                  <option *ngFor="let s of candidateStatuses" [value]="s">{{ s }}</option>
-                </select>
-              </div>
-            <a
-              *ngIf="!authStore.isEmployee()"
-              [routerLink]="resolvePath('/candidates/edit/' + candidate()!.id)"
-              class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0"
-            >
+            <a *ngIf="!authStore.isEmployee()" [routerLink]="resolvePath('/candidates/edit/' + candidate()!.id)"
+              class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0">
               <i class="bi bi-pencil"></i> Edit
             </a>
-            <button
-              *ngIf="!authStore.isEmployee()"
-              (click)="openDeleteConfirm()"
-              class="px-4 py-2 rounded-lg text-sm font-semibold text-red-600 bg-red-50 border border-red-100 hover:bg-red-100 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0"
-            >
+            <button *ngIf="!authStore.isEmployee()" (click)="openDeleteConfirm()"
+              class="px-4 py-2 rounded-lg text-sm font-semibold text-red-600 bg-red-50 border border-red-100 hover:bg-red-100 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0">
               <i class="bi bi-trash"></i> Delete
             </button>
-            <button
-              *ngIf="!authStore.isEmployee() && !candidate()?.isArchived"
-              (click)="openArchiveConfirm()"
-              class="px-4 py-2 rounded-lg text-sm font-semibold text-amber-600 bg-amber-50 border border-amber-100 hover:bg-amber-100 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0"
-            >
+            <button *ngIf="!authStore.isEmployee() && !candidate()?.isArchived" (click)="openArchiveConfirm()"
+              class="px-4 py-2 rounded-lg text-sm font-semibold text-amber-600 bg-amber-50 border border-amber-100 hover:bg-amber-100 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer grow sm:grow-0">
               <i class="bi bi-archive"></i> Archive
             </button>
-            <div *ngIf="candidate()?.isArchived" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-500 bg-gray-100 border border-gray-200 flex items-center justify-center gap-2 shadow-sm grow sm:grow-0">
+            <div *ngIf="candidate()?.isArchived"
+              class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-500 bg-gray-100 border border-gray-200 flex items-center justify-center gap-2 shadow-sm grow sm:grow-0">
               <i class="bi bi-archive-fill"></i> Archived
             </div>
-
+            <div *ngIf="authStore.orgType() === 'SOLVENTEK'"
+              class="py-2 inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 border border-purple-200 rounded-md shadow-sm">
+              <i class="bi bi-person-badge pl-2 text-purple-500"></i>
+              <select [ngModel]="selectedStatus()" (ngModelChange)="updateStatus($event)"
+                class="bg-transparent text-xs font-semibold uppercase tracking-wide border-none focus:ring-0 pr-8 text-purple-700 cursor-pointer">
+                <option *ngFor="let s of candidateStatuses" [value]="s">{{ s }}</option>
+              </select>
+            </div>
             <!-- File Input (Hidden) -->
-            <input
-              #fileInput
-              type="file"
-              class="hidden"
-              (change)="onFileSelected($event)"
-              accept=".pdf,.docx,.doc"
-            />
+            <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept=".pdf,.docx,.doc" />
           </div>
         </div>
 
@@ -99,108 +82,73 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-indigo-100/50">
           <!-- Location -->
           <div
-            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100"
-          >
+            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100">
             <div
-              class="w-10 h-10 rounded-full bg-green-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all"
-            >
+              class="w-10 h-10 rounded-full bg-green-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all">
               <i class="bi bi-geo-alt text-green-500 text-lg"></i>
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5"
-                >Location</span
-              >
-              <span
-                class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate"
-                >{{ candidate()!.city || 'Not specified' }}</span
-              >
+              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">Location</span>
+              <span class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate">{{
+                candidate()!.city || 'Not specified' }}</span>
             </div>
           </div>
 
           <!-- Experience -->
           <div
-            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100"
-          >
+            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100">
             <div
-              class="w-10 h-10 rounded-full bg-blue-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all"
-            >
+              class="w-10 h-10 rounded-full bg-blue-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all">
               <i class="bi bi-briefcase text-blue-500 text-lg"></i>
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5"
-                >Experience</span
-              >
-              <span class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate"
-                >{{ candidate()!.experienceYears || 0 }} years</span
-              >
+              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">Experience</span>
+              <span class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate">{{
+                candidate()!.experienceYears || 0 }} years</span>
             </div>
           </div>
 
           <!-- Phone -->
           <div
-            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100"
-          >
+            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100">
             <div
-              class="w-10 h-10 rounded-full bg-rose-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all"
-            >
+              class="w-10 h-10 rounded-full bg-rose-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all">
               <i class="bi bi-telephone text-rose-500 text-lg"></i>
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5"
-                >Phone</span
-              >
-              <span
-                class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate"
-                >{{ candidate()!.phone || '--' }}</span
-              >
+              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">Phone</span>
+              <span class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate">{{
+                candidate()!.phone || '--' }}</span>
             </div>
           </div>
 
           <!-- Email -->
           <div
-            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100"
-          >
+            class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-indigo-50/80 transition-colors group/item cursor-default border border-transparent hover:border-indigo-100">
             <div
-              class="w-10 h-10 rounded-full bg-yellow-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all"
-            >
+              class="w-10 h-10 rounded-full bg-yellow-100 text-gray-400 flex items-center justify-center shrink-0 group-hover/item:bg-white group-hover/item:text-indigo-600 group-hover/item:shadow-sm transition-all">
               <i class="bi bi-envelope text-yellow-500 text-lg"></i>
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5"
-                >Email</span
-              >
-              <span
-                class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate"
-                [title]="candidate()!.email"
-                >{{ candidate()!.email }}</span
-              >
+              <span class="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">Email</span>
+              <span class="text-sm font-semibold text-gray-700 group-hover/item:text-gray-900 truncate"
+                [title]="candidate()!.email">{{ candidate()!.email }}</span>
             </div>
           </div>
         </div>
 
         <!-- Links -->
         <div class="flex flex-wrap items-center gap-3 pt-2">
-          <a
-            *ngIf="candidate()!.linkedInUrl"
-            [href]="candidate()!.linkedInUrl"
-            target="_blank"
-            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors"
-          >
+          <a *ngIf="candidate()!.linkedInUrl" [href]="candidate()!.linkedInUrl" target="_blank"
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors">
             <i class="bi bi-linkedin"></i> LinkedIn
           </a>
-          <a
-            *ngIf="candidate()!.portfolioUrl"
-            [href]="candidate()!.portfolioUrl"
-            target="_blank"
-            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-pink-700 bg-pink-50 hover:bg-pink-100 transition-colors"
-          >
+          <a *ngIf="candidate()!.portfolioUrl" [href]="candidate()!.portfolioUrl" target="_blank"
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-pink-700 bg-pink-50 hover:bg-pink-100 transition-colors">
             <i class="bi bi-dribbble"></i> Portfolio
           </a>
-          <button
-            *ngIf="candidate()!.resumeFilePath"
-            (click)="downloadResume()"
-            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer"
-          >
+          <button *ngIf="candidate()!.resumeFilePath" (click)="downloadResume()"
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer">
             <i class="bi bi-download"></i> Resume
           </button>
         </div>
@@ -210,18 +158,11 @@
 
   <!-- Main Grid: items-start prevents awkward vertical stretching -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
-    
+
     <!-- Main Content (Tabbed) -->
     <div class="lg:col-span-2 w-full">
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
-        <mat-tab-group
-          animationDuration="300ms"
-          mat-stretch-tabs="false"
-          mat-align-tabs="start"
-          class="flex-1"
-        >
-          <!-- Overview Tab -->
-          <mat-tab>
+
             <ng-template mat-tab-label>
               <div class="flex items-center gap-2 px-2">
                 <mat-icon class="text-indigo-500">person</mat-icon>
@@ -229,21 +170,23 @@
               </div>
             </ng-template>
             <div class="p-6 space-y-6 bg-gray-50/30 overflow-y-auto h-full">
-              
+
               <!-- Applied Jobs Section -->
               <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <i class="bi bi-briefcase-fill text-indigo-500"></i> Applied Jobs
                 </h3>
                 <div class="space-y-4" *ngIf="applications().length > 0; else noApps">
-                  <div *ngFor="let app of applications()" class="p-4 rounded-xl border border-gray-100 hover:border-indigo-200 transition-all duration-200 bg-gray-50/50 group">
+                  <div *ngFor="let app of applications()"
+                    class="p-4 rounded-xl border border-gray-100 hover:border-indigo-200 transition-all duration-200 bg-gray-50/50 group">
                     <div class="flex justify-between items-start gap-4">
                       <div class="min-w-0">
-                        <h4 class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{{ app.job.title }}</h4>
+                        <h4 class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">{{
+                          app.job.title }}</h4>
                         <p class="text-xs text-gray-500 mt-0.5 truncate">{{ app.job.organization?.name }}</p>
                       </div>
-                      <span class="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" 
-                            [ngClass]="{
+                      <span class="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                        [ngClass]="{
                               'bg-blue-100 text-blue-700': app.status === 'APPLIED',
                               'bg-yellow-100 text-yellow-700': ['L1_INTERVIEW', 'L2_INTERVIEW', 'L3_INTERVIEW', 'INTERVIEW_SCHEDULED'].includes(app.status || ''),
                               'bg-green-100 text-green-700': ['OFFERED', 'ONBOARDED'].includes(app.status || ''),
@@ -253,11 +196,13 @@
                         {{ app.status }}
                       </span>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-gray-100/50 flex flex-wrap justify-between items-center gap-3">
+                    <div
+                      class="mt-4 pt-3 border-t border-gray-100/50 flex flex-wrap justify-between items-center gap-3">
                       <span class="text-xs font-medium text-gray-400 flex items-center gap-1.5">
                         <i class="bi bi-calendar-event"></i> Applied {{ app.createdAt | date:'mediumDate' }}
                       </span>
-                      <a [routerLink]="resolvePath('/applications/' + app.id)" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1">
+                      <a [routerLink]="resolvePath('/applications/' + app.id)"
+                        class="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1">
                         View Application <i class="bi bi-arrow-right"></i>
                       </a>
                     </div>
@@ -277,14 +222,15 @@
                   <i class="bi bi-calendar-check-fill text-indigo-500"></i> Scheduled Interviews
                 </h3>
                 <div class="space-y-4" *ngIf="interviews().length > 0; else noInterviews">
-                  <div *ngFor="let interview of interviews()" class="p-4 rounded-xl border border-gray-100 hover:border-indigo-200 transition-all duration-200 bg-gray-50/50">
+                  <div *ngFor="let interview of interviews()"
+                    class="p-4 rounded-xl border border-gray-100 hover:border-indigo-200 transition-all duration-200 bg-gray-50/50">
                     <div class="flex justify-between items-start gap-4">
                       <div class="min-w-0">
                         <h4 class="font-bold text-gray-900 truncate">{{ interview.type }} Round</h4>
                         <p class="text-xs text-gray-500 mt-0.5 truncate">for {{ interview.application?.job?.title }}</p>
                       </div>
                       <span class="shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                            [ngClass]="{
+                        [ngClass]="{
                               'bg-green-100 text-green-700': interview.status === 'COMPLETED',
                               'bg-blue-100 text-blue-700': interview.status === 'SCHEDULED',
                               'bg-red-100 text-red-700': interview.status === 'CANCELLED'
@@ -297,19 +243,24 @@
                         <div class="p-1.5 bg-indigo-50 rounded text-indigo-500"><i class="bi bi-clock"></i></div>
                         {{ interview.scheduledAt | date:'medium' }}
                       </div>
-                      <div class="flex items-center gap-2 text-sm font-medium text-gray-700" *ngIf="interview.durationMinutes">
-                        <div class="p-1.5 bg-indigo-50 rounded text-indigo-500"><i class="bi bi-hourglass-split"></i></div>
+                      <div class="flex items-center gap-2 text-sm font-medium text-gray-700"
+                        *ngIf="interview.durationMinutes">
+                        <div class="p-1.5 bg-indigo-50 rounded text-indigo-500"><i class="bi bi-hourglass-split"></i>
+                        </div>
                         {{ interview.durationMinutes }} min
                       </div>
                     </div>
                     <div class="mt-4 flex justify-between items-center">
                       <div class="flex items-center gap-2.5" *ngIf="interview.interviewer">
-                        <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold border border-indigo-200">
+                        <div
+                          class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold border border-indigo-200">
                           {{ interview.interviewer.firstName[0] }}{{ interview.interviewer.lastName[0] }}
                         </div>
-                        <span class="text-sm font-medium text-gray-700">{{ interview.interviewer.firstName }} {{ interview.interviewer.lastName }}</span>
+                        <span class="text-sm font-medium text-gray-700">{{ interview.interviewer.firstName }} {{
+                          interview.interviewer.lastName }}</span>
                       </div>
-                      <a *ngIf="interview.meetingLink" [href]="interview.meetingLink" target="_blank" class="px-4 py-2 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2">
+                      <a *ngIf="interview.meetingLink" [href]="interview.meetingLink" target="_blank"
+                        class="px-4 py-2 rounded-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm flex items-center gap-2">
                         <i class="bi bi-camera-video"></i> Join
                       </a>
                     </div>
@@ -339,102 +290,86 @@
               </div>
 
               <!-- Experience and Education Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-  
-  <!-- Experience -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[500px] overflow-hidden">
-    <!-- Fixed Header -->
-    <div class="px-6 pt-6 pb-4 border-b border-gray-50 shrink-0 bg-white z-10">
-      <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-        <i class="bi bi-briefcase text-indigo-500"></i> Experience
-      </h3>
-    </div>
-    
-    <!-- Scrollable Content -->
-    <div class="p-6 overflow-y-auto grow custom-scrollbar">
-      <div class="space-y-8" *ngIf="getExperience().length > 0; else noExp">
-        <div
-          *ngFor="let exp of getExperience()"
-          class="relative pl-8 border-l-2 border-gray-100 last:border-0 pb-6 last:pb-0"
-        >
-          <div
-            class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-white border-2 border-indigo-500"
-          ></div>
-          <div class="mb-1.5">
-            <h4 class="text-base font-bold text-gray-900 leading-tight">{{ exp.title }}</h4>
-            <p class="text-sm font-semibold text-indigo-600 mt-1">{{ exp.company }}</p>
-          </div>
-          <p class="text-xs font-medium text-gray-400 mb-3 block bg-gray-50 px-2 py-0.5 rounded w-fit">
-            {{ exp.start }} - {{ exp.end || (exp.isCurrent ? 'Present' : '') }}
-          </p>
-          <p class="text-sm text-gray-600 leading-relaxed" *ngIf="exp.description">
-            {{ exp.description }}
-          </p>
-        </div>
-      </div>
-      <ng-template #noExp>
-        <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-500 italic">No experience details parsed.</div>
-      </ng-template>
-    </div>
-  </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-  <!-- Education -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[500px] overflow-hidden">
-    <!-- Fixed Header -->
-    <div class="px-6 pt-6 pb-4 border-b border-gray-50 shrink-0 bg-white z-10">
-      <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-        <i class="bi bi-mortarboard text-indigo-500"></i> Education
-      </h3>
-    </div>
-    
-    <!-- Scrollable Content -->
-    <div class="p-6 overflow-y-auto grow custom-scrollbar">
-      <div class="space-y-6" *ngIf="getEducation().length > 0; else noEdu">
-        <div *ngFor="let edu of getEducation()" class="flex gap-4">
-          <div
-            class="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 border border-indigo-100"
-          >
-            <i class="bi bi-building-check"></i>
-          </div>
-          <div>
-            <h4 class="font-bold text-gray-900 leading-tight">{{ edu.institution }}</h4>
-            <p class="text-sm font-medium text-gray-700 mt-1">
-              {{ edu.degree }}
-              <span *ngIf="edu.fieldOfStudy" class="text-gray-500">in {{ edu.fieldOfStudy }}</span>
-            </p>
-            <p class="text-xs font-medium text-gray-400 mt-1 bg-gray-50 px-2 py-0.5 rounded w-fit">{{ edu.startYear }} - {{ edu.endYear }}</p>
-          </div>
-        </div>
-      </div>
-      <ng-template #noEdu>
-        <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-500 italic">No education details parsed.</div>
-      </ng-template>
-    </div>
-  </div>
-  
-</div>
-            </div>
-          </mat-tab>
+                <!-- Experience -->
+                <div
+                  class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[500px] overflow-hidden">
+                  <!-- Fixed Header -->
+                  <div class="px-6 pt-6 pb-4 border-b border-gray-50 shrink-0 bg-white z-10">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <i class="bi bi-briefcase text-indigo-500"></i> Experience
+                    </h3>
+                  </div>
 
-          <!-- Activity Log Tab -->
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <div class="flex items-center gap-2 px-2">
-                <mat-icon class="text-blue-500">history</mat-icon>
-                <span class="font-bold">Activity Log</span>
+                  <!-- Scrollable Content -->
+                  <div class="p-6 overflow-y-auto grow custom-scrollbar">
+                    <div class="space-y-8" *ngIf="getExperience().length > 0; else noExp">
+                      <div *ngFor="let exp of getExperience()"
+                        class="relative pl-8 border-l-2 border-gray-100 last:border-0 pb-6 last:pb-0">
+                        <div
+                          class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-white border-2 border-indigo-500">
+                        </div>
+                        <div class="mb-1.5">
+                          <h4 class="text-base font-bold text-gray-900 leading-tight">{{ exp.title }}</h4>
+                          <p class="text-sm font-semibold text-indigo-600 mt-1">{{ exp.company }}</p>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400 mb-3 block bg-gray-50 px-2 py-0.5 rounded w-fit">
+                          {{ exp.start }} - {{ exp.end || (exp.isCurrent ? 'Present' : '') }}
+                        </p>
+                        <p class="text-sm text-gray-600 leading-relaxed" *ngIf="exp.description">
+                          {{ exp.description }}
+                        </p>
+                      </div>
+                    </div>
+                    <ng-template #noExp>
+                      <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-500 italic">No experience details parsed.
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+
+                <!-- Education -->
+                <div
+                  class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[500px] overflow-hidden">
+                  <!-- Fixed Header -->
+                  <div class="px-6 pt-6 pb-4 border-b border-gray-50 shrink-0 bg-white z-10">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <i class="bi bi-mortarboard text-indigo-500"></i> Education
+                    </h3>
+                  </div>
+
+                  <!-- Scrollable Content -->
+                  <div class="p-6 overflow-y-auto grow custom-scrollbar">
+                    <div class="space-y-6" *ngIf="getEducation().length > 0; else noEdu">
+                      <div *ngFor="let edu of getEducation()" class="flex gap-4">
+                        <div
+                          class="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 border border-indigo-100">
+                          <i class="bi bi-building-check"></i>
+                        </div>
+                        <div>
+                          <h4 class="font-bold text-gray-900 leading-tight">{{ edu.institution }}</h4>
+                          <p class="text-sm font-medium text-gray-700 mt-1">
+                            {{ edu.degree }}
+                            <span *ngIf="edu.fieldOfStudy" class="text-gray-500">in {{ edu.fieldOfStudy }}</span>
+                          </p>
+                          <p class="text-xs font-medium text-gray-400 mt-1 bg-gray-50 px-2 py-0.5 rounded w-fit">{{
+                            edu.startYear }} - {{ edu.endYear }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template #noEdu>
+                      <div class="p-4 bg-gray-50 rounded-lg text-sm text-gray-500 italic">No education details parsed.
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+
               </div>
-            </ng-template>
-            <div class="p-6 bg-gray-50/30 overflow-y-auto h-full">
-              <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <mat-icon class="text-blue-500">timeline</mat-icon>
-                Candidate Activity Audit
-              </h3>
             </div>
-          </mat-tab>
-        </mat-tab-group>
       </div>
     </div>
- 
+
     <!-- Sidebar: flex-col and sticky top behavior applied here -->
     <div class="flex flex-col gap-6 lg:sticky lg:top-8 w-full">
 
@@ -444,26 +379,20 @@
           <i class="bi bi-stars text-indigo-500"></i> Skills
         </h3>
         <div class="flex flex-wrap gap-2">
-          <span
-            *ngFor="
+          <span *ngFor="
               let skill of skillsExpanded()
                 ? candidate()!.skills
                 : candidate()!.skills.slice(0, 10)
-            "
-            class="px-3 py-1.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-100"
-          >
+            " class="px-3 py-1.5 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-100">
             {{ skill }}
           </span>
-          <span *ngIf="candidate()!.skills.length === 0" class="text-gray-400 text-sm font-medium italic bg-gray-50 px-3 py-1.5 rounded-lg w-full"
-            >No skills listed</span
-          >
+          <span *ngIf="candidate()!.skills.length === 0"
+            class="text-gray-400 text-sm font-medium italic bg-gray-50 px-3 py-1.5 rounded-lg w-full">No skills
+            listed</span>
         </div>
 
-        <button
-          *ngIf="candidate()!.skills.length > 10"
-          (click)="skillsExpanded.set(!skillsExpanded())"
-          class="mt-4 text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer w-full justify-center p-2 rounded-lg hover:bg-indigo-50 transition-colors"
-        >
+        <button *ngIf="candidate()!.skills.length > 10" (click)="skillsExpanded.set(!skillsExpanded())"
+          class="mt-4 text-sm font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer w-full justify-center p-2 rounded-lg hover:bg-indigo-50 transition-colors">
           <span *ngIf="!skillsExpanded()">Show {{ candidate()!.skills.length - 10 }} more</span>
           <span *ngIf="skillsExpanded()">Show less</span>
           <i class="bi" [ngClass]="skillsExpanded() ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
@@ -476,17 +405,14 @@
         <div class="space-y-4">
           <div class="flex justify-between items-center pb-3 border-b border-gray-50">
             <span class="text-sm font-medium text-gray-500">Filename</span>
-            <span
-              class="text-sm text-gray-900 font-semibold truncate max-w-[150px] bg-gray-50 px-2 py-1 rounded"
-              [title]="candidate()!.resumeOriginalFileName"
-              >{{ candidate()!.resumeOriginalFileName }}</span
-            >
+            <span class="text-sm text-gray-900 font-semibold truncate max-w-[150px] bg-gray-50 px-2 py-1 rounded"
+              [title]="candidate()!.resumeOriginalFileName">{{ candidate()!.resumeOriginalFileName }}</span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-sm font-medium text-gray-500">Parsed On</span>
             <span class="text-sm text-gray-900 font-semibold">{{
               candidate()!.createdAt | date: 'mediumDate'
-            }}</span>
+              }}</span>
           </div>
         </div>
       </div>
@@ -498,39 +424,30 @@
         </h3>
         <div *ngIf="brandedResume(); else noBranded">
           <div class="flex items-center justify-between mb-4">
-            <span
-              class="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-              [ngClass]="{
+            <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" [ngClass]="{
                 'bg-green-100 text-green-700': brandedResume()!.status === 'COMPLETED',
                 'bg-yellow-100 text-yellow-700': brandedResume()!.status === 'GENERATING',
                 'bg-red-100 text-red-700': brandedResume()!.status === 'FAILED',
-              }"
-            >
+              }">
               {{ brandedResume()!.status }}
             </span>
-            <span class="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-md">v{{ brandedResume()!.version }}</span>
+            <span class="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded-md">v{{ brandedResume()!.version
+              }}</span>
           </div>
-          
+
           <div class="flex flex-col gap-3">
-            <button
-              *ngIf="brandedResume()!.status === 'COMPLETED'"
-              (click)="downloadBrandedResume()"
-              class="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-indigo-200"
-            >
+            <button *ngIf="brandedResume()!.status === 'COMPLETED'" (click)="downloadBrandedResume()"
+              class="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-indigo-200">
               <i class="bi bi-download"></i> Download Resume
             </button>
-            
+
             <div class="grid grid-cols-2 gap-3">
-              <a
-                [routerLink]="resolvePath('/candidates/resumes/' + brandedResume()!.id)"
-                class="w-full px-3 py-2 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-all flex items-center justify-center gap-2 cursor-pointer text-decoration-none"
-              >
+              <a [routerLink]="resolvePath('/candidates/resumes/' + brandedResume()!.id)"
+                class="w-full px-3 py-2 rounded-xl text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-all flex items-center justify-center gap-2 cursor-pointer text-decoration-none">
                 <i class="bi bi-eye"></i> View
               </a>
-              <button
-                (click)="regenerateBrandedResume()"
-                class="w-full px-3 py-2 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
+              <button (click)="regenerateBrandedResume()"
+                class="w-full px-3 py-2 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 transition-all flex items-center justify-center gap-2 cursor-pointer">
                 <i class="bi bi-arrow-clockwise"></i> Rebuild
               </button>
             </div>
@@ -543,99 +460,75 @@
           <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed text-center mb-4">
             <p class="text-gray-500 text-sm font-medium">No branded resume generated yet.</p>
           </div>
-          <button
-            *ngIf="!authStore.isEmployee()"
-            (click)="regenerateBrandedResume()"
-            class="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-indigo-200"
-          >
+          <button *ngIf="!authStore.isEmployee()" (click)="regenerateBrandedResume()"
+            class="w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-indigo-200">
             <i class="bi bi-magic"></i> Generate Now
           </button>
         </ng-template>
       </div>
 
       <!-- Organization Details (Visible to Solventek) -->
-      <div
-        *ngIf="candidate()!.organization && authStore.orgType() === 'SOLVENTEK'"
-        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-      >
+      <div *ngIf="candidate()!.organization && authStore.orgType() === 'SOLVENTEK'"
+        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="px-6 py-4 bg-linear-to-r from-gray-50 to-white border-b border-gray-100">
           <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">
             Sourced By (Vendor)
           </h3>
         </div>
-        
+
         <div class="p-6">
           <div class="flex items-start gap-4 mb-6">
-            <app-organization-logo
-              [name]="candidate()!.organization?.name"
-              size="lg"
-              [rounded]="true"
-            ></app-organization-logo>
+            <app-organization-logo [name]="candidate()!.organization?.name" size="lg"
+              [rounded]="true"></app-organization-logo>
             <div class="min-w-0">
               <h4 class="text-lg font-bold text-gray-900 leading-tight mb-1 truncate">
                 {{ candidate()!.organization?.name }}
               </h4>
-              <span
-                class="inline-flex px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-600"
-              >
+              <span class="inline-flex px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-600">
                 {{ candidate()!.organization?.type | titlecase }}
               </span>
             </div>
           </div>
 
           <div class="space-y-4">
-            <div
-              class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
-              *ngIf="candidate()!.organization?.email"
-            >
-              <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+            <div class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
+              *ngIf="candidate()!.organization?.email">
+              <div
+                class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
                 <i class="bi bi-envelope"></i>
               </div>
-              <a
-                [href]="'mailto:' + candidate()!.organization?.email"
-                class="hover:text-indigo-600 truncate"
-                >{{ candidate()!.organization?.email }}</a
-              >
+              <a [href]="'mailto:' + candidate()!.organization?.email" class="hover:text-indigo-600 truncate">{{
+                candidate()!.organization?.email }}</a>
             </div>
-            
-            <div
-              class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
-              *ngIf="candidate()!.organization?.phone"
-            >
-              <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+
+            <div class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
+              *ngIf="candidate()!.organization?.phone">
+              <div
+                class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
                 <i class="bi bi-telephone"></i>
               </div>
               <span>{{ candidate()!.organization?.phone }}</span>
             </div>
-            
-            <div
-              class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
-              *ngIf="candidate()!.organization?.website"
-            >
-              <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+
+            <div class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
+              *ngIf="candidate()!.organization?.website">
+              <div
+                class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
                 <i class="bi bi-globe"></i>
               </div>
-              <a
-                [href]="candidate()!.organization?.website"
-                target="_blank"
-                class="hover:text-indigo-600 truncate"
-                >{{ candidate()!.organization?.website }}</a
-              >
+              <a [href]="candidate()!.organization?.website" target="_blank" class="hover:text-indigo-600 truncate">{{
+                candidate()!.organization?.website }}</a>
             </div>
-            
-            <div
-              class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
-              *ngIf="candidate()!.organization?.city"
-            >
-              <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+
+            <div class="flex items-center gap-3 text-sm text-gray-700 font-medium group"
+              *ngIf="candidate()!.organization?.city">
+              <div
+                class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
                 <i class="bi bi-geo-alt"></i>
               </div>
-              <span class="truncate"
-                >{{ candidate()!.organization?.city
-                }}<span *ngIf="candidate()!.organization?.country"
-                  >, {{ candidate()!.organization?.country }}</span
-                ></span
-              >
+              <span class="truncate">{{ candidate()!.organization?.city
+                }}<span *ngIf="candidate()!.organization?.country">, {{ candidate()!.organization?.country
+                  }}</span></span>
             </div>
           </div>
         </div>

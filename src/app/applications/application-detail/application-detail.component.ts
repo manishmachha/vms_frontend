@@ -42,6 +42,7 @@ import { Interview, InterviewType } from '../../models/interview.model';
 import { ChangeDetectorRef } from '@angular/core';
 import { DashboardStatsResponse } from '../../models/dashboard-stats.model';
 import { ScheduleInterviewDialogComponent } from '../dialogs/schedule-interview-dialog/schedule-interview-dialog.component';
+import { ActivityService, ActivityLog } from '../../activities/services/activity.service';
 
 @Component({
   selector: 'app-application-detail',
@@ -116,6 +117,10 @@ export class ApplicationDetailComponent implements OnInit {
   // Interview State
   interviews = signal<Interview[]>([]);
   showScheduleModal = signal(false);
+
+  // Activity Log State
+  private activityService = inject(ActivityService);
+  activities = signal<ActivityLog[]>([]);
 
   // Documents
   selectedFile: File | null = null;
@@ -323,7 +328,16 @@ export class ApplicationDetailComponent implements OnInit {
       this.loadDocuments(id);
       this.startAnalysisPolling(id);
       this.loadInterviews(id);
+      this.loadActivities(id);
     }
+  }
+
+  loadActivities(id: string | number) {
+    this.activityService.getActivities(undefined, undefined, undefined, undefined, undefined, 0, 10, 'timestamp', 'desc', String(id))
+      .subscribe({
+        next: (page) => this.activities.set(page.content),
+        error: (err) => console.error('Failed to load activities', err)
+      });
   }
 
   ngOnDestroy() {

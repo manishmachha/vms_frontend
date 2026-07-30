@@ -39,3 +39,12 @@ export interface UpdateTimesheetStatusRequest {
   status: TimesheetStatus;
   managerNotes?: string;
 }
+
+export interface TimesheetStats {
+  total: number;
+  draft: number;
+  submitted: number;
+  approved: number;
+  rejected: number;
+  clarificationRequested: number;
+}

@@ -35,7 +35,6 @@ export class ClientSubmissionsComponent implements OnInit {
   private submissionService = inject(ClientSubmissionService);
   private clientService = inject(ClientService);
   private authStore = inject(AuthStore);
-  private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   private dialogService = inject(DialogService);
 

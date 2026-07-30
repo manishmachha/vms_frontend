@@ -87,8 +87,20 @@ export class ProjectService {
     return this.api.delete<void>(`/projects/${id}`);
   }
 
-  getAllocations(projectId: string) {
-    return this.api.get<ProjectAllocation[]>(`/projects/${projectId}/allocations`);
+  getAllocations(
+    projectId: string,
+    page: number = 0,
+    size: number = 10,
+    search?: string,
+    sort?: string,
+    status?: string
+  ): Observable<Page<ProjectAllocation>> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (search) params = params.set('search', search);
+    if (sort) params = params.set('sort', sort);
+    if (status) params = params.set('status', status);
+    
+    return this.api.get<Page<ProjectAllocation>>(`/projects/${projectId}/allocations`, params);
   }
 
   allocateUser(projectId: number, request: AllocateUserRequest) {

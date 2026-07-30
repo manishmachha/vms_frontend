@@ -28,17 +28,20 @@ export class TimesheetFormComponent implements OnInit {
   form!: FormGroup;
   isEdit = signal(false);
   timesheetId = signal<string | null>(null);
-  
+
   projectName = signal('Loading...');
   requestId = signal('Loading...');
+  clientName = signal('Loading...');
+  startDate = signal<string>('');
+  endDate = signal<string>('');
   projectAllocationId = signal<number | null>(null);
-  
+
   selectedFile = signal<File | null>(null);
   submitting = signal(false);
 
   ngOnInit() {
     this.initForm();
-    
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEdit.set(true);
@@ -52,6 +55,8 @@ export class TimesheetFormComponent implements OnInit {
     }
   }
 
+  timesheetStatus = signal<string>('DRAFT');
+
   initForm() {
     this.form = this.fb.group({
       weekStartDate: ['', Validators.required],
@@ -59,22 +64,49 @@ export class TimesheetFormComponent implements OnInit {
       employeeNotes: [''],
       entries: this.fb.array([])
     });
+
+    this.form.get('weekStartDate')?.valueChanges.subscribe(dateStr => {
+      if (dateStr) {
+        this.generateWeekEntries(dateStr);
+      }
+    });
   }
 
   get entries() {
     return this.form.get('entries') as FormArray;
   }
 
-  addEntry(date = '', hours = 0, desc = '') {
-    this.entries.push(this.fb.group({
-      entryDate: [date, Validators.required],
-      hours: [hours, [Validators.required, Validators.min(0), Validators.max(24)]],
-      taskDescription: [desc, Validators.required]
-    }));
-  }
+  generateWeekEntries(startDateStr: string) {
+    const start = new Date(startDateStr);
+    if (isNaN(start.getTime())) return;
+    
+    // Calculate end date (6 days after start)
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    this.form.get('weekEndDate')?.setValue(end.toISOString().split('T')[0], { emitEvent: false });
 
-  removeEntry(index: number) {
-    this.entries.removeAt(index);
+    // Store existing entries mapped by date to preserve data
+    const existingData = new Map<string, any>();
+    this.entries.controls.forEach(ctrl => {
+      const date = ctrl.get('entryDate')?.value;
+      if (date) existingData.set(date, ctrl.value);
+    });
+
+    this.entries.clear();
+    const formatDate = (d: Date) => d.toISOString().split('T')[0];
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      const dateStr = formatDate(d);
+      
+      const existing = existingData.get(dateStr);
+      this.entries.push(this.fb.group({
+        entryDate: [dateStr, Validators.required],
+        hours: [existing?.hours || 0, [Validators.required, Validators.min(0), Validators.max(24)]],
+        taskDescription: [existing?.taskDescription || '']
+      }));
+    }
   }
 
   prefillCurrentWeek() {
@@ -82,21 +114,12 @@ export class TimesheetFormComponent implements OnInit {
     const day = today.getDay(); // 0 is Sunday
     const diffToMonday = today.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(today.setDate(diffToMonday));
-    const sunday = new Date(today.setDate(diffToMonday + 6));
     
     const formatDate = (d: Date) => d.toISOString().split('T')[0];
-    
+    // This will trigger the valueChanges listener to populate the 7 entries
     this.form.patchValue({
-      weekStartDate: formatDate(monday),
-      weekEndDate: formatDate(sunday)
+      weekStartDate: formatDate(monday)
     });
-    
-    // Add 5 empty days for Mon-Fri
-    for (let i = 0; i < 5; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      this.addEntry(formatDate(d), 0, '');
-    }
   }
 
   loadActiveProject() {
@@ -105,8 +128,11 @@ export class TimesheetFormComponent implements OnInit {
         if (res.content && res.content.length > 0) {
           const project = res.content[0];
           this.projectName.set(project.name);
+          this.clientName.set(project.client?.name ?? '');
+          this.startDate.set(project.startDate ?? '');
+          this.endDate.set(project.endDate ?? '');
           this.requestId.set(project.requestId || 'N/A');
-          
+
           if (project.allocations && project.allocations.length > 0) {
             // Assume the first allocation is the current user's allocation for this employee
             this.projectAllocationId.set(project.allocations[0].id!);
@@ -129,20 +155,47 @@ export class TimesheetFormComponent implements OnInit {
         this.projectName.set(ts.projectName);
         this.requestId.set(ts.projectRequestId || 'N/A');
         this.projectAllocationId.set(ts.projectAllocationId);
-        
+
+        this.timesheetStatus.set(ts.status);
+
+        // Patching weekStartDate will trigger generateWeekEntries
         this.form.patchValue({
           weekStartDate: ts.weekStartDate,
           weekEndDate: ts.weekEndDate,
           employeeNotes: ts.employeeNotes
         });
-        
-        // Clear and add entries
-        this.entries.clear();
-        ts.entries.forEach(e => {
-          this.addEntry(e.entryDate, e.hours, e.taskDescription);
-        });
+
+        // After generation, patch the actual values for the generated controls
+        this.entries.patchValue(ts.entries.map(e => ({
+          entryDate: e.entryDate,
+          hours: e.hours,
+          taskDescription: e.taskDescription
+        })));
       },
       error: () => this.snackBar.open('Failed to load timesheet', 'Close', { duration: 3000 })
+    });
+  }
+
+  withdrawTimesheet() {
+    if (!this.isEdit() || !this.timesheetId()) return;
+    
+    this.submitting.set(true);
+    const data: CreateTimesheetRequest = {
+      ...this.form.value,
+      projectAllocationId: this.projectAllocationId()!,
+      submit: false // Triggers the withdrawal logic in backend
+    };
+
+    this.timesheetService.updateTimesheet(this.timesheetId()!, data).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.snackBar.open('Timesheet successfully withdrawn to Draft', 'OK', { duration: 3000 });
+        this.router.navigate(['/timesheets']);
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        this.snackBar.open(err.error?.message || 'Failed to withdraw timesheet', 'Close', { duration: 3000 });
+      }
     });
   }
 
@@ -162,9 +215,10 @@ export class TimesheetFormComponent implements OnInit {
   onSubmit(submit: boolean) {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.snackBar.open('Please fill out all required fields correctly.', 'Close', { duration: 3000 });
       return;
     }
-    
+
     if (!this.projectAllocationId()) {
       this.snackBar.open('Missing project allocation. Cannot save timesheet.', 'Close', { duration: 3000 });
       return;
@@ -177,7 +231,7 @@ export class TimesheetFormComponent implements OnInit {
       submit
     };
 
-    const req$ = this.isEdit() 
+    const req$ = this.isEdit()
       ? this.timesheetService.updateTimesheet(this.timesheetId()!, data)
       : this.timesheetService.createTimesheet(data);
 
@@ -202,13 +256,13 @@ export class TimesheetFormComponent implements OnInit {
       }
     });
   }
-  
+
   finalizeSubmit(submit: boolean) {
     this.submitting.set(false);
     this.snackBar.open(`Timesheet ${submit ? 'submitted' : 'saved as draft'} successfully`, 'OK', { duration: 3000 });
     this.router.navigate(['/timesheets']);
   }
-  
+
   getTotalHours(): number {
     return this.entries.controls.reduce((acc, curr) => acc + (Number(curr.get('hours')?.value) || 0), 0);
   }

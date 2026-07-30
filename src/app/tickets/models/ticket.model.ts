@@ -65,5 +65,6 @@ export interface TicketCreateRequest {
   category: TicketCategory;
   refEntityId?: number;
   priority: TicketPriority;
-  ccUserIds?: number[];
+  ccUserIds?: number[] | string[];
+  assignedToId?: string;
 }

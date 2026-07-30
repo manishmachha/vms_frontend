@@ -1,22 +1,92 @@
 <div class="p-6 space-y-6">
-  <div class="flex justify-between items-center">
-    <div class="flex gap-4">
-      <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value); loadTimesheets()" class="border-gray-300 rounded-md shadow-sm py-2 pl-3 pr-8 focus:ring-indigo-500 focus:border-indigo-500">
-        <option value="">All Statuses</option>
-        <option value="DRAFT">Draft</option>
-        <option value="SUBMITTED">Submitted</option>
-        <option value="APPROVED">Approved</option>
-        <option value="REJECTED">Rejected</option>
-        <option value="CLARIFICATION_REQUESTED">Needs Clarification</option>
-      </select>
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6" *ngIf="stats() as s">
+    <div class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-blue-500 to-blue-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-blue-100 text-sm font-medium">Total Timesheets</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ s.total }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-clock-history"></i>
+        </div>
+      </div>
     </div>
-    <a *ngIf="authStore.isEmployee()" routerLink="new" class="px-4 py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">+ New Timesheet</a>
+    
+    <div class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-amber-500 to-amber-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-amber-100 text-sm font-medium">Pending Review</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ s.submitted }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-emerald-500 to-emerald-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-emerald-100 text-sm font-medium">Approved</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ s.approved }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-red-500 to-red-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-red-100 text-sm font-medium">Rejected</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ s.rejected }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-x-circle-fill"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Controls -->
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <div class="relative flex-1 sm:w-48">
+        <select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event); onFilterChange()" 
+          class="w-full py-2 pl-4 pr-8 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 text-gray-700 cursor-pointer">
+          <option value="">All Statuses</option>
+          <option value="DRAFT">Draft</option>
+          <option value="SUBMITTED">Submitted</option>
+          <option value="APPROVED">Approved</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="CLARIFICATION_REQUESTED">Needs Clarification</option>
+        </select>
+      </div>
+
+      <div class="relative flex-1 sm:w-48" *ngIf="authStore.isAdmin() && authStore.orgType() === 'SOLVENTEK'">
+        <select [ngModel]="vendorFilter()" (ngModelChange)="vendorFilter.set($event); onFilterChange()" 
+          class="w-full py-2 pl-4 pr-8 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 text-gray-700 cursor-pointer">
+          <option value="">All Vendors</option>
+          <option *ngFor="let vendor of vendors()" [value]="vendor.id">{{ vendor.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a *ngIf="authStore.isEmployee()" routerLink="new"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 transition-all">
+        <i class="bi bi-plus-lg"></i>
+        <span>New Timesheet</span>
+      </a>
+    </div>
   </div>
 
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-    <table mat-table [dataSource]="dataSource" class="w-full text-left">
+    <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" class="w-full text-left">
       <ng-container matColumnDef="period">
-        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Period</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="weekStartDate" class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Period</th>
         <td mat-cell *matCellDef="let ts" class="px-6 py-4 border-b border-gray-50">
           <div class="font-bold text-gray-900">{{ ts.weekStartDate | date:'MMM d' }} - {{ ts.weekEndDate | date:'MMM d, yyyy' }}</div>
           <div class="text-xs text-gray-500 font-medium mt-0.5" *ngIf="!authStore.isEmployee()"><i class="bi bi-person-fill"></i> {{ ts.employeeName }}</div>
@@ -32,12 +102,12 @@
       </ng-container>
 
       <ng-container matColumnDef="hours">
-        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Total Hours</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="totalHours" class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Total Hours</th>
         <td mat-cell *matCellDef="let ts" class="px-6 py-4 border-b border-gray-50 font-bold text-indigo-600">{{ ts.totalHours }}h</td>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Status</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header="status" class="bg-gray-50 px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-100">Status</th>
         <td mat-cell *matCellDef="let ts" class="px-6 py-4 border-b border-gray-50">
           <span class="px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider"
             [ngClass]="{
