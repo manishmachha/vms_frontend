@@ -9,6 +9,7 @@ export interface AuthResponse {
   role: string;
   orgId?: number;
   userType?: string;
+  orgName?: string
 }
 
 // ===== Generic API Response wrapper =====

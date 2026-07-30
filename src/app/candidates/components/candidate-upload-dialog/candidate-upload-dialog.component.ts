@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { CandidateService } from '../../../services/candidate.service';
 import { LoadingService } from '../../../services/loading.service';
 import { Candidate } from '../../models/candidate.model';
+import { AuthStore } from '../../../services/auth.store';
 
 @Component({
   selector: 'app-candidate-upload-dialog',
@@ -13,10 +14,11 @@ import { Candidate } from '../../models/candidate.model';
   templateUrl: './candidate-upload-dialog.component.html',
   styleUrls: ['./candidate-upload-dialog.component.css']
 })
-export class CandidateUploadDialogComponent {
+export class CandidateUploadDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<CandidateUploadDialogComponent>);
   private candidateService = inject(CandidateService);
   private loadingService = inject(LoadingService);
+  private authStore = inject(AuthStore);
 
   selectedFile = signal<File | null>(null);
   selectedSource = signal<string>('LinkedIn');
@@ -24,6 +26,14 @@ export class CandidateUploadDialogComponent {
   uploadError = signal<string | null>(null);
 
   sources = ['LinkedIn', 'Naukri', 'Monster', 'Referral', 'Others'];
+
+  ngOnInit() {
+    const user = this.authStore.user();
+    if (user?.organizationName) {
+      // Insert the organization name before 'Others'
+      this.sources.splice(this.sources.length - 1, 0, user.organizationName);
+    }
+  }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;

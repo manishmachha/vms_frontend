@@ -102,6 +102,7 @@ export class AuthStore {
       organizationId: response.orgId,
       orgId: response.orgId,
       type: response.userType,
+      organizationName: response.orgName
     };
 
     this.state.set({
