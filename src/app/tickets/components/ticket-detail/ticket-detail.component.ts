@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { TicketService } from '../../services/ticket.service';
+import { TicketService } from '../../../services/ticket.service';
 import { HeaderService } from '../../../services/header.service';
 import { Ticket, TicketMessage, TicketStatus } from '../../models/ticket.model';
 import { AuthStore } from '../../../services/auth.store';
@@ -25,12 +25,12 @@ export class TicketDetailComponent implements OnInit {
   ticket = signal<Ticket | null>(null);
   messages = signal<TicketMessage[]>([]);
   eligibleUsers = signal<User[]>([]);
-  
+
   isEditingCc = false;
   selectedCcUserIds: string[] = [];
   ccSearchTerm = signal('');
   isCcDropdownOpen = signal(false);
-  
+
   newMessage = '';
   selectedFiles: File[] = [];
   isSubmitting = false;
@@ -38,7 +38,7 @@ export class TicketDetailComponent implements OnInit {
   get filteredCcUsers(): User[] {
     const term = this.ccSearchTerm().toLowerCase().trim();
     if (!term) return this.eligibleUsers();
-    return this.eligibleUsers().filter(u => 
+    return this.eligibleUsers().filter(u =>
       `${u.firstName} ${u.lastName}`.toLowerCase().includes(term) ||
       (u.email && u.email.toLowerCase().includes(term))
     );
@@ -116,7 +116,7 @@ export class TicketDetailComponent implements OnInit {
     if (!this.newMessage.trim() && this.selectedFiles.length === 0) {
       return;
     }
-    
+
     this.isSubmitting = true;
     this.ticketService.addMessage(this.ticketId(), this.newMessage, this.selectedFiles).subscribe({
       next: (msg) => {

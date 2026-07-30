@@ -41,7 +41,7 @@ export class ApiService {
     const req = this.http
       .get<ApiResponse<T>>(`${this.baseUrl}${path}`, { params, headers, context })
       .pipe(
-        map((response) => response.data),
+        map((response: any) => response?.data !== undefined ? response.data : response),
         catchError(this.handleError),
       );
     return this.wrapWithLoader(req, skipLoader);
@@ -52,7 +52,7 @@ export class ApiService {
     const req = this.http
       .post<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers, context })
       .pipe(
-        map((response) => response.data),
+        map((response: any) => response?.data !== undefined ? response.data : response),
         catchError(this.handleError),
       );
     return this.wrapWithLoader(req, skipLoader);
@@ -63,7 +63,7 @@ export class ApiService {
     const req = this.http
       .put<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers, params, context })
       .pipe(
-        map((response) => response.data),
+        map((response: any) => response?.data !== undefined ? response.data : response),
         catchError(this.handleError),
       );
     return this.wrapWithLoader(req, skipLoader);
@@ -74,7 +74,7 @@ export class ApiService {
     const req = this.http
       .patch<ApiResponse<T>>(`${this.baseUrl}${path}`, body, { headers, context })
       .pipe(
-        map((response) => response.data),
+        map((response: any) => response?.data !== undefined ? response.data : response),
         catchError(this.handleError),
       );
     return this.wrapWithLoader(req, skipLoader);
@@ -85,7 +85,7 @@ export class ApiService {
     const req = this.http
       .delete<ApiResponse<T>>(`${this.baseUrl}${path}`, { headers, context })
       .pipe(
-        map((response) => response.data),
+        map((response: any) => response?.data !== undefined ? response.data : response),
         catchError(this.handleError),
       );
     return this.wrapWithLoader(req, skipLoader);

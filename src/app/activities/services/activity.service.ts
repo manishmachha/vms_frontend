@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
+import { ApiService } from '../../services/api.service';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -38,8 +39,8 @@ export interface Page<T> {
   providedIn: 'root'
 })
 export class ActivityService {
-  private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/activities`;
+  private api = inject(ApiService);
+  private apiUrl = `/activities`;
 
   getActivities(
     organizationId?: string,
@@ -64,13 +65,13 @@ export class ActivityService {
     if (search) params = params.set('search', search);
     if (user) params = params.set('user', user);
 
-    return this.http.get<Page<ActivityLog>>(this.apiUrl, { params });
+    return this.api.get<Page<ActivityLog>>(this.apiUrl, params);
   }
 
   getActivityStats(organizationId?: string): Observable<ActivityLogStatsResponse> {
     let params = new HttpParams();
     if (organizationId) params = params.set('organizationId', organizationId);
     
-    return this.http.get<ActivityLogStatsResponse>(`${this.apiUrl}/stats`, { params });
+    return this.api.get<ActivityLogStatsResponse>(`${this.apiUrl}/stats`, params);
   }
 }

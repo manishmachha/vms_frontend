@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TicketService } from '../../services/ticket.service';
+import { TicketService } from '../../../services/ticket.service';
 import { HeaderService } from '../../../services/header.service';
 import { TicketCategory, TicketPriority } from '../../models/ticket.model';
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
@@ -39,7 +39,7 @@ export class TicketFormComponent implements OnInit {
   get filteredCcUsers(): User[] {
     const term = this.ccSearchTerm().toLowerCase().trim();
     if (!term) return this.eligibleUsers();
-    return this.eligibleUsers().filter(u => 
+    return this.eligibleUsers().filter(u =>
       `${u.firstName} ${u.lastName}`.toLowerCase().includes(term) ||
       (u.email && u.email.toLowerCase().includes(term))
     );

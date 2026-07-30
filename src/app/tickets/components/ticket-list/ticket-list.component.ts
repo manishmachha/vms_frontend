@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { TicketService } from '../../services/ticket.service';
+import { TicketService } from '../../../services/ticket.service';
 import { Ticket, TicketCategory, TicketStatus, TicketPriority } from '../../models/ticket.model';
 import { HeaderService } from '../../../services/header.service';
 import { AuthStore } from '../../../services/auth.store';
@@ -30,7 +30,7 @@ export class TicketListComponent implements OnInit {
   }
 
   tickets = signal<Ticket[]>([]);
-  
+
   openCount = computed(() => this.tickets().filter((t) => t.status === TicketStatus.OPEN).length);
   resolvedCount = computed(() => this.tickets().filter((t) => t.status === TicketStatus.RESOLVED).length);
   public notificationService = inject(NotificationService);
@@ -60,9 +60,9 @@ export class TicketListComponent implements OnInit {
   }
 
   hasNotification(ticketId: string | number): boolean {
-    return this.notificationService.notifications().some(n => 
-      n.entityType === 'TICKET' && 
-      String(n.entityId) === String(ticketId) && 
+    return this.notificationService.notifications().some(n =>
+      n.entityType === 'TICKET' &&
+      String(n.entityId) === String(ticketId) &&
       !n.read
     );
   }
