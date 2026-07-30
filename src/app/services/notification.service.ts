@@ -25,6 +25,11 @@ export class NotificationService {
     private api: ApiService,
     private authStore: AuthStore
   ) {
+    // Request OS Notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
     // Initial fetch if already logged in
     if (this.authStore.isAuthenticated()) {
       this.fetchInitialNotifications();
@@ -179,7 +184,26 @@ export class NotificationService {
         });
         
         this._unreadCount.update(count => count + 1);
-        
+
+        // Spawn OS Level Notification
+        if ('Notification' in window) {
+          console.log('[NotificationService] Permission status:', Notification.permission);
+          if (Notification.permission === 'granted') {
+            console.log('[NotificationService] Spawning OS notification:', notification.message);
+            const osNotification = new Notification('Solventek VMS', {
+              body: notification.message || 'You have a new notification',
+              icon: '/favicon.ico'
+            });
+            
+            osNotification.onclick = function() {
+              window.focus();
+              this.close();
+            };
+          } else if (Notification.permission === 'default') {
+            console.log('[NotificationService] Permission is default, attempting to request...');
+            Notification.requestPermission();
+          }
+        }
       } catch (err) {
         console.error('Error parsing incoming notification', err);
       }

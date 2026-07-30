@@ -96,6 +96,10 @@ export class NotificationDropdownComponent {
 
   toggle() {
     this.isOpen = !this.isOpen;
+    // Request permission upon user interaction to avoid browser auto-blocking
+    if (this.isOpen && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
   }
 
   markAllAsRead() {
