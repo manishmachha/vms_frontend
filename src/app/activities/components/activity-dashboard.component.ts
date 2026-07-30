@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -14,8 +14,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { ActivityService, ActivityLog, ActivityLogStatsResponse } from '../services/activity.service';
 import { UserService } from '../../services/user.service';
 import { AuthStore } from '../../services/auth.store';
-import { BehaviorSubject, combineLatest, debounceTime, distinctUntilChanged, startWith, Subject, switchMap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-activity-dashboard',
@@ -38,7 +38,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './activity-dashboard.component.html',
   styleUrls: ['./activity-dashboard.component.css']
 })
-export class ActivityDashboardComponent implements OnInit, AfterViewInit {
+export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private activityService = inject(ActivityService);
   private userService = inject(UserService);
   private authStore = inject(AuthStore);
@@ -69,12 +69,13 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit {
 
   // RxJS triggers for fetching data
   private filterChange$ = new BehaviorSubject<void>(undefined);
+  private destroy$ = new Subject<void>();
 
   constructor() {
     // Debounce search query
     this.filterChange$.pipe(
       debounceTime(300),
-      takeUntilDestroyed()
+      takeUntil(this.destroy$)
     ).subscribe(() => {
       this.loadActivities();
     });
@@ -94,6 +95,11 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit {
     this.paginator.page.subscribe(() => {
       this.loadActivities();
     });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadStats() {
