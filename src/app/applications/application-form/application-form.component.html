@@ -20,223 +20,54 @@
     </button>
   </div>
 
-  <!-- Stepper Progress -->
-  <div class="bg-gray-50 px-6 py-4">
-    <div class="flex items-center justify-between">
-      <ng-container *ngFor="let step of steps; let i = index; let last = last">
-        <div class="flex items-center" [class.flex-1]="!last">
-          <div class="relative flex flex-col items-center">
-            <div
-              class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all duration-300"
-              [class.bg-indigo-600]="currentStep() >= i"
-              [class.text-white]="currentStep() >= i"
-              [class.bg-gray-200]="currentStep() < i"
-              [class.text-gray-500]="currentStep() < i"
-              [class.ring-4]="currentStep() === i"
-              [class.ring-indigo-100]="currentStep() === i"
-            >
-              <i *ngIf="currentStep() > i" class="bi bi-check text-lg"></i>
-              <span *ngIf="currentStep() <= i">{{ i + 1 }}</span>
-            </div>
-            <span
-              class="absolute -bottom-6 w-32 text-center text-xs font-medium transition-colors duration-300"
-              [class.text-indigo-600]="currentStep() >= i"
-              [class.text-gray-400]="currentStep() < i"
-            >
-              {{ step }}
-            </span>
-          </div>
-          <div *ngIf="!last" class="mx-2 h-[2px] flex-1 rounded-full bg-gray-200">
-            <div
-              class="h-full bg-indigo-600 transition-all duration-500"
-              [style.width.%]="currentStep() > i ? 100 : 0"
-            ></div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-  </div>
-
-  <!-- Form Content -->
+  <!-- Content -->
   <div class="flex-1 overflow-y-auto px-6 py-10">
-    <form [formGroup]="form" (ngSubmit)="submit()">
+    
+    <!-- Empty State -->
+    <div *ngIf="candidates().length === 0" class="flex flex-col items-center justify-center h-full py-12 text-center animate-fade-in-up">
+      <div class="h-20 w-20 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 mb-5">
+        <i class="bi bi-people text-4xl"></i>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">No Candidates Available</h3>
+      <p class="text-sm text-gray-500 mb-8 max-w-md">
+        You need to have at least one candidate in the system to apply for this job. 
+        Please navigate to the candidates section to add a new candidate.
+      </p>
+      <button 
+        (click)="goToCandidates()" 
+        class="rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:shadow-indigo-500/25 cursor-pointer">
+        Go to Candidates
+      </button>
+    </div>
+
+    <!-- Candidate Selection & Review -->
+    <div *ngIf="candidates().length > 0" class="space-y-6">
+      
       <!-- Candidate Selection -->
-      <div
-        *ngIf="currentStep() === 0 && candidates().length > 0"
-        class="mb-8 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 animate-fade-in-up"
-      >
+      <div class="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 animate-fade-in-up">
         <label class="block text-sm font-medium text-indigo-900 mb-2"
-          >Select Existing Candidate</label
+          >Select Candidate <span class="text-red-500">*</span></label
         >
         <select
           [formControl]="candidateIdControl"
           class="w-full rounded-xl border border-indigo-200 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all cursor-pointer"
         >
-          <option [ngValue]="null">-- Create New Candidate --</option>
+          <option [ngValue]="null">-- Select a Candidate --</option>
           <option *ngFor="let c of candidates()" [ngValue]="c.id">
             {{ c.firstName }} {{ c.lastName }} ({{ c.email }})
           </option>
         </select>
         <p class="mt-2 text-xs text-indigo-600">
-          Select a candidate to auto-fill their details.
+          Select an existing candidate to apply for this job.
         </p>
       </div>
 
-      <!-- Step 1: Personal Details -->
-      <div *ngIf="currentStep() === 0" class="animate-fade-in-up space-y-5">
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700"
-              >First Name <span class="text-red-500">*</span></label
-            >
-            <input
-              type="text"
-              formControlName="firstName"
-              class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-              placeholder="e.g. Sarah"
-            />
-            <p class="text-xs text-red-500" *ngIf="hasError('firstName')">
-              First name is required
-            </p>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700"
-              >Last Name <span class="text-red-500">*</span></label
-            >
-            <input
-              type="text"
-              formControlName="lastName"
-              class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-              placeholder="e.g. Connor"
-            />
-            <p class="text-xs text-red-500" *ngIf="hasError('lastName')">
-              Last name is required
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700"
-              >Email Address <span class="text-red-500">*</span></label
-            >
-            <input
-              type="email"
-              formControlName="email"
-              class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-              placeholder="sarah@example.com"
-            />
-            <p class="text-xs text-red-500" *ngIf="hasError('email')">
-              Valid email is required
-            </p>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700">Phone Number</label>
-            <input
-              type="tel" maxlength="10"
-              formControlName="phone"
-              class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-              placeholder="+1 (555) 000-0000"
-            />
-          </div>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-sm font-medium text-gray-700">Address / Location</label>
-          <input
-            type="text"
-            formControlName="location"
-            class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-            placeholder="City, Country"
-          />
-        </div>
-      </div>
-
-      <!-- Step 2: Professional Profile -->
-      <div *ngIf="currentStep() === 1" class="animate-fade-in-up space-y-5">
-        <div class="space-y-1.5">
-          <label class="text-sm font-medium text-gray-700">Current Title</label>
-          <input
-            type="text"
-            formControlName="currentTitle"
-            class="w-full rounded-xl border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-            placeholder="e.g. Senior Product Designer"
-          />
-        </div>
-
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700">Current Company</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                <i class="bi bi-building"></i>
-              </div>
-              <input
-                type="text"
-                formControlName="currentCompany"
-                class="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-                placeholder="e.g. Acme Corp"
-              />
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700">Years of Experience</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                <i class="bi bi-briefcase"></i>
-              </div>
-              <input
-                type="number"
-                formControlName="experienceYears"
-                min="0"
-                max="50"
-                class="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-                placeholder="e.g. 5"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700">LinkedIn URL</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                <i class="bi bi-linkedin"></i>
-              </div>
-              <input
-                type="text"
-                formControlName="linkedinUrl"
-                class="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-                placeholder="linkedin.com/in/username"
-              />
-            </div>
-          </div>
-
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-700">Portfolio URL</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-pink-500">
-                <i class="bi bi-dribbble"></i>
-              </div>
-              <input
-                type="text"
-                formControlName="portfolioUrl"
-                class="w-full rounded-xl border border-gray-300 bg-gray-50 pl-10 px-4 py-2.5 text-sm text-gray-900 shadow-xs transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100 focus:outline-hidden"
-                placeholder="dribbble.com/username"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3: Resume & Review -->
-      <div *ngIf="currentStep() === 2" class="animate-fade-in-up space-y-6">
+      <!-- Resume & Review (Visible if candidate is selected) -->
+      <div *ngIf="selectedCandidate()" class="animate-fade-in-up space-y-6">
+        
+        <!-- Upload New Resume -->
         <div
-          *ngIf="!selectedFile && !candidateIdControl.value"
+          *ngIf="!selectedFile && !hasExistingResume()"
           class="group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-8 transition hover:border-indigo-500 hover:bg-indigo-50"
           (click)="fileInput.click()"
           (dragover)="onDragOver($event)"
@@ -267,7 +98,7 @@
 
         <!-- Pre-selected Resume or Uploaded File -->
         <div
-          *ngIf="selectedFile || (candidateIdControl.value && hasExistingResume())"
+          *ngIf="selectedFile || hasExistingResume()"
           class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-center justify-between"
         >
           <div class="flex items-center gap-3">
@@ -292,7 +123,7 @@
           <button
             *ngIf="selectedFile"
             (click)="removeFile($event)"
-            class="text-gray-400 hover:text-red-500 transition"
+            class="text-gray-400 hover:text-red-500 transition cursor-pointer"
           >
             <i class="bi bi-trash"></i>
           </button>
@@ -300,10 +131,11 @@
 
         <p class="text-center text-xs text-red-500" *ngIf="fileError">{{ fileError }}</p>
 
-        <div class="rounded-xl bg-gray-50 p-4 border border-gray-100">
+        <!-- Review Application -->
+        <div class="rounded-xl bg-gray-50 p-4 border border-gray-100 relative group">
           <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
             <i class="bi bi-clipboard-check text-indigo-500"></i>
-            Review Application
+            Candidate Summary
           </h4>
           <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
             <div>
@@ -311,17 +143,17 @@
                 Applicant
               </p>
               <p class="font-medium text-gray-900">
-                {{ form.get('firstName')?.value }} {{ form.get('lastName')?.value }}
+                {{ selectedCandidate()?.firstName || 'N/A' }} {{ selectedCandidate()?.lastName }}
               </p>
             </div>
             <div>
               <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Contact</p>
-              <p class="font-medium text-gray-900 truncate">{{ form.get('email')?.value }}</p>
+              <p class="font-medium text-gray-900 truncate">{{ selectedCandidate()?.email || 'N/A' }}</p>
             </div>
             <div>
               <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Role</p>
               <p class="font-medium text-gray-900">
-                {{ form.get('currentTitle')?.value || 'Not specified' }}
+                {{ selectedCandidate()?.currentDesignation || 'Not specified' }}
               </p>
             </div>
             <div>
@@ -329,28 +161,28 @@
                 Experience
               </p>
               <p class="font-medium text-gray-900">
-                {{ form.get('experienceYears')?.value }} years
+                {{ selectedCandidate()?.experienceYears || 0 }} years
               </p>
             </div>
           </div>
         </div>
       </div>
-    </form>
+
+      <!-- Placeholder when no candidate is selected -->
+      <div *ngIf="!selectedCandidate()" class="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-300 rounded-2xl bg-gray-50/50 animate-fade-in-up">
+        <div class="h-14 w-14 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
+          <i class="bi bi-person-bounding-box text-2xl"></i>
+        </div>
+        <h4 class="text-sm font-semibold text-gray-700">Select a Candidate</h4>
+        <p class="text-xs text-gray-500 mt-1">Please select a candidate from the dropdown above to view details and proceed.</p>
+      </div>
+    </div>
   </div>
 
   <!-- Footer Buttons -->
   <div class="border-t border-gray-100 bg-white px-6 py-4">
     <div class="flex items-center justify-between">
       <button
-        *ngIf="currentStep() > 0"
-        type="button"
-        (click)="prevStep()"
-        class="flex items-center rounded-xl bg-gray-100 px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-200 cursor-pointer"
-      >
-        Back
-      </button>
-      <button
-        *ngIf="currentStep() === 0"
         type="button"
         (click)="dialogRef.close()"
         class="rounded-xl bg-white px-5 py-2.5 text-sm font-medium text-gray-500 transition hover:text-gray-700 cursor-pointer"
@@ -359,20 +191,10 @@
       </button>
 
       <button
-        *ngIf="currentStep() < 2"
-        type="button"
-        (click)="nextStep()"
-        [disabled]="isStepInvalid()"
-        class="ml-auto rounded-xl bg-linear-to-r from-indigo-600 to-violet-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition hover:shadow-indigo-500/25 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-      >
-        Continue
-      </button>
-
-      <button
-        *ngIf="currentStep() === 2"
+        *ngIf="candidates().length > 0"
         type="button"
         (click)="submit()"
-        [disabled]="form.invalid || (!selectedFile && !candidateIdControl.value)"
+        [disabled]="!candidateIdControl.value"
         class="ml-auto flex items-center rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition hover:shadow-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
       >
         Submit Application
