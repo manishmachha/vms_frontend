@@ -207,6 +207,7 @@ export class InterviewListComponent implements OnInit {
       width: '600px',
       data: { 
         applicationId: interview?.application?.id,
+        application: interview?.application,
         candidateName: interview ? `${interview.application?.candidate?.firstName} ${interview.application?.candidate?.lastName}` : null,
         jobTitle: interview?.application?.job?.title
       },

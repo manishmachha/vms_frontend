@@ -1,0 +1,56 @@
+<div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100">
+      <mat-icon class="text-indigo-600">calendar_today</mat-icon>
+    </div>
+    <div>
+      <h2 class="text-lg font-bold text-gray-900 tracking-tight m-0">Interviews</h2>
+      <p class="text-xs text-gray-500 font-medium">{{ data.date | date: 'mediumDate' }}</p>
+    </div>
+  </div>
+  <button mat-dialog-close class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+    <mat-icon class="text-xl">close</mat-icon>
+  </button>
+</div>
+
+<div class="p-6">
+  <div class="space-y-3 max-h-100 overflow-y-auto pr-1 custom-scrollbar">
+    <div (click)="navigateToInterview(interview.id)"
+      *ngFor="let interview of data.interviews"
+      class="group p-4 bg-white rounded-2xl border border-gray-100 hover:border-indigo-100 hover:shadow-md cursor-pointer transition-all relative overflow-hidden"
+    >
+      <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <p class="text-sm font-bold text-gray-900 capitalize">
+            {{ interview.type.toLowerCase().replace('_', ' ') }}
+          </p>
+          <p class="text-xs text-gray-500 mt-0.5 font-medium flex items-center gap-1.5">
+            <mat-icon class="text-[14px] w-3.5 h-3.5 text-gray-400">schedule</mat-icon>
+            {{ interview.scheduledAt | date: 'shortTime' }} ({{ interview.durationMinutes }}m)
+          </p>
+        </div>
+        <span
+          class="text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100"
+        >
+          {{ interview.status }}
+        </span>
+      </div>
+      
+      <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50">
+        <div class="flex -space-x-2">
+          <div class="w-6 h-6 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-[10px] font-bold text-gray-600">
+            {{ interview.interviewer?.firstName?.charAt(0) || 'I' }}
+          </div>
+          <div class="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-indigo-600">
+            {{ interview.application?.candidate?.firstName?.charAt(0) || 'C' }}
+          </div>
+        </div>
+        <span class="text-xs text-gray-500 font-medium">
+          {{ interview.interviewer?.firstName || 'Interviewer' }} &amp; {{ interview.application?.candidate?.firstName || 'Candidate' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

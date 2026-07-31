@@ -5,6 +5,7 @@ import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { AuthStore } from '../../services/auth.store';
 import { HeaderService } from '../../services/header.service';
 import { EmployeeDashboardService, EmployeeDashboardStats } from '../../services/employee-dashboard.service';
+import { RecentActivityWidgetComponent } from '../components/recent-activity-widget/recent-activity-widget.component';
 
 interface StatCard {
   label: string;
@@ -18,7 +19,7 @@ interface StatCard {
 @Component({
   selector: 'app-employee-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RecentActivityWidgetComponent],
   template: `
     <div class="space-y-6 animate-fade-in pb-10">
       <div class="flex items-center justify-between">
@@ -76,17 +77,17 @@ interface StatCard {
             </a>
             
             <a
-              [routerLink]="resolvePath('/projects')"
+              [routerLink]="resolvePath('/profile')"
               class="flex items-center gap-4 group cursor-pointer p-3 rounded-xl hover:bg-slate-50 transition-all"
             >
               <div class="w-10 h-10 rounded-lg text-emerald-600 bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <i class="bi bi-kanban"></i>
+                <i class="bi bi-person"></i>
               </div>
               <div>
                 <h4 class="font-semibold text-slate-900 group-hover:text-emerald-600">
-                  My Projects
+                  My Profile
                 </h4>
-                <p class="text-xs text-gray-500">View current allocations</p>
+                <p class="text-xs text-gray-500">Manage your profile details</p>
               </div>
             </a>
             
@@ -121,6 +122,10 @@ interface StatCard {
             </a>
           </div>
         </div>
+
+        <div>
+          <app-recent-activity-widget [forCurrentUser]="true" [fullHeight]="true"></app-recent-activity-widget>
+        </div>
       </div>
     </div>
   `
@@ -142,7 +147,7 @@ export class EmployeeDashboardComponent implements OnInit {
       value: 0,
       icon: 'bi bi-kanban-fill',
       bgStyle: 'linear-gradient(to bottom right, #3b82f6, #1d4ed8)',
-      link: '/projects',
+      link: '/dashboard',
     },
     {
       label: 'Pending Interviews',

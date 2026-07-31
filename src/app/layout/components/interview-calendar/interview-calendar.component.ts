@@ -8,11 +8,13 @@ import { InterviewService } from '../../../services/interview.service';
 import { Interview } from '../../../models/interview.model';
 import { RouterLink } from "@angular/router";
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { InterviewListDialogComponent } from './interview-list-dialog.component';
 
 @Component({
   selector: 'app-interview-calendar',
   standalone: true,
-  imports: [CommonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule, RouterLink],
+  imports: [CommonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule, RouterLink, MatDialogModule],
   templateUrl: './interview-calendar.component.html',
   styleUrls: ['./interview-calendar.component.css'],
   encapsulation: ViewEncapsulation.None,
@@ -73,10 +75,22 @@ export class InterviewCalendarComponent implements OnInit {
     return '';
   };
 
+  private dialog = inject(MatDialog);
+
   onDateSelected(date: Date | null) {
     if (date) {
       this.selectedDate = date;
       this.updateSelectedInterviews();
+      
+      const interviews = this.selectedInterviews();
+      if (interviews.length > 0) {
+        this.dialog.open(InterviewListDialogComponent, {
+          data: { date: this.selectedDate, interviews: interviews },
+          width: '500px',
+          maxWidth: '95vw',
+          panelClass: 'custom-dialog-container'
+        });
+      }
     }
   }
 

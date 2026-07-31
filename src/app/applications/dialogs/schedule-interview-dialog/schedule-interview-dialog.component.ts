@@ -88,13 +88,18 @@ export class ScheduleInterviewDialogComponent implements OnInit {
 
   ngOnInit() {
     this.loadPotentialCcUsers();
-    
+
     if (this.data?.interview) {
       this.isEditMode = true;
       this.interviewId = this.data.interview.id;
       this.patchForm(this.data.interview);
-    } else if (!this.data?.applicationId) {
-      this.loadApplications();
+    } else {
+      if (this.data?.application) {
+        this.selectedApp.set(this.data.application);
+      }
+      if (!this.data?.applicationId) {
+        this.loadApplications();
+      }
     }
   }
 
@@ -111,10 +116,10 @@ export class ScheduleInterviewDialogComponent implements OnInit {
     });
 
     if (interview.application) {
-        this.selectedApp.set(interview.application);
+      this.selectedApp.set(interview.application);
     }
     if (interview.ccUsers) {
-        this.selectedCcUsers.set(interview.ccUsers);
+      this.selectedCcUsers.set(interview.ccUsers);
     }
   }
 
@@ -129,21 +134,21 @@ export class ScheduleInterviewDialogComponent implements OnInit {
     this.selectedApp.set(null);
     this.scheduleForm.patchValue({ applicationId: null });
     if (this.applications().length === 0) {
-        this.loadApplications();
+      this.loadApplications();
     }
   }
 
   toggleCcUser(user: any) {
     const current = this.selectedCcUsers();
     const index = current.findIndex(u => u.id === user.id);
-    
+
     let updated;
     if (index > -1) {
       updated = current.filter(u => u.id !== user.id);
     } else {
       updated = [...current, user];
     }
-    
+
     this.selectedCcUsers.set(updated);
     this.scheduleForm.patchValue({ ccUserIds: updated.map(u => u.id) });
     this.userSearchTerm.set('');
@@ -168,8 +173,8 @@ export class ScheduleInterviewDialogComponent implements OnInit {
   }
 
   loadPotentialCcUsers() {
-    const internalUsers$ = this.userService.getUsers().pipe(
-      map((res: any) => res.data || res),
+    const internalUsers$ = this.userService.getUsers(0, 100).pipe(
+      map((res: any) => res.content || res.data || res),
       catchError(() => of([])),
     );
 

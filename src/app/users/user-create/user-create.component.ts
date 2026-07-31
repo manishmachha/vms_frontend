@@ -69,6 +69,11 @@ export class UserCreateComponent implements OnInit {
     { value: 'EMPLOYEE', label: 'Employee' }
   ];
 
+  vendorRoles = [
+    { value: 'VENDOR', label: 'Vendor' },
+    { value: 'EMPLOYEE', label: 'Employee' }
+  ];
+
   ngOnInit() {
     this.loadInitialData();
     this.setupTypeListener();
@@ -130,7 +135,6 @@ export class UserCreateComponent implements OnInit {
       
       if (type === 'VENDOR') {
         roleControl?.setValue('VENDOR');
-        roleControl?.disable();
         
         orgControl?.setValue(null);
       } else {

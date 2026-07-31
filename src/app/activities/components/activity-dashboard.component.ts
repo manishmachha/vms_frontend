@@ -16,6 +16,8 @@ import { UserService } from '../../services/user.service';
 import { AuthStore } from '../../services/auth.store';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivityDetailDialogComponent } from './activity-detail-dialog.component';
 
 @Component({
   selector: 'app-activity-dashboard',
@@ -33,7 +35,8 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatChipsModule
+    MatChipsModule,
+    MatDialogModule
   ],
   templateUrl: './activity-dashboard.component.html',
   styleUrls: ['./activity-dashboard.component.css']
@@ -42,6 +45,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   private activityService = inject(ActivityService);
   private userService = inject(UserService);
   private authStore = inject(AuthStore);
+  private dialog = inject(MatDialog);
 
   // View state
   viewMode = signal<'grid' | 'table'>('grid');
@@ -62,7 +66,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   userSearchQuery = signal<string>('');
   
   // Table state
-  displayedColumns: string[] = ['timestamp', 'action', 'entityType', 'entityLabel', 'actorEmail', 'message'];
+  displayedColumns: string[] = ['timestamp', 'action', 'entityType', 'entityLabel', 'actorEmail', 'message', 'actions'];
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -184,6 +188,14 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
 
   toggleViewMode(mode: 'grid' | 'table') {
     this.viewMode.set(mode);
+  }
+
+  viewActivity(activity: ActivityLog) {
+    this.dialog.open(ActivityDetailDialogComponent, {
+      width: '600px',
+      data: { activity },
+      panelClass: 'dialog-modern'
+    });
   }
 
   getActionIcon(action: string): string {

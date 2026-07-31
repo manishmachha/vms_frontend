@@ -5,11 +5,12 @@ import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { HeaderService } from '../../services/header.service';
 import { DashboardService, DashboardStats } from '../../services/dashboard.service';
 import { InterviewCalendarComponent } from '../../layout/components/interview-calendar/interview-calendar.component';
+import { RecentActivityWidgetComponent } from '../components/recent-activity-widget/recent-activity-widget.component';
 
 @Component({
   selector: 'app-super-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, InterviewCalendarComponent],
+  imports: [CommonModule, RouterLink, InterviewCalendarComponent, RecentActivityWidgetComponent],
   templateUrl: './super-admin-dashboard.component.html',
   styleUrls: ['./super-admin-dashboard.component.css']
 })

@@ -9,6 +9,7 @@ import { forkJoin } from 'rxjs';
 import { AuthStore } from '../../services/auth.store';
 import { HeaderService } from '../../services/header.service';
 import { InterviewCalendarComponent } from '../../layout/components/interview-calendar/interview-calendar.component';
+import { RecentActivityWidgetComponent } from '../components/recent-activity-widget/recent-activity-widget.component';
 import { JobService } from '../../services/job.service';
 import { ApplicationService } from '../../services/application.service';
 import { UserService } from '../../services/user.service';
@@ -45,7 +46,7 @@ interface RecentActivity {
 @Component({
   selector: 'app-manager-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, InterviewCalendarComponent, BaseChartDirective],
+  imports: [CommonModule, RouterLink, InterviewCalendarComponent, BaseChartDirective, RecentActivityWidgetComponent],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './manager-dashboard.component.html',
   styleUrls: ['./manager-dashboard.component.css'],

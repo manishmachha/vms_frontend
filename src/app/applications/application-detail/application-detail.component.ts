@@ -428,7 +428,7 @@ export class ApplicationDetailComponent implements OnInit {
 
     this.dialog.open(ScheduleInterviewDialogComponent, {
       width: '600px',
-      data: { applicationId: appId },
+      data: { applicationId: appId, application: this.application() },
       panelClass: 'dialog-modern'
     }).afterClosed().pipe(take(1)).subscribe(result => {
       if (result) {

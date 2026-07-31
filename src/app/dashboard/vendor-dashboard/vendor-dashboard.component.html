@@ -159,79 +159,84 @@
       </a>
     </div>
 
-    <!-- Recent Applications -->
-    <div class="card-modern overflow-hidden animate-fade-in-up" style="animation-delay: 300ms;">
-      <div
-        class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50"
-      >
-        <h3 class="text-lg font-bold text-gray-900">Recent Applications</h3>
-        <a
-          [routerLink]="resolvePath('/track-applications')"
-          class="text-indigo-600 hover:text-indigo-800 text-sm font-medium hover:underline"
+    <!-- Recent Applications & Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in-up" style="animation-delay: 300ms;">
+      <div class="card-modern overflow-hidden">
+        <div
+          class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50"
         >
-          View All →
-        </a>
-      </div>
-      <div class="p-6">
-        <div class="space-y-4">
-          <div *ngIf="vendorRecentApps().length === 0" class="text-center text-gray-500 py-8">
-            <div
-              class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center"
-            >
-              <i class="bi bi-file-earmark-text text-2xl text-gray-300"></i>
-            </div>
-            <p class="font-medium text-gray-600">No applications yet</p>
-            <p class="text-sm mt-1 mb-4">Start by applying candidates to open jobs</p>
-            <a
-              [routerLink]="resolvePath('/jobs')"
-              class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl font-semibold hover:bg-indigo-100 transition-colors"
-            >
-              <i class="bi bi-search"></i> Browse Jobs
-            </a>
-          </div>
-
-          <div *ngIf="vendorRecentApps().length > 0" class="space-y-4">
-            <div [routerLink]="resolvePath('/applications/' + app.id)"
-              *ngFor="let app of vendorRecentApps()"
-              class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors border border-transparent hover:border-gray-100 group"
-            >
+          <h3 class="text-lg font-bold text-gray-900">Recent Applications</h3>
+          <a
+            [routerLink]="resolvePath('/track-applications')"
+            class="text-indigo-600 hover:text-indigo-800 text-sm font-medium hover:underline"
+          >
+            View All →
+          </a>
+        </div>
+        <div class="p-6">
+          <div class="space-y-4">
+            <div *ngIf="vendorRecentApps().length === 0" class="text-center text-gray-500 py-8">
               <div
-                class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold shrink-0"
+                class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-50 flex items-center justify-center"
               >
-                {{ app.firstName.charAt(0) }}{{ app.lastName.charAt(0) }}
+                <i class="bi bi-file-earmark-text text-2xl text-gray-300"></i>
               </div>
-              <div class="flex-1 min-w-0">
-                <h4 class="font-semibold text-gray-900 truncate">{{ app.job.title }}</h4>
-                <p class="text-sm text-gray-500 truncate">
-                  {{ app.firstName }} {{ app.lastName }}
-                </p>
-              </div>
-              <div class="text-right shrink-0">
-                <span
-                  class="px-2.5 py-1 text-xs font-bold rounded-lg"
-                  [ngClass]="{
-                    'bg-yellow-100 text-yellow-700': app.status === 'APPLIED',
-                    'bg-blue-100 text-blue-700': [
-                      'SCREENING',
-                      'SHORTLISTED',
-                      'INTERVIEW_SCHEDULED',
-                    ].includes(app.status),
-                    'bg-green-100 text-green-700': ['OFFERED', 'HIRED', 'ONBOARDED'].includes(
-                      app.status
-                    ),
-                    'bg-red-100 text-red-700': ['REJECTED', 'DROPPED'].includes(app.status),
-                  }"
+              <p class="font-medium text-gray-600">No applications yet</p>
+              <p class="text-sm mt-1 mb-4">Start by applying candidates to open jobs</p>
+              <a
+                [routerLink]="resolvePath('/jobs')"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl font-semibold hover:bg-indigo-100 transition-colors"
+              >
+                <i class="bi bi-search"></i> Browse Jobs
+              </a>
+            </div>
+
+            <div *ngIf="vendorRecentApps().length > 0" class="space-y-4">
+              <div [routerLink]="resolvePath('/applications/' + app.id)"
+                *ngFor="let app of vendorRecentApps()"
+                class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-xl transition-colors border border-transparent hover:border-gray-100 group"
+              >
+                <div
+                  class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold shrink-0"
                 >
-                  {{ app.status | titlecase }}
-                </span>
-                <p class="text-[10px] text-gray-400 mt-1">
-                  {{ app.createdAt | date: 'MMM d' }}
-                </p>
+                  {{ app.firstName.charAt(0) }}{{ app.lastName.charAt(0) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-semibold text-gray-900 truncate">{{ app.job.title }}</h4>
+                  <p class="text-sm text-gray-500 truncate">
+                    {{ app.firstName }} {{ app.lastName }}
+                  </p>
+                </div>
+                <div class="text-right shrink-0">
+                  <span
+                    class="px-2.5 py-1 text-xs font-bold rounded-lg"
+                    [ngClass]="{
+                      'bg-yellow-100 text-yellow-700': app.status === 'APPLIED',
+                      'bg-blue-100 text-blue-700': [
+                        'SCREENING',
+                        'SHORTLISTED',
+                        'INTERVIEW_SCHEDULED',
+                      ].includes(app.status),
+                      'bg-green-100 text-green-700': ['OFFERED', 'HIRED', 'ONBOARDED'].includes(
+                        app.status
+                      ),
+                      'bg-red-100 text-red-700': ['REJECTED', 'DROPPED'].includes(app.status)
+                    }"
+                  >
+                    {{ app.status | titlecase }}
+                  </span>
+                  <p class="text-[10px] text-gray-400 mt-1">
+                    {{ app.createdAt | date: 'MMM d' }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      
+      <!-- Recent Activity -->
+      <app-recent-activity-widget [forCurrentUser]="true" [fullHeight]="true"></app-recent-activity-widget>
     </div>
   </ng-container>
 </div>

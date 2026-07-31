@@ -68,15 +68,7 @@ export class SidebarComponent implements OnInit {
           icon: 'bi bi-speedometer2',
           roles: ['SUPER_ADMIN', 'MANAGER',  'TALENT_ACQUISITION', 'EMPLOYEE', 'VENDOR'],
           orgTypes: ['SOLVENTEK', 'VENDOR'],
-        },
-        {
-          label: 'Users',
-          route: '/users/',
-          icon: 'bi bi-building',
-          roles: ['SUPER_ADMIN', 'MANAGER'],
-          orgTypes: ['SOLVENTEK'],
-          notificationCategory: 'USER',
-        },
+        }
       ],
     },
     {
@@ -87,7 +79,7 @@ export class SidebarComponent implements OnInit {
           label: 'Activity Log',
           route: '/activities',
           icon: 'bi bi-activity',
-          roles: ['SUPER_ADMIN', 'MANAGER'],
+          roles: ['SUPER_ADMIN'],
           orgTypes: ['SOLVENTEK'],
         },
         {
@@ -97,6 +89,14 @@ export class SidebarComponent implements OnInit {
           roles: ['SUPER_ADMIN', 'MANAGER'],
           orgTypes: ['SOLVENTEK'],
           notificationCategory: 'ORGANIZATION',
+        },
+        {
+          label: 'Users',
+          route: '/users/',
+          icon: 'bi bi-building',
+          roles: ['SUPER_ADMIN', 'MANAGER'],
+          orgTypes: ['SOLVENTEK'],
+          notificationCategory: 'USER',
         }
       ],
     },
@@ -269,16 +269,13 @@ export class SidebarComponent implements OnInit {
 
   getOrgName(): string {
     const orgType = this.authStore.orgType();
-    if (orgType === 'SOLVENTEK') return 'VMS';
+    if (orgType === 'SOLVENTEK') return 'Solventek VMS';
     if (orgType === 'VENDOR') return 'Vendor Portal';
     return 'VMS';
   }
 
   getPortalType(): string {
-    const orgType = this.authStore.orgType();
-    if (orgType === 'SOLVENTEK') return 'Solventek VMS';
-    if (orgType === 'VENDOR') return 'Vendor Portal';
-    return 'VMS';
+    return 'Solventek VMS';
   }
 
   getOrgGradient(): string {

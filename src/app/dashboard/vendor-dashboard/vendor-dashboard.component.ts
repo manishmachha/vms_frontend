@@ -26,10 +26,12 @@ interface StatCard {
   trendUp?: boolean;
 }
 
+import { RecentActivityWidgetComponent } from '../components/recent-activity-widget/recent-activity-widget.component';
+
 @Component({
   selector: 'app-vendor-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, RecentActivityWidgetComponent],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './vendor-dashboard.component.html',
   styleUrls: ['./vendor-dashboard.component.css'],

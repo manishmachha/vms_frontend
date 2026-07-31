@@ -125,11 +125,15 @@ export class UserService {
     return this.api.get<User>('/v1/users/me');
   }
 
-  updateMe(data: { firstName: string; lastName: string; phone: string }) {
+  updateMe(data: { firstName?: string; lastName?: string; phone?: string; status?: boolean }) {
     return this.api.put<User>('/v1/users/me', data);
   }
 
   changeMyPassword(data: { currentPassword: string; newPassword: string }) {
     return this.api.post<void>('/v1/users/me/change-password', data);
+  }
+
+  resetPassword(userId: string | number, data: { newPassword: string }) {
+    return this.api.post<void>(`/v1/users/${userId}/reset-password`, data);
   }
 }

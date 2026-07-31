@@ -112,7 +112,7 @@
                 class="w-full pl-11 pr-10 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all appearance-none cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
                 <option value="" disabled>Select a role...</option>
-                <option *ngFor="let role of (userForm.get('type')?.value === 'SOLVENTEK' ? solventekRoles : [{value: 'VENDOR', label: 'Vendor Partner'}])" [value]="role.value">
+                <option *ngFor="let role of (userForm.get('type')?.value === 'SOLVENTEK' ? solventekRoles : vendorRoles)" [value]="role.value">
                   {{ role.label }}
                 </option>
               </select>

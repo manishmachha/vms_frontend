@@ -17,7 +17,7 @@ export const USER_ROUTES: Routes = [
       {
         path: ':id',
         loadComponent: () =>
-          import('./user-detail/user-detail.component').then((m) => m.UserDetailComponent),
+          import('../profile/my-profile.component').then((m) => m.MyProfileComponent),
       },
       {
         path: 'edit/:id',
