@@ -1,7 +1,7 @@
 <div class="h-[calc(100vh-64px)] p-6 bg-gray-50 flex flex-col" *ngIf="ticket()">
   
   <!-- 3 Evenly Spaced, Fixed-Height Stat Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 h-[260px] mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0 h-65 mb-6">
     
     <!-- Card 1: Overview & Status -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden">
@@ -216,28 +216,28 @@
       
     <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/30 custom-scrollbar">
         
-        <div *ngFor="let msg of messages()" class="flex gap-4" [ngClass]="{'flex-row-reverse': msg.sender?.id === authStore.user()?.id}">
+        <div *ngFor="let msg of messages()" class="flex gap-4" [ngClass]="{'flex-row-reverse': msg.sender.id === authStore.user()?.id}">
           <!-- Avatar -->
           <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-            <span class="text-indigo-700 font-bold text-sm">{{ msg.sender?.firstName?.charAt(0) }}{{ msg.sender?.lastName?.charAt(0) }}</span>
+            <span class="text-indigo-700 font-bold text-sm">{{ msg.sender.firstName.charAt(0) }}{{ msg.sender.lastName.charAt(0) }}</span>
           </div>
           
           <!-- Message Bubble -->
-          <div class="max-w-[80%]" [ngClass]="{'items-end flex flex-col': msg.sender?.id === authStore.user()?.id}">
-            <div class="flex items-baseline gap-2 mb-1" [ngClass]="{'flex-row-reverse': msg.sender?.id === authStore.user()?.id}">
-              <span class="text-sm font-medium text-gray-900">{{ msg.sender?.firstName }} {{ msg.sender?.lastName }}</span>
+          <div class="max-w-[80%]" [ngClass]="{'items-end flex flex-col': msg.sender.id === authStore.user()?.id}">
+            <div class="flex items-baseline gap-2 mb-1" [ngClass]="{'flex-row-reverse': msg.sender.id === authStore.user()?.id}">
+              <span class="text-sm font-medium text-gray-900">{{ msg.sender.firstName }} {{ msg.sender.lastName }}</span>
               <span class="text-xs text-gray-500">{{ msg.createdAt | date:'short' }}</span>
             </div>
             
-            <div class="p-4 rounded-2xl shadow-sm" [ngClass]="msg.sender?.id === authStore.user()?.id ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-gray-100 text-gray-800 rounded-tl-none'">
+            <div class="p-4 rounded-2xl shadow-sm" [ngClass]="msg.sender.id === authStore.user()?.id ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-gray-100 text-gray-800 rounded-tl-none'">
               <p class="whitespace-pre-wrap text-sm">{{ msg.message }}</p>
               
               <!-- Attachments -->
-              <div *ngIf="msg.attachments && msg.attachments.length > 0" class="mt-3 pt-3 border-t" [ngClass]="msg.sender?.id === authStore.user()?.id ? 'border-indigo-500' : 'border-gray-100'">
+              <div *ngIf="msg.attachments && msg.attachments.length > 0" class="mt-3 pt-3 border-t" [ngClass]="msg.sender.id === authStore.user()?.id ? 'border-indigo-500' : 'border-gray-100'">
                 <div class="flex flex-wrap gap-2">
-                  <a *ngFor="let att of msg.attachments" [href]="att.fileUrl" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" [ngClass]="msg.sender?.id === authStore.user()?.id ? 'bg-indigo-700 text-indigo-50 hover:bg-indigo-800' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'">
+                  <a *ngFor="let att of msg.attachments" [href]="att.fileUrl" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors" [ngClass]="msg.sender.id === authStore.user()?.id ? 'bg-indigo-700 text-indigo-50 hover:bg-indigo-800' : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'">
                     <i class="bi bi-paperclip"></i>
-                    <span class="truncate max-w-[150px]">{{ att.fileName }}</span>
+                    <span class="truncate max-w-37.5">{{ att.fileName }}</span>
                   </a>
                 </div>
               </div>
@@ -258,7 +258,7 @@
         <div *ngIf="selectedFiles.length > 0" class="flex flex-wrap gap-2 mb-3 px-2">
           <div *ngFor="let file of selectedFiles; let i = index" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-700">
             <i class="bi bi-file-earmark"></i>
-            <span class="truncate max-w-[100px]">{{ file.name }}</span>
+            <span class="truncate max-w-25">{{ file.name }}</span>
             <button type="button" (click)="removeFile(i)" class="text-gray-400 hover:text-red-500">
               <i class="bi bi-x-circle-fill"></i>
             </button>

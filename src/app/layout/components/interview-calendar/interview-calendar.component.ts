@@ -6,7 +6,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { InterviewService } from '../../../services/interview.service';
 import { Interview } from '../../../models/interview.model';
-import { RouterLink } from "@angular/router";
 import { MfeNavigationService } from '../../../services/mfe-navigation.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { InterviewListDialogComponent } from './interview-list-dialog.component';
@@ -14,7 +13,7 @@ import { InterviewListDialogComponent } from './interview-list-dialog.component'
 @Component({
   selector: 'app-interview-calendar',
   standalone: true,
-  imports: [CommonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule, RouterLink, MatDialogModule],
+  imports: [CommonModule, MatDatepickerModule, MatNativeDateModule, MatCardModule, MatIconModule, MatDialogModule],
   templateUrl: './interview-calendar.component.html',
   styleUrls: ['./interview-calendar.component.css'],
   encapsulation: ViewEncapsulation.None,

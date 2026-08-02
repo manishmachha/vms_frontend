@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { JobService } from '../../services/job.service';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
@@ -8,7 +8,7 @@ import { MfeNavigationService } from '../../services/mfe-navigation.service';
 @Component({
   selector: 'app-job-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './job-create.component.html',
   styleUrls: ['./job-create.component.css'],
 })

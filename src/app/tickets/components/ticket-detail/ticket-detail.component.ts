@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TicketService } from '../../../services/ticket.service';
 import { HeaderService } from '../../../services/header.service';
 import { Ticket, TicketMessage, TicketStatus } from '../../models/ticket.model';
@@ -11,7 +11,7 @@ import { User } from '../../../models/auth.model';
 @Component({
   selector: 'app-ticket-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './ticket-detail.component.html',
   styleUrls: ['./ticket-detail.component.css']
 })

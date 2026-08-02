@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MfeNavigationService } from '../../services/mfe-navigation.service';
 import { ProjectService } from '../../services/project.service';
@@ -27,7 +27,6 @@ import { Subject, debounceTime, merge, startWith, switchMap } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     FormsModule,
     OrganizationLogoComponent,
     UserAvatarComponent,

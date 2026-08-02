@@ -1,12 +1,12 @@
 <div class="dialog-container p-6 bg-white rounded-2xl relative overflow-hidden">
   <!-- Decorative background based on action -->
-  <div class="absolute right-0 top-0 w-32 h-32 bg-gradient-to-br from-slate-50 to-slate-100 rounded-bl-full -mr-8 -mt-8 opacity-50"></div>
+  <div class="absolute right-0 top-0 w-32 h-32 bg-linear-to-br from-slate-50 to-slate-100 rounded-bl-full -mr-8 -mt-8 opacity-50"></div>
 
   <!-- Header -->
   <div class="flex items-start justify-between mb-6 relative z-10">
     <div class="flex items-center gap-4">
       <div [class]="'w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ' + getActionColorClass(data.activity.action)">
-        <mat-icon class="text-[24px] w-[24px] h-[24px]">{{ getActionIcon(data.activity.action) }}</mat-icon>
+        <mat-icon class="text-[24px] w-6 h-6">{{ getActionIcon(data.activity.action) }}</mat-icon>
       </div>
       <div>
         <h3 class="text-xl font-bold text-slate-800 tracking-tight">Activity Details</h3>
@@ -23,7 +23,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Entity</p>
-        <p class="text-base font-semibold text-slate-800 break-words">{{ data.activity.entityLabel || data.activity.entityId }}</p>
+        <p class="text-base font-semibold text-slate-800 wrap-break-word">{{ data.activity.entityLabel || data.activity.entityId }}</p>
         <p class="text-sm text-slate-500 mt-0.5">{{ data.activity.entityType }}</p>
       </div>
 
@@ -31,9 +31,9 @@
         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">User</p>
         <div class="flex items-center gap-2 mt-1">
           <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">
-            {{ (data.activity.actorEmail?.charAt(0) || '?') | uppercase }}
+            {{ (data.activity.actorEmail.charAt(0) || '?') | uppercase }}
           </div>
-          <p class="text-base font-medium text-slate-700 break-words">{{ data.activity.actorEmail || 'System' }}</p>
+          <p class="text-base font-medium text-slate-700 wrap-break-word">{{ data.activity.actorEmail || 'System' }}</p>
         </div>
       </div>
     </div>
