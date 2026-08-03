@@ -18,7 +18,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivityDetailDialogComponent } from './activity-detail-dialog.component';
-import { BaseChartDirective } from 'ng2-charts';
+import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartOptions, ChartType } from 'chart.js';
 
 @Component({
@@ -40,6 +40,9 @@ import { ChartConfiguration, ChartData, ChartOptions, ChartType } from 'chart.js
     MatChipsModule,
     MatDialogModule,
     BaseChartDirective
+  ],
+  providers: [
+    provideCharts(withDefaultRegisterables())
   ],
   templateUrl: './activity-dashboard.component.html',
   styleUrls: ['./activity-dashboard.component.css']
@@ -110,14 +113,20 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   }
 
   ngAfterViewInit() {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadActivities();
-    });
+    if (this.sort) {
+      this.sort.sortChange.subscribe(() => {
+        if (this.paginator) {
+          this.paginator.pageIndex = 0;
+        }
+        this.loadActivities();
+      });
+    }
 
-    this.paginator.page.subscribe(() => {
-      this.loadActivities();
-    });
+    if (this.paginator) {
+      this.paginator.page.subscribe(() => {
+        this.loadActivities();
+      });
+    }
   }
 
   ngOnDestroy() {
