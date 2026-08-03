@@ -30,6 +30,7 @@ export interface Job {
   payRate?: number;
   aiInsights?: Record<string, unknown>;
   requestId?: string;
+  publishedOnCareersPage?: boolean;
   organization?: Organization;
   createdAt?: string;
   updatedAt?: string;

@@ -20,6 +20,9 @@ export interface Candidate {
   experienceDetailsJson?: string;
   educationDetailsJson?: string;
   aiAnalysisJson?: string;
+  jobId?: string;
+  jobTitle?: string;
+  applyToJob?: boolean;
   organization?: {
     id: string;
     name: string;

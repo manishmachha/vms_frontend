@@ -263,4 +263,20 @@ export class JobDetailComponent implements OnInit {
       if (result) this.loadJob();
     });
   }
+
+  toggleCareersPublish(event: Event) {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    if (!this.job()) return;
+
+    const payload = {
+      ...this.job(),
+      publishedOnCareersPage: isChecked
+    };
+
+    this.jobService.updateJob(this.job()!.id, payload).subscribe({
+      next: () => {
+        this.loadJob();
+      }
+    });
+  }
 }

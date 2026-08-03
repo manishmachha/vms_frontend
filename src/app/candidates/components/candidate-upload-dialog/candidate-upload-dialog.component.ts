@@ -6,6 +6,8 @@ import { CandidateService } from '../../../services/candidate.service';
 import { LoadingService } from '../../../services/loading.service';
 import { Candidate } from '../../models/candidate.model';
 import { AuthStore } from '../../../services/auth.store';
+import { JobService } from '../../../services/job.service';
+import { Job } from '../../../models/job.model';
 
 @Component({
   selector: 'app-candidate-upload-dialog',
@@ -19,11 +21,16 @@ export class CandidateUploadDialogComponent implements OnInit {
   private candidateService = inject(CandidateService);
   private loadingService = inject(LoadingService);
   private authStore = inject(AuthStore);
+  private jobService = inject(JobService);
 
   selectedFile = signal<File | null>(null);
   selectedSource = signal<string>('LinkedIn');
   otherSourceText = signal<string>('');
   uploadError = signal<string | null>(null);
+
+  jobs = signal<Job[]>([]);
+  selectedJobId = signal<string | null>(null);
+  applyToJob = signal<boolean>(false);
 
   sources = ['LinkedIn', 'Naukri', 'Monster', 'Referral', 'Others'];
 
@@ -33,6 +40,9 @@ export class CandidateUploadDialogComponent implements OnInit {
       // Insert the organization name before 'Others'
       this.sources.splice(this.sources.length - 1, 0, user.organizationName);
     }
+    this.jobService.getJobs(0, 100).subscribe((res) => {
+      this.jobs.set(res.content);
+    });
   }
 
   onFileSelected(event: Event) {
@@ -80,7 +90,7 @@ export class CandidateUploadDialogComponent implements OnInit {
     this.uploadError.set(null);
     this.loadingService.show();
 
-    this.candidateService.uploadResume(file, finalSource).subscribe({
+    this.candidateService.uploadResume(file, finalSource, this.selectedJobId(), this.applyToJob()).subscribe({
       next: (candidate: Candidate) => {
         this.loadingService.hide();
         this.dialogRef.close(candidate);

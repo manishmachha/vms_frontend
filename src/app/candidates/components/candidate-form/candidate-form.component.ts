@@ -40,7 +40,7 @@ export class CandidateFormComponent {
     portfolioUrl: [''],
   });
 
-  isEditMode = signal(true);
+  isEditMode = signal(false);
   candidateId = signal<string | null>(null);
 
   constructor() {
@@ -91,6 +91,12 @@ export class CandidateFormComponent {
 
     if (this.candidateId()) {
       this.candidateService.updateCandidate(this.candidateId()!, payload).subscribe({
+        next: () => {
+          this.mfeNav.navigate('/candidates');
+        },
+      });
+    } else {
+      this.candidateService.createManual(payload).subscribe({
         next: () => {
           this.mfeNav.navigate('/candidates');
         },

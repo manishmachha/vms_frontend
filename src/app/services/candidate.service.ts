@@ -39,11 +39,17 @@ export class CandidateService {
     return this.api.post<Candidate>(`${this.BASE_URL}/${id}/resume`, formData);
   }
 
-  uploadResume(file: File, source: string): Observable<Candidate> {
+  uploadResume(file: File, source: string, jobId?: string | null, applyToJob?: boolean): Observable<Candidate> {
     const formData = new FormData();
     formData.append('file', file);
     if (source) {
       formData.append('source', source);
+    }
+    if (jobId) {
+      formData.append('jobId', jobId);
+    }
+    if (applyToJob) {
+      formData.append('applyToJob', String(applyToJob));
     }
     return this.api.post<Candidate>(`${this.BASE_URL}/upload`, formData);
   }

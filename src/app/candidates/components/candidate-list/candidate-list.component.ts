@@ -41,7 +41,7 @@ export class CandidateListComponent implements OnInit {
 
   viewMode = signal<'table' | 'grid'>('grid');
   dataSource = new MatTableDataSource<Candidate>([]);
-  displayedColumns: string[] = ['candidate', 'contact', 'experience', 'source', 'organization', 'actions'];
+  displayedColumns: string[] = ['candidate', 'job', 'contact', 'experience', 'source', 'organization', 'actions'];
 
   totalElements = signal(0);
   pageSize = signal(12);
