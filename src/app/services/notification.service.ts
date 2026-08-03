@@ -40,11 +40,14 @@ export class NotificationService {
   /**
    * Fetches the initial page of notifications via REST API
    */
-  public fetchInitialNotifications() {
+  public fetchInitialNotifications(unreadOnly: boolean = false) {
     const orgId = this.authStore.organizationId();
     let url = `/activities?size=50`;
     if (orgId) {
       url += `&organizationId=${orgId}`;
+    }
+    if (unreadOnly) {
+      url += `&unreadOnly=true`;
     }
 
     this.api.get<any>(url, undefined, undefined, true).subscribe({

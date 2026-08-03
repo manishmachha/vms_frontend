@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NotificationService } from '../../../services/notification.service';
@@ -27,10 +27,25 @@ import { ActivityLog } from '../../../models/notification.model';
         </div>
       </div>
 
-      <!-- Filters (Placeholder for later) -->
+      <!-- Filters -->
       <div class="flex gap-2 mb-6 border-b border-gray-200 pb-4">
-        <button class="px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg">All</button>
-        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">Unread</button>
+        <button 
+          (click)="setFilter('all')"
+          [class]="activeFilter() === 'all' 
+            ? 'px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm' 
+            : 'px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors'">
+          All
+        </button>
+        <button 
+          (click)="setFilter('unread')"
+          [class]="activeFilter() === 'unread' 
+            ? 'px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm flex items-center gap-2' 
+            : 'px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2'">
+          Unread
+          <span *ngIf="notificationService.unreadCount() > 0" class="px-2 py-0.5 text-xs rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+            {{ notificationService.unreadCount() }}
+          </span>
+        </button>
       </div>
 
       <!-- Notifications List -->
@@ -49,7 +64,7 @@ import { ActivityLog } from '../../../models/notification.model';
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
                   <!-- Icon -->
-                  <div class="flex-shrink-0">
+                  <div class="shrink-0">
                     <div class="h-10 w-10 rounded-full flex items-center justify-center shadow-sm" [ngClass]="getIconBgClass(notif.entityType)">
                       <i class="bi text-white text-lg" [ngClass]="getIconClass(notif.entityType)"></i>
                     </div>
@@ -69,7 +84,7 @@ import { ActivityLog } from '../../../models/notification.model';
                   </div>
                 </div>
                 
-                <div class="ml-4 flex-shrink-0 flex items-center gap-3">
+                <div class="ml-4 shrink-0 flex items-center gap-3">
                   <span *ngIf="!notif.read" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                     New
                   </span>
@@ -85,16 +100,38 @@ import { ActivityLog } from '../../../models/notification.model';
     </div>
   `
 })
-export class NotificationsPageComponent {
+export class NotificationsPageComponent implements OnInit {
   notificationService = inject(NotificationService);
   mfeNav = inject(MfeNavigationService);
 
+  activeFilter = signal<'all' | 'unread'>('all');
+
+  ngOnInit() {
+    this.fetchNotifications();
+  }
+
+  setFilter(filter: 'all' | 'unread') {
+    if (this.activeFilter() === filter) return;
+    this.activeFilter.set(filter);
+    this.fetchNotifications();
+  }
+
+  fetchNotifications() {
+    this.notificationService.fetchInitialNotifications(this.activeFilter() === 'unread');
+  }
+
   markAllAsRead() {
     this.notificationService.markAllAsRead();
+    if (this.activeFilter() === 'unread') {
+      this.fetchNotifications();
+    }
   }
 
   handleNotificationClick(notification: ActivityLog) {
     this.notificationService.markAsRead(notification.id);
+    if (this.activeFilter() === 'unread') {
+      this.fetchNotifications();
+    }
     
     const path = this.getRouteForEntity(notification.entityType, notification.entityId);
     if (path) {
