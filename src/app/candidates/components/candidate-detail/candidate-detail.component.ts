@@ -42,7 +42,6 @@ import { FormsModule } from '@angular/forms';
 
 export class CandidateDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private mfeNav = inject(MfeNavigationService);
 
   resolvePath(path: string): string {
@@ -171,23 +170,6 @@ export class CandidateDetailComponent implements OnInit {
         setTimeout(() => this.loadBrandedResume(c.id), 10000);
       },
       error: () => this.snackBar.open('Regeneration failed', 'Close', { duration: 3000 }),
-    });
-  }
-
-
-  openArchiveConfirm() {
-    this.dialogService.confirm('Archive Candidate', 'Are you sure you want to archive this candidate?', 'primary').subscribe(confirmed => {
-      if (confirmed) {
-        const c = this.candidate();
-        if (!c) return;
-        this.candidateService.archiveCandidate(c.id).subscribe({
-          next: (updated) => {
-            this.candidate.set(updated);
-            this.snackBar.open('Candidate archived successfully', 'OK', { duration: 3000 });
-          },
-          error: () => this.snackBar.open('Archive failed', 'Close', { duration: 3000 })
-        });
-      }
     });
   }
 

@@ -91,10 +91,6 @@ export class CandidateService {
     return this.api.download(`${this.BASE_URL}/${id}/resume`);
   }
 
-  archiveCandidate(id: string): Observable<Candidate> {
-    return this.api.post<Candidate>(`${this.BASE_URL}/${id}/archive`, {});
-  }
-
   getCandidateApplications(id: string): Observable<JobApplication[]> {
     return this.api.get<JobApplication[]>(`${this.BASE_URL}/${id}/applications`);
   }
