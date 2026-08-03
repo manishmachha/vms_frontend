@@ -1,31 +1,22 @@
-<header class="h-[60px] flex items-center justify-between px-4 md:px-6 gap-4">
-  <!-- Left Section -->
+<header class="h-[76px] flex items-center justify-between px-4 md:px-6 gap-4">
+  <!-- Left: Menu Toggle + Title -->
   <div class="flex items-center gap-3 md:gap-4 shrink-0">
-    <!-- Mobile Sidebar Toggle -->
+    <!-- Mobile Menu Toggle -->
     <button
       (click)="toggleSidebar.emit()"
       class="md:hidden p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
       aria-label="Toggle menu"
     >
       <i
-        class="bi text-xl"
+        class="bi"
         [class.bi-list]="!sidebarOpen"
         [class.bi-x-lg]="sidebarOpen"
+        class="text-xl"
       ></i>
     </button>
 
-    <!-- Shell Mode: Logo -->
-    <a *ngIf="isRunningInShell" (click)="navigateToShellRoute('/')" class="flex items-center gap-2 group cursor-pointer shrink-0">
-      <div class="p-0.5 rounded-lg group-hover:scale-105 transition-all duration-300 shrink-0">
-        <img src="Solventek_logo.png" alt="Solventek" class="w-auto object-contain h-8" />
-      </div>
-      <span class="font-bold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors text-base hidden sm:inline">
-        Solventek
-      </span>
-    </a>
-
-    <!-- Standalone Mode: Page Title with Icon -->
-    <div *ngIf="!isRunningInShell" class="flex items-center gap-3">
+    <!-- Dynamic Title with Icon -->
+    <div class="flex items-center gap-3">
       <div
         class="hidden sm:flex p-2.5 rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
       >
@@ -45,63 +36,8 @@
     </div>
   </div>
 
-  <!-- Center: Shell Nav Links (desktop) -->
-  <div *ngIf="isRunningInShell" class="hidden lg:flex items-center gap-1 bg-gray-100 p-1 rounded-full border border-gray-200/80">
-    <a (click)="navigateToShellRoute('/')"
-      class="px-4 py-1.5 rounded-full text-gray-500 font-medium hover:text-gray-900 hover:bg-white transition-all duration-200 text-sm cursor-pointer">
-      Home
-    </a>
-    <a (click)="navigateToShellRoute('/vms')"
-      class="px-4 py-1.5 rounded-full font-medium transition-all duration-200 text-sm cursor-pointer"
-      [class.bg-indigo-600]="isActiveMfe('vms')" [class.text-white]="isActiveMfe('vms')" [class.shadow-sm]="isActiveMfe('vms')"
-      [class.text-gray-500]="!isActiveMfe('vms')" [class.hover:text-gray-900]="!isActiveMfe('vms')" [class.hover:bg-white]="!isActiveMfe('vms')">
-      VMS Portal
-    </a>
-    <a (click)="navigateToShellRoute('/hrms')"
-      class="px-4 py-1.5 rounded-full font-medium transition-all duration-200 text-sm cursor-pointer"
-      [class.bg-indigo-600]="isActiveMfe('hrms')" [class.text-white]="isActiveMfe('hrms')" [class.shadow-sm]="isActiveMfe('hrms')"
-      [class.text-gray-500]="!isActiveMfe('hrms')" [class.hover:text-gray-900]="!isActiveMfe('hrms')" [class.hover:bg-white]="!isActiveMfe('hrms')">
-      HRMS Portal
-    </a>
-    <a (click)="navigateToShellRoute('/contact')"
-      class="px-4 py-1.5 rounded-full text-gray-500 font-medium hover:text-gray-900 hover:bg-white transition-all duration-200 text-sm cursor-pointer">
-      Contact Us
-    </a>
-  </div>
-
   <!-- Right: Actions -->
   <div class="flex items-center gap-2 md:gap-4 shrink-0">
-    <!-- Shell Mobile Nav Toggle -->
-    <div *ngIf="isRunningInShell" class="lg:hidden relative">
-      <button (click)="shellMenuOpen = !shellMenuOpen"
-        class="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">
-        <i class="bi bi-grid-3x3-gap text-lg"></i>
-      </button>
-      <div *ngIf="shellMenuOpen"
-        class="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
-        <a (click)="navigateToShellRoute('/'); shellMenuOpen = false"
-          class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer">
-          Home
-        </a>
-        <a (click)="navigateToShellRoute('/vms'); shellMenuOpen = false"
-          class="block px-4 py-2.5 text-sm transition-colors cursor-pointer"
-          [class.bg-indigo-50]="isActiveMfe('vms')" [class.text-indigo-700]="isActiveMfe('vms')" [class.font-semibold]="isActiveMfe('vms')"
-          [class.text-gray-600]="!isActiveMfe('vms')" [class.hover:bg-gray-50]="!isActiveMfe('vms')">
-          VMS Portal
-        </a>
-        <a (click)="navigateToShellRoute('/hrms'); shellMenuOpen = false"
-          class="block px-4 py-2.5 text-sm transition-colors cursor-pointer"
-          [class.bg-indigo-50]="isActiveMfe('hrms')" [class.text-indigo-700]="isActiveMfe('hrms')" [class.font-semibold]="isActiveMfe('hrms')"
-          [class.text-gray-600]="!isActiveMfe('hrms')" [class.hover:bg-gray-50]="!isActiveMfe('hrms')">
-          HRMS Portal
-        </a>
-        <a (click)="navigateToShellRoute('/contact'); shellMenuOpen = false"
-          class="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer">
-          Contact Us
-        </a>
-      </div>
-    </div>
-
     <!-- Notification Dropdown -->
     <app-notification-dropdown></app-notification-dropdown>
 
