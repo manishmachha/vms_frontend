@@ -18,6 +18,8 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivityDetailDialogComponent } from './activity-detail-dialog.component';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartData, ChartOptions, ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-activity-dashboard',
@@ -36,7 +38,8 @@ import { ActivityDetailDialogComponent } from './activity-detail-dialog.componen
     MatIconModule,
     MatCardModule,
     MatChipsModule,
-    MatDialogModule
+    MatDialogModule,
+    BaseChartDirective
   ],
   templateUrl: './activity-dashboard.component.html',
   styleUrls: ['./activity-dashboard.component.css']
@@ -47,9 +50,6 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   private authStore = inject(AuthStore);
   private dialog = inject(MatDialog);
 
-  // View state
-  viewMode = signal<'grid' | 'table'>('grid');
-  
   // Data state
   activities = signal<ActivityLog[]>([]);
   stats = signal<ActivityLogStatsResponse | null>(null);
@@ -63,13 +63,31 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   selectedAction = signal<string>('');
   selectedCategory = signal<string>('');
   selectedUser = signal<string>('');
+  selectedTimeRange = signal<string>('30days');
   userSearchQuery = signal<string>('');
-  
+
   // Table state
   displayedColumns: string[] = ['timestamp', 'action', 'entityType', 'entityLabel', 'actorEmail', 'message', 'actions'];
-  
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
+  // Chart configuration
+  public lineChartData = signal<ChartData<'line'>>({
+    labels: [],
+    datasets: []
+  });
+  public lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, position: 'top' }
+    },
+    scales: {
+      y: { beginAtZero: true, ticks: { precision: 0 } }
+    }
+  };
+  public lineChartType: ChartType = 'line';
 
   // RxJS triggers for fetching data
   private filterChange$ = new BehaviorSubject<void>(undefined);
@@ -82,6 +100,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
       takeUntil(this.destroy$)
     ).subscribe(() => {
       this.loadActivities();
+      this.loadStats();
     });
   }
 
@@ -95,7 +114,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
       this.paginator.pageIndex = 0;
       this.loadActivities();
     });
-    
+
     this.paginator.page.subscribe(() => {
       this.loadActivities();
     });
@@ -106,20 +125,114 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
     this.destroy$.complete();
   }
 
+  private getDateRange(): { start?: string, end?: string } {
+    const range = this.selectedTimeRange();
+    if (!range || range === 'all') return {};
+
+    const end = new Date();
+    const start = new Date();
+    if (range === 'today') {
+      start.setHours(0, 0, 0, 0);
+    } else if (range === '7days') {
+      start.setDate(end.getDate() - 7);
+    } else if (range === '30days') {
+      start.setDate(end.getDate() - 30);
+    }
+    
+    return {
+      start: start.toISOString(),
+      end: end.toISOString()
+    };
+  }
+
   loadStats() {
     const orgId = this.authStore.organizationId();
     if (!orgId) return;
 
-    this.activityService.getActivityStats(orgId.toString()).subscribe({
-      next: (data) => this.stats.set(data),
+    const dates = this.getDateRange();
+
+    this.activityService.getActivityStats(
+      orgId.toString(),
+      this.selectedAction(),
+      this.selectedCategory(),
+      this.searchQuery(),
+      this.selectedUser(),
+      dates.start,
+      dates.end
+    ).subscribe({
+      next: (data) => {
+        this.stats.set(data);
+        this.updateChartData(data);
+      },
       error: (err) => console.error('Failed to load stats', err)
+    });
+  }
+
+  private updateChartData(stats: ActivityLogStatsResponse) {
+    if (!stats || !stats.activitiesByDate) {
+      this.lineChartData.set({ labels: [], datasets: [] });
+      return;
+    }
+
+    // Merge all unique dates from all maps to ensure no gaps
+    const allDates = new Set([
+      ...Object.keys(stats.activitiesByDate || {}),
+      ...Object.keys(stats.createsByDate || {}),
+      ...Object.keys(stats.updatesByDate || {}),
+      ...Object.keys(stats.deletesByDate || {})
+    ]);
+    
+    const sortedDates = Array.from(allDates).sort();
+    
+    const totalCounts = sortedDates.map(date => stats.activitiesByDate?.[date] || 0);
+    const createsCounts = sortedDates.map(date => stats.createsByDate?.[date] || 0);
+    const updatesCounts = sortedDates.map(date => stats.updatesByDate?.[date] || 0);
+    const deletesCounts = sortedDates.map(date => stats.deletesByDate?.[date] || 0);
+
+    this.lineChartData.set({
+      labels: sortedDates,
+      datasets: [
+        {
+          data: totalCounts,
+          label: 'Total',
+          borderColor: '#473dff', // indigo-500
+          backgroundColor: 'transparent',
+          tension: 0.3,
+          fill: false,
+          hidden: false // hide by default so it's not too cluttered
+        },
+        {
+          data: createsCounts,
+          label: 'Creates',
+          borderColor: '#10b981', // emerald-500
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.3,
+          fill: true
+        },
+        {
+          data: updatesCounts,
+          label: 'Updates',
+          borderColor: '#f59e0b', // amber-500
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          tension: 0.3,
+          fill: true
+        },
+        {
+          data: deletesCounts,
+          label: 'Deletes',
+          borderColor: '#ef4444', // red-500
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          tension: 0.3,
+          fill: true
+        }
+      ]
     });
   }
 
   loadUsers() {
     const orgId = this.authStore.organizationId();
     if (!orgId) return;
-    
+
     this.userService.getUsersByOrganization(orgId).subscribe({
       next: (res) => {
         this.users.set(res);
@@ -140,6 +253,8 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
     const sortField = this.sort ? this.sort.active : 'timestamp';
     const sortDirection = this.sort ? this.sort.direction || 'desc' : 'desc';
 
+    const dates = this.getDateRange();
+
     this.activityService.getActivities(
       orgId.toString(),
       this.selectedAction(),
@@ -149,7 +264,10 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
       page,
       size,
       sortField,
-      sortDirection
+      sortDirection,
+      undefined,
+      dates.start,
+      dates.end
     ).subscribe({
       next: (res) => {
         this.activities.set(res.content);
@@ -173,21 +291,17 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   onUserSearch(event: any) {
     const term = event.target.value.toLowerCase();
     this.userSearchQuery.set(term);
-    
+
     if (!term) {
       this.filteredUsers.set(this.users());
     } else {
-      const filtered = this.users().filter(u => 
-        (u.firstName && u.firstName.toLowerCase().includes(term)) || 
+      const filtered = this.users().filter(u =>
+        (u.firstName && u.firstName.toLowerCase().includes(term)) ||
         (u.lastName && u.lastName.toLowerCase().includes(term)) ||
         (u.email && u.email.toLowerCase().includes(term))
       );
       this.filteredUsers.set(filtered);
     }
-  }
-
-  toggleViewMode(mode: 'grid' | 'table') {
-    this.viewMode.set(mode);
   }
 
   viewActivity(activity: ActivityLog) {
@@ -199,7 +313,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   }
 
   getActionIcon(action: string): string {
-    switch(action?.toUpperCase()) {
+    switch (action?.toUpperCase()) {
       case 'CREATE': return 'add_circle';
       case 'UPDATE': return 'edit';
       case 'DELETE': return 'delete';
@@ -208,7 +322,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   }
 
   getActionColorClass(action: string): string {
-    switch(action?.toUpperCase()) {
+    switch (action?.toUpperCase()) {
       case 'CREATE': return 'text-emerald-500 bg-emerald-50';
       case 'UPDATE': return 'text-amber-500 bg-amber-50';
       case 'DELETE': return 'text-red-500 bg-red-50';

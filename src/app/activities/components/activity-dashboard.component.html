@@ -1,55 +1,76 @@
 <div class="min-h-screen bg-slate-50/50 p-6 space-y-6">
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
     <!-- Total Activities -->
-    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
-      <div
-        class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
+    <div class="p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-indigo-500 to-indigo-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-indigo-100 text-sm font-medium">Total Activities</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ stats()?.totalActivities || 0 }}</h3>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-activity"></i>
+        </div>
       </div>
-      <div class="relative z-10 flex flex-col h-full">
-        <div class="text-slate-500 text-sm font-medium">Total Activities</div>
-        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalActivities || 0 }}</div>
-        <div class="mt-auto pt-4 text-xs text-slate-400">All time recorded events</div>
+      <div class="mt-4 flex items-center justify-between text-[11px] text-indigo-100 font-medium gap-1">
+        <span>Today: <strong class="text-white">{{ stats()?.todayActivities || 0 }}</strong></span>
+        <span>Week: <strong class="text-white">{{ stats()?.thisWeekActivities || 0 }}</strong></span>
+        <span>Month: <strong class="text-white">{{ stats()?.thisMonthActivities || 0 }}</strong></span>
       </div>
     </div>
 
     <!-- Total Creates -->
-    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
-      <div
-        class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
-      </div>
-      <div class="relative z-10 flex flex-col h-full">
-        <div class="text-slate-500 text-sm font-medium flex items-center gap-2">
-          <mat-icon class="text-emerald-500 text-[18px] w-[18px] h-[18px]">add_circle</mat-icon> Creates
+    <div class="p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-emerald-500 to-emerald-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-emerald-100 text-sm font-medium">Creates</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ stats()?.totalCreates || 0 }}</h3>
         </div>
-        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalCreates || 0 }}</div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-plus-circle-fill"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-between text-[11px] text-emerald-100 font-medium gap-1">
+        <span>Today: <strong class="text-white">{{ stats()?.todayCreates || 0 }}</strong></span>
+        <span>Week: <strong class="text-white">{{ stats()?.thisWeekCreates || 0 }}</strong></span>
+        <span>Month: <strong class="text-white">{{ stats()?.thisMonthCreates || 0 }}</strong></span>
       </div>
     </div>
 
     <!-- Total Updates -->
-    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
-      <div
-        class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-amber-50 to-amber-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
-      </div>
-      <div class="relative z-10 flex flex-col h-full">
-        <div class="text-slate-500 text-sm font-medium flex items-center gap-2">
-          <mat-icon class="text-amber-500 text-[18px] w-[18px] h-[18px]">edit</mat-icon> Updates
+    <div class="p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-amber-500 to-amber-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-amber-100 text-sm font-medium">Updates</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ stats()?.totalUpdates || 0 }}</h3>
         </div>
-        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalUpdates || 0 }}</div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-pencil-square"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-between text-[11px] text-amber-100 font-medium gap-1">
+        <span>Today: <strong class="text-white">{{ stats()?.todayUpdates || 0 }}</strong></span>
+        <span>Week: <strong class="text-white">{{ stats()?.thisWeekUpdates || 0 }}</strong></span>
+        <span>Month: <strong class="text-white">{{ stats()?.thisMonthUpdates || 0 }}</strong></span>
       </div>
     </div>
 
     <!-- Total Deletes -->
-    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 relative overflow-hidden group">
-      <div
-        class="absolute right-0 top-0 w-24 h-24 bg-gradient-to-br from-red-50 to-red-100 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
-      </div>
-      <div class="relative z-10 flex flex-col h-full">
-        <div class="text-slate-500 text-sm font-medium flex items-center gap-2">
-          <mat-icon class="text-red-500 text-[18px] w-[18px] h-[18px]">delete</mat-icon> Deletes
+    <div class="p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 bg-linear-to-br from-red-500 to-red-600">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-red-100 text-sm font-medium">Deletes</p>
+          <h3 class="text-3xl font-bold text-white mt-1">{{ stats()?.totalDeletes || 0 }}</h3>
         </div>
-        <div class="text-3xl font-bold text-slate-800 mt-2">{{ stats()?.totalDeletes || 0 }}</div>
+        <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white text-xl">
+          <i class="bi bi-trash-fill"></i>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center justify-between text-[11px] text-red-100 font-medium gap-1">
+        <span>Today: <strong class="text-white">{{ stats()?.todayDeletes || 0 }}</strong></span>
+        <span>Week: <strong class="text-white">{{ stats()?.thisWeekDeletes || 0 }}</strong></span>
+        <span>Month: <strong class="text-white">{{ stats()?.thisMonthDeletes || 0 }}</strong></span>
       </div>
     </div>
   </div>
@@ -59,13 +80,27 @@
     <div class="grid grid-cols-12 gap-4">
 
       <!-- Search -->
-      <div class="relative w-full col-span-4">
+      <div class="relative w-full col-span-3">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <mat-icon class="text-slate-400 text-[20px] w-[20px] h-[20px]">search</mat-icon>
+          <mat-icon class="text-slate-400 text-[20px] w-5 h-5">search</mat-icon>
         </div>
         <input type="text" placeholder="Search activities..." [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event); onFilterChange()"
           class="w-full pl-10 pr-3 py-2.5 bg-slate-50/50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors">
+      </div>
+
+      <!-- Time Range Filter -->
+      <div class="relative w-full col-span-2">
+        <select [ngModel]="selectedTimeRange()" (ngModelChange)="selectedTimeRange.set($event); onFilterChange()"
+          class="w-full pl-3 pr-10 py-2.5 bg-slate-50/50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors appearance-none">
+          <option value="all">All Time</option>
+          <option value="today">Today</option>
+          <option value="7days">Last 7 Days</option>
+          <option value="30days">Last 30 Days</option>
+        </select>
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+          <mat-icon class="text-[20px] w-5 h-5">expand_more</mat-icon>
+        </div>
       </div>
 
       <!-- User Filter -->
@@ -78,7 +113,7 @@
           </option>
         </select>
         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-          <mat-icon class="text-[20px] w-[20px] h-[20px]">expand_more</mat-icon>
+          <mat-icon class="text-[20px] w-5 h-5">expand_more</mat-icon>
         </div>
       </div>
 
@@ -92,7 +127,7 @@
           <option value="DELETE">Deletes</option>
         </select>
         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-          <mat-icon class="text-[20px] w-[20px] h-[20px]">expand_more</mat-icon>
+          <mat-icon class="text-[20px] w-5 h-5">expand_more</mat-icon>
         </div>
       </div>
 
@@ -106,121 +141,29 @@
           </option>
         </select>
         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-          <mat-icon class="text-[20px] w-[20px] h-[20px]">expand_more</mat-icon>
+          <mat-icon class="text-[20px] w-5 h-5">expand_more</mat-icon>
         </div>
-      </div>
-
-      <!-- View mode -->
-      <div class="col-span-2 flex items-center justify-between bg-white rounded-lg p-1 shadow-xs border border-slate-200">
-        <button (click)="toggleViewMode('table')"
-          [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'table' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')">
-          <mat-icon class="text-[18px] w-[18px] h-[18px]">table_rows</mat-icon>
-        </button>
-        <button (click)="toggleViewMode('grid')"
-          [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'grid' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')">
-          <mat-icon class="text-[18px] w-[18px] h-[18px]">grid_view</mat-icon>
-        </button>
       </div>
 
     </div>
   </div>
 
-  <!-- Loading Overlay wrapper -->
-  <div class="relative min-h-[400px]">
-    <!-- Table View -->
-    <div [class.hidden]="viewMode() !== 'table'"
-      class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300 ease-in-out">
-      <div class="overflow-x-auto">
-        <table mat-table [dataSource]="activities()" matSort class="w-full" [class.opacity-50]="loading()">
-
-          <!-- Timestamp Column -->
-          <ng-container matColumnDef="timestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Date & Time </th>
-            <td mat-cell *matCellDef="let row" class="text-slate-600 whitespace-nowrap py-3">
-              {{ row.timestamp | date:'MMM d, y, h:mm a' }}
-            </td>
-          </ng-container>
-
-          <!-- Action Column -->
-          <ng-container matColumnDef="action">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Action </th>
-            <td mat-cell *matCellDef="let row" class="py-3">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-                [ngClass]="getActionColorClass(row.action)">
-                <mat-icon class="text-[14px] w-[14px] h-[14px]">{{ getActionIcon(row.action) }}</mat-icon>
-                {{ row.action }}
-              </span>
-            </td>
-          </ng-container>
-
-          <!-- Entity Type Column -->
-          <ng-container matColumnDef="entityType">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Entity Type </th>
-            <td mat-cell *matCellDef="let row" class="py-3 text-slate-800 font-medium">
-              {{ row.entityType }}
-            </td>
-          </ng-container>
-
-          <!-- Entity Label Column -->
-          <ng-container matColumnDef="entityLabel">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Entity </th>
-            <td mat-cell *matCellDef="let row" class="py-3 text-slate-600">
-              {{ row.entityLabel || row.entityId }}
-            </td>
-          </ng-container>
-
-          <!-- User Column -->
-          <ng-container matColumnDef="actorEmail">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> User </th>
-            <td mat-cell *matCellDef="let row" class="py-3">
-              <div class="flex items-center gap-2">
-                <div
-                  class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
-                  {{ (row.actorEmail?.charAt(0) || '?') | uppercase }}
-                </div>
-                <span class="text-sm text-slate-700">{{ row.actorEmail || 'System' }}</span>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Message Column -->
-          <ng-container matColumnDef="message">
-            <th mat-header-cell *matHeaderCellDef> Details </th>
-            <td mat-cell *matCellDef="let row" class="py-3 text-slate-500 max-w-xs truncate" [title]="row.message">
-              {{ row.message }}
-            </td>
-          </ng-container>
-
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef class="text-right pr-4"> Actions </th>
-            <td mat-cell *matCellDef="let row" class="py-3 text-right pr-4">
-              <button (click)="viewActivity(row)"
-                class="text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors items-center gap-1 inline-flex cursor-pointer">
-                <mat-icon class="text-[14px] w-[14px] h-[14px]">visibility</mat-icon>
-                View
-              </button>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"
-            class="bg-slate-50 border-b border-slate-200"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-            class="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"></tr>
-
-          <!-- No Data Row -->
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell text-center py-12 text-slate-500" colspan="6">
-              <mat-icon class="text-4xl text-slate-300 mb-2">inbox</mat-icon>
-              <p>No activities found matching your filters.</p>
-            </td>
-          </tr>
-        </table>
-      </div>
+  <!-- Graph View -->
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 h-75">
+    <div class="text-slate-800 font-semibold mb-4">Activity Trends</div>
+    <div class="h-55">
+      <canvas baseChart
+        [data]="lineChartData()"
+        [options]="lineChartOptions"
+        type="line">
+      </canvas>
     </div>
+  </div>
 
-    <!-- Grid View -->
-    <div [class.hidden]="viewMode() !== 'grid'"
+  <!-- Loading Overlay wrapper -->
+  <div class="relative min-h-100">
+
+    <div
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 transition-all duration-300 ease-in-out"
       [class.opacity-50]="loading()">
       <div *ngFor="let row of activities()"
@@ -229,7 +172,7 @@
         <div class="flex items-start gap-4 mb-4">
           <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
             [ngClass]="getActionColorClass(row.action)">
-            <mat-icon class="text-[24px] w-[24px] h-[24px]">{{ getActionIcon(row.action) }}</mat-icon>
+            <mat-icon class="text-[24px] w-6 h-6">{{ getActionIcon(row.action) }}</mat-icon>
           </div>
           <div class="flex-1 min-w-0 pt-1">
             <h3 class="text-base font-semibold text-slate-800 leading-tight mb-1 truncate">{{ row.entityType }}</h3>
@@ -251,7 +194,7 @@
 
           <div>
             <p class="text-sm text-slate-700 truncate flex items-center gap-1.5" [title]="row.actorEmail || 'System'">
-              <mat-icon class="text-[16px] w-[16px] h-[16px] text-slate-400 -ml-0.5">person</mat-icon>
+              <mat-icon class="text-[16px] w-4 h-4 text-slate-400 -ml-0.5">person</mat-icon>
               {{ row.actorEmail || 'System' }}
             </p>
             <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mt-1">User</p>
@@ -265,7 +208,7 @@
 
           <button (click)="viewActivity(row)"
             class="mt-auto w-full flex items-center justify-center gap-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer">
-            <mat-icon class="text-[18px] w-[18px] h-[18px]">visibility</mat-icon>
+            <mat-icon class="text-[18px] w-4.5 h-4.5">visibility</mat-icon>
             View Details
           </button>
         </div>
