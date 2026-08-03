@@ -65,6 +65,9 @@
                 <option *ngFor="let s of candidateStatuses" [value]="s">{{ s }}</option>
               </select>
             </div>
+            <div *ngIf="authStore.orgType() === 'VENDOR'" class="bg-transparent text-xs font-semibold uppercase tracking-wide border-none focus:ring-0 pr-8 text-purple-700 cursor-pointer">
+              {{candidateStatus()}}
+            </div>
             <!-- File Input (Hidden) -->
             <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept=".pdf,.docx,.doc" />
           </div>

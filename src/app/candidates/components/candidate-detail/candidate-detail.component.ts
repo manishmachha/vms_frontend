@@ -56,7 +56,7 @@ export class CandidateDetailComponent implements OnInit {
   private headerService = inject(HeaderService);
   candidate = signal<Candidate | null>(null);
   dashboardStats = signal<DashboardStatsResponse | null>(null);
-
+  candidateStatus = signal<string>('');
   selectedStatus = signal<string>('AVAILABLE');
   brandedResume = signal<BrandedResume | null>(null);
   applications = signal<JobApplication[]>([]);
@@ -94,7 +94,7 @@ export class CandidateDetailComponent implements OnInit {
       next: (c) => {
         this.candidate.set(c);
         this.selectedStatus.set(c.status || 'AVAILABLE');
-
+        this.candidateStatus.set(c.status || 'AVAILABLE');
         this.loadApplications(c.id);
         this.loadInterviews(c.id);
         this.loadBrandedResume(c.id);
