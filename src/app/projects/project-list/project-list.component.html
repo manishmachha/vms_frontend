@@ -1,35 +1,4 @@
 <div class="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Projects</h1>
-      <p class="text-gray-500">Manage client and internal projects</p>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="bg-gray-50 p-1 rounded-xl flex border border-gray-200">
-        <button (click)="toggleView('table')" [class.bg-white]="viewMode() === 'table'"
-          [class.shadow-sm]="viewMode() === 'table'"
-          class="p-2 text-gray-500 hover:text-indigo-600 rounded-lg transition-all cursor-pointer" title="Table View">
-          <i class="bi bi-list-task"></i>
-        </button>
-        <button (click)="toggleView('grid')" [class.bg-white]="viewMode() === 'grid'"
-          [class.shadow-sm]="viewMode() === 'grid'"
-          class="p-2 text-gray-500 hover:text-indigo-600 rounded-lg transition-all cursor-pointer" title="Grid View">
-          <i class="bi bi-grid"></i>
-        </button>
-      </div>
-      <button (click)="loadProjects()"
-        class="p-2.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all border border-gray-200 bg-white cursor-pointer" title="Refresh">
-        <i class="bi bi-arrow-clockwise text-xl"></i>
-      </button>
-      <button
-        (click)="openCreateModal()"
-        class="btn-primary inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer"
-      >
-        <i class="bi bi-plus-lg mr-2"></i> New Project
-      </button>
-    </div>
-  </div>
 
   <!-- Stats Cards -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -110,6 +79,26 @@
       <option value="">All Clients</option>
       <option *ngFor="let client of clients()" [value]="client.id">{{ client.name }}</option>
     </select>
+    <div class="flex items-center gap-3">
+      <div class="bg-gray-50 p-1 rounded-xl flex border border-gray-200">
+        <button (click)="toggleView('table')" [class.bg-white]="viewMode() === 'table'"
+          [class.shadow-sm]="viewMode() === 'table'"
+          class="p-2 text-gray-500 hover:text-indigo-600 rounded-lg transition-all cursor-pointer" title="Table View">
+          <i class="bi bi-list-task"></i>
+        </button>
+        <button (click)="toggleView('grid')" [class.bg-white]="viewMode() === 'grid'"
+          [class.shadow-sm]="viewMode() === 'grid'"
+          class="p-2 text-gray-500 hover:text-indigo-600 rounded-lg transition-all cursor-pointer" title="Grid View">
+          <i class="bi bi-grid"></i>
+        </button>
+      </div>
+      <button
+        (click)="openCreateModal()"
+        class="btn-primary inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer"
+      >
+        <i class="bi bi-plus-lg mr-2"></i> New Project
+      </button>
+    </div>
   </div>
 
   <!-- Project Table View -->

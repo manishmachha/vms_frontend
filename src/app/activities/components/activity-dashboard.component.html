@@ -1,28 +1,4 @@
 <div class="min-h-screen bg-slate-50/50 p-6 space-y-6">
-  
-  <!-- Header & Title -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-    <div>
-      <h1 class="text-2xl font-semibold text-slate-800 tracking-tight">Activity Log</h1>
-      <p class="text-sm text-slate-500 mt-1">Track and monitor all activities across the system</p>
-    </div>
-    <div class="flex items-center bg-white rounded-lg p-1 shadow-xs border border-slate-200">
-      <button 
-        (click)="toggleViewMode('table')"
-        [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'table' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')"
-      >
-        <mat-icon class="text-[18px] w-[18px] h-[18px]">table_rows</mat-icon>
-        Table
-      </button>
-      <button 
-        (click)="toggleViewMode('grid')"
-        [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'grid' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')"
-      >
-        <mat-icon class="text-[18px] w-[18px] h-[18px]">grid_view</mat-icon>
-        Grid
-      </button>
-    </div>
-  </div>
 
   <!-- Stats Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -126,6 +102,23 @@
           <mat-icon class="text-[20px] w-[20px] h-[20px]">expand_more</mat-icon>
         </div>
       </div>
+
+      <div class="flex items-center bg-white rounded-lg p-1 shadow-xs border border-slate-200">
+      <button 
+        (click)="toggleViewMode('table')"
+        [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'table' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')"
+      >
+        <mat-icon class="text-[18px] w-[18px] h-[18px]">table_rows</mat-icon>
+        Table
+      </button>
+      <button 
+        (click)="toggleViewMode('grid')"
+        [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ' + (viewMode() === 'grid' ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:text-slate-700')"
+      >
+        <mat-icon class="text-[18px] w-[18px] h-[18px]">grid_view</mat-icon>
+        Grid
+      </button>
+    </div>
       
     </div>
   </div>
