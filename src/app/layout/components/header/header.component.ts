@@ -33,6 +33,30 @@ export class HeaderComponent {
 
   user = this.authStore.user;
 
+  /** True when VMS is loaded as a microfrontend inside the Solventek shell */
+  isRunningInShell = window.location.pathname.startsWith('/vms');
+
+  /** Controls the mobile shell nav dropdown visibility */
+  shellMenuOpen = false;
+
+  /**
+   * Navigate to a shell-level route.
+   * MFE routes (/vms/..., /hrms/...) use the Angular Router.
+   * Shell-only routes (/, /contact) use full-page navigation.
+   */
+  navigateToShellRoute(path: string): void {
+    if (path.startsWith('/vms') || path.startsWith('/hrms')) {
+      this.router.navigateByUrl(path);
+    } else {
+      window.location.href = path;
+    }
+  }
+
+  /** Check if a specific MFE is currently active */
+  isActiveMfe(mfeName: string): boolean {
+    return window.location.pathname.startsWith(`/${mfeName}`);
+  }
+
   logout() {
     this.authService.logout();
     this.mfeNav.navigate('/');
