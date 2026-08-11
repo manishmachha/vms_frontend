@@ -1,15 +1,14 @@
 import { Organization } from './organization.model';
 
 // ===== Job Status (matches backend JobStatus enum) =====
-export type JobStatus =
-  | 'DRAFT'
-  | 'SUBMITTED'
-  | 'ADMIN_VERIFIED'
-  | 'TA_ENRICHED'
-  | 'ADMIN_FINAL_VERIFIED'
-  | 'PUBLISHED'
-  | 'PAUSED'
-  | 'CLOSED';
+export enum JobStatus {
+  DRAFT = 'DRAFT',
+  SUBMITTED = 'SUBMITTED',
+  VERIFIED = 'VERIFIED',
+  PUBLISHED = 'PUBLISHED',
+  CLOSED = 'CLOSED',
+  DEFERRED = 'DEFERRED'
+}
 
 // ===== Employment Type (matches backend EmploymentType enum) =====
 export type EmploymentType = 'FTE' | 'C2H';

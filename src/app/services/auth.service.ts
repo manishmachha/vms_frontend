@@ -34,6 +34,9 @@ export class AuthService {
   }
 
   logout() {
-    this.store.logout();
+    this.api.post('/v1/auth/logout', {}).subscribe({
+      next: () => this.store.logout(),
+      error: () => this.store.logout()
+    });
   }
 }

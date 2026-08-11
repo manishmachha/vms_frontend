@@ -95,28 +95,21 @@ export class JobDetailComponent implements OnInit {
     return this.canManage() && !this.authStore.isTA();
   }
 
+  canDeleteJob() {
+    return this.authStore.userRole() === 'SUPER_ADMIN';
+  }
+
   canVerify() {
     return (
       this.canPerformCriticalAction() &&
       (this.job()?.status === 'SUBMITTED' || this.job()?.status === 'DRAFT')
     );
   }
-  canEnrich() {
-    return (
-      this.canManage() && // TA can enrich
-      this.job()?.status === 'ADMIN_VERIFIED'
-    );
-  }
-  canFinalVerify() {
-    return (
-      this.canPerformCriticalAction() && // TA cannot final verify/approve
-      (this.job()?.status === 'TA_ENRICHED' || this.job()?.status === 'ADMIN_VERIFIED')
-    );
-  }
+
   canPublish() {
     return (
       this.canPerformCriticalAction() && // TA cannot publish
-      this.job()?.status === 'ADMIN_FINAL_VERIFIED'
+      this.job()?.status === 'VERIFIED'
     );
   }
 
@@ -142,14 +135,12 @@ export class JobDetailComponent implements OnInit {
         return 'bg-gray-100 text-gray-800 border border-gray-200';
       case 'SUBMITTED':
         return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-      case 'ADMIN_VERIFIED':
+      case 'VERIFIED':
         return 'bg-blue-100 text-blue-800 border border-blue-200';
-      case 'TA_ENRICHED':
-        return 'bg-purple-100 text-purple-800 border border-purple-200';
-      case 'ADMIN_FINAL_VERIFIED':
-        return 'bg-indigo-100 text-indigo-800 border border-indigo-200';
       case 'CLOSED':
         return 'bg-red-100 text-red-800 border border-red-200';
+      case 'DEFERRED':
+        return 'bg-orange-100 text-orange-800 border border-orange-200';
       default:
         return 'bg-gray-100 text-gray-800 border border-gray-200';
     }
@@ -163,14 +154,12 @@ export class JobDetailComponent implements OnInit {
         return 'bi-file-earmark';
       case 'SUBMITTED':
         return 'bi-send';
-      case 'ADMIN_VERIFIED':
+      case 'VERIFIED':
         return 'bi-check-circle';
-      case 'TA_ENRICHED':
-        return 'bi-stars';
-      case 'ADMIN_FINAL_VERIFIED':
-        return 'bi-shield-check';
       case 'CLOSED':
         return 'bi-x-circle';
+      case 'DEFERRED':
+        return 'bi-pause-circle';
       default:
         return 'bi-circle';
     }

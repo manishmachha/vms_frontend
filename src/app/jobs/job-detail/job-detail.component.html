@@ -245,14 +245,6 @@
               <i class="bi bi-check-circle mr-2"></i> Verify Job
             </button>
 
-            <button *ngIf="canEnrich()" (click)="openEnrichForm()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-white bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg shadow-purple-200">
-              <i class="bi bi-magic mr-2"></i> Enrich Job
-            </button>
-
-            <button *ngIf="canFinalVerify()" (click)="onFinalVerify()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-white bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-md hover:shadow-lg shadow-emerald-200">
-              <i class="bi bi-cash-coin mr-2"></i> Final Verify & Rates
-            </button>
-
             <button *ngIf="canPublish()" (click)="publish()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-white bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg shadow-blue-200">
               <i class="bi bi-globe mr-2"></i> Publish Job
             </button>
@@ -265,7 +257,7 @@
               <i class="bi bi-arrow-repeat mr-2"></i> Update Status
             </button>
 
-            <button *ngIf="canPerformCriticalAction()" (click)="deleteJob()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-red-600 bg-red-50 border border-red-100 hover:bg-red-100 transition-all shadow-xs">
+            <button *ngIf="canDeleteJob()" (click)="deleteJob()" class="w-full inline-flex justify-center items-center px-4 py-2.5 text-sm font-medium rounded-xl text-red-600 bg-red-50 border border-red-100 hover:bg-red-100 transition-all shadow-xs">
               <i class="bi bi-trash mr-2"></i> Delete Job
             </button>
 
@@ -278,7 +270,7 @@
               </label>
             </div>
 
-            <div *ngIf="!canVerify() && !canEnrich() && !canFinalVerify() && !canPublish() && !canManage()" class="text-center py-4">
+            <div *ngIf="!canVerify() && !canPublish() && !canManage()" class="text-center py-4">
               <div class="p-4 bg-gray-50 border border-gray-100 border-dashed rounded-xl">
                 <i class="bi bi-info-circle text-gray-400 text-xl mb-2"></i>
                 <p class="text-sm text-gray-500 font-medium">No actions available at this stage</p>
