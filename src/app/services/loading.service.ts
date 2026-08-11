@@ -28,12 +28,10 @@ export class LoadingService {
   }
 
   hide() {
-    setTimeout(() => {
-      this.activeRequests.update((count) => {
-        const next = Math.max(0, count - 1);
-        console.log(`[LoadingService #${this.id}] hide() called. Active requests: ${next}`);
-        return next;
-      });
+    this.activeRequests.update((count) => {
+      const next = Math.max(0, count - 1);
+      console.log(`[LoadingService #${this.id}] hide() called. Active requests: ${next}`);
+      return next;
     });
   }
 }

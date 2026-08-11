@@ -32,9 +32,7 @@ export class LoadingInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       finalize(() => {
         console.log('[LoadingInterceptor] Hiding loader for:', req.url);
-        setTimeout(() => {
-          this.loadingService.hide();
-        });
+        this.loadingService.hide();
       }),
     );
   }

@@ -187,6 +187,5 @@ export class AuthStore {
     sessionStorage.removeItem('vms_access_token');
     sessionStorage.removeItem('vms_refresh_token');
     sessionStorage.removeItem('vms_user');
-    sessionStorage.removeItem('mfe_last_route_vms');
   }
 }
