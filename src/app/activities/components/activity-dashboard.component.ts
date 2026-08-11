@@ -93,7 +93,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   public lineChartType: ChartType = 'line';
 
   // RxJS triggers for fetching data
-  private filterChange$ = new BehaviorSubject<void>(undefined);
+  private filterChange$ = new Subject<void>();
   private destroy$ = new Subject<void>();
 
   constructor() {
@@ -110,6 +110,7 @@ export class ActivityDashboardComponent implements OnInit, AfterViewInit, OnDest
   ngOnInit() {
     this.loadStats();
     this.loadUsers();
+    this.loadActivities();
   }
 
   ngAfterViewInit() {
