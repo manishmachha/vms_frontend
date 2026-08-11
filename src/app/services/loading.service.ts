@@ -34,6 +34,6 @@ export class LoadingService {
         console.log(`[LoadingService #${this.id}] hide() called. Active requests: ${next}`);
         return next;
       });
-    }, 500); // 500ms delay so the loader has time to fade in and be visible
+    });
   }
 }
